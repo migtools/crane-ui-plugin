@@ -11,6 +11,7 @@ import { PlusCircleIcon } from "@patternfly/react-icons";
 import { Title } from "@patternfly/react-core/dist/esm/components/Title/Title";
 import { EmptyStateBody } from "@patternfly/react-core/dist/esm/components/EmptyState/EmptyStateBody";
 import CreatePlanButton from "./CreatePlanButton";
+import PlansTable from "./PlansTable";
 
 const PlansList: React.FC = () => {
   const plansQuery = usePlansQuery();
@@ -35,16 +36,13 @@ const PlansList: React.FC = () => {
                 <CreatePlanButton />
               </EmptyState>
             ) : (
-              <div>
-                Plans list:
-                {plansQuery?.data?.items.map((d) => (
-                  <div key={d.metadata.name}>{d.metadata.name}</div>
-                ))}
-              </div>
-              // <PlansTable
-              //   plans={plansQuery.data?.items || []}
-              //   errorContainerRef={errorContainerRef}
-              // />
+              // <div>
+              //   Plans list:
+              //   {plansQuery?.data?.items.map((d) => (
+              //     <div key={d.metadata.name}>{d.metadata.name}</div>
+              //   ))}
+              // </div>
+              <PlansTable planList={plansQuery.data?.items || []} />
             )}
           </CardBody>
         </Card>
