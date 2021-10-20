@@ -3,7 +3,6 @@ import { Button, Flex, FlexItem } from "@patternfly/react-core";
 import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
 import {
   sortable,
-  truncate,
   cellWidth,
   TableComposable,
   Caption,
@@ -13,7 +12,7 @@ import {
   Thead,
   Tr,
 } from "@patternfly/react-table";
-import { useCreatePlanMutation } from "./plans";
+import { useCreateClusterMutation } from "./clusters";
 
 interface IPlansTableProps {
   planList: any[];
@@ -24,43 +23,24 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
 }: IPlansTableProps) => {
   const columns = [
     { title: "Name", transforms: [sortable, cellWidth(10)] },
-    { title: "Source", transforms: [sortable, cellWidth(10)] },
-    { title: "Target", transforms: [sortable, cellWidth(10)] },
-    { title: "Repository", transforms: [sortable, cellWidth(10)] },
-    {
-      title: "Namespaces",
-      transforms: [sortable, cellWidth(15)],
-    },
-    {
-      title: "Last state",
-      transforms: [sortable, cellWidth(40)],
-      cellTransforms: [truncate],
-    },
+    { title: "Namespace", transforms: [sortable, cellWidth(10)] },
+    { title: "Host cluster", transforms: [sortable, cellWidth(10)] },
   ];
   console.log("columns", columns);
 
   const rows = planList.map((plan: any) => {
-    console.log("plan", plan);
     return {
       cells: [
         plan.metadata.name,
-        plan.spec.srcMigClusterRef.name,
-        plan.spec.destMigClusterRef.name,
-        plan.spec.migStorageRef.name,
-        <ul>
-          {plan.spec?.namespaces.map((ns) => {
-            <li>Namespace: {ns}</li>;
-          })}
-        </ul>,
-        "Status",
+        plan.metadata.namespace,
+        plan.spec.isHostCluster,
       ],
       meta: {
         id: "thisid",
       }, // See comments on onSelect
     };
   });
-  console.log("rows", rows);
-  const createPlanMutation = useCreatePlanMutation();
+  const createClusterMutation = useCreateClusterMutation();
 
   return (
     <>
@@ -68,12 +48,12 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
         <FlexItem>
           <Button
             onClick={() => {
-              createPlanMutation.mutate("mockvals");
+              createClusterMutation.mutate("mockvals");
             }}
             id="add-plan-btn"
             variant="secondary"
           >
-            Add migration plan
+            Add cluster
           </Button>
         </FlexItem>
         <FlexItem
@@ -83,22 +63,18 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
         ></FlexItem>
       </Flex>
       <TableComposable aria-label="Simple table">
-        <Caption>Migration plans</Caption>
+        <Caption>Migration clusters</Caption>
         <Thead>
           <Tr>
             <Th width={20}>{columns[0].title} </Th>
             <Th width={10}>{columns[1].title}</Th>
             <Th width={10}>{columns[2].title}</Th>
-            <Th width={10}>{columns[3].title}</Th>
-            <Th width={10}>{columns[4].title}</Th>
-            <Th width={10}>{columns[5].title}</Th>
           </Tr>
         </Thead>
         <Tbody>
           {rows.map((row, rowIndex) => (
             <Tr key={rowIndex}>
               {row.cells.map((cell, cellIndex) => {
-                console.log("what is cell", cell);
                 return (
                   <>
                     <Td key={`${rowIndex}_${cellIndex}`}>{cell}</Td>

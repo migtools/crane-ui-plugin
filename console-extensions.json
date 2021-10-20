@@ -36,17 +36,16 @@
     "type": "console.page/route",
     "properties": {
       "exact": false,
-      "path": "/plans",
-      "component": { "$codeRef": "plansComp" }
+      "path": "/storagerepos",
+      "component": { "$codeRef": "storageReposComp" }
     }
   },
   {
-    "type": "console.navigation/href",
+    "type": "console.page/route",
     "properties": {
-      "id": "plans-page",
-      "name": "Plans",
-      "href": "/plans",
-      "section": "admin-migrations-section"
+      "exact": false,
+      "path": "/plans",
+      "component": { "$codeRef": "plansComp" }
     }
   },
   {
@@ -55,6 +54,24 @@
       "id": "clusters-page",
       "name": "Clusters",
       "href": "/clusters",
+      "section": "admin-migrations-section"
+    }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "id": "storage-repos-page",
+      "name": "Replication repositories",
+      "href": "/storagerepos",
+      "section": "admin-migrations-section"
+    }
+  },
+  {
+    "type": "console.navigation/href",
+    "properties": {
+      "id": "plans-page",
+      "name": "Migration plans",
+      "href": "/plans",
       "section": "admin-migrations-section"
     }
   },

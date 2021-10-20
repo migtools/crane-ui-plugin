@@ -55,7 +55,8 @@
     "exposedModules": {
       "barUtils": "./utils/bar",
       "clustersComp": "./components/ClustersPage.tsx",
-      "plansComp": "./components/PlansPage.tsx"
+      "plansComp": "./components/PlansPage.tsx",
+      "storageReposComp": "./components/StorageReposPage.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"

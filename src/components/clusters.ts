@@ -88,12 +88,12 @@ export class MigResource extends NamespacedResource {
     return this._gvk;
   }
 }
-const planResource = new MigResource(
-  MigResourceKind.MigPlan,
+const clusterResource = new MigResource(
+  MigResourceKind.MigCluster,
   "openshift-migration"
 );
 
-export const usePlansQuery = (): UseQueryResult<IKubeList<any>> => {
+export const useClustersQuery = (): UseQueryResult<IKubeList<any>> => {
   const client = useAuthorizedK8sClient();
   const sortKubeListByNameCallback = React.useCallback(
     (data): IKubeList<any> => data,
@@ -101,15 +101,14 @@ export const usePlansQuery = (): UseQueryResult<IKubeList<any>> => {
   );
   const result = useMockableQuery<IKubeList<any>>(
     {
-      queryKey: "plans",
+      queryKey: "clusters",
       queryFn: async () =>
-        (await client.list<IKubeList<any>>(planResource)).data,
+        (await client.list<IKubeList<any>>(clusterResource)).data,
       refetchInterval: 5000,
       select: sortKubeListByNameCallback,
     },
-    mockKubeList(null, "Plan")
+    mockKubeList(null, "Cluster")
   );
-  debugger;
   console.log("result", result);
   return result;
 };
@@ -169,7 +168,7 @@ export const useMockableMutation = <
   );
 };
 
-export const useCreatePlanMutation = (
+export const useCreateClusterMutation = (
   onSuccess?: () => void
 ): UseMutationResult<
   IKubeResponse<any>,
@@ -208,9 +207,12 @@ export const useCreatePlanMutation = (
         },
       };
 
-      const planResponse = await client.create<any>(planResource, mockPlan);
+      const clusterResponse = await client.create<any>(
+        clusterResource,
+        mockPlan
+      );
 
-      return planResponse;
+      return clusterResponse;
     },
     {
       onSuccess: () => {
