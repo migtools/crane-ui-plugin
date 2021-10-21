@@ -9,8 +9,8 @@ import { EmptyStateIcon } from "@patternfly/react-core/dist/esm/components/Empty
 import { PlusCircleIcon } from "@patternfly/react-icons";
 import { Title } from "@patternfly/react-core/dist/esm/components/Title/Title";
 import { EmptyStateBody } from "@patternfly/react-core/dist/esm/components/EmptyState/EmptyStateBody";
-import CreatePlanButton from "./CreatePlanButton";
-import { useClustersQuery } from "./clusters";
+import CreatePlanButton from "../../common/CreatePlanButton";
+import { useClustersQuery } from "../../queries/clusters";
 import ClustersTable from "./ClustersTable";
 
 const ClustersList: React.FC = () => {

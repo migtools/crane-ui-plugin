@@ -1,16 +1,16 @@
 import * as React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import StorageReposList from "./StorageReposList";
+import ClustersList from "./components/ClustersList";
 
-const StorageReposPage: React.FC = () => {
+const ClustersPage: React.FC = () => {
   const queryClient = new QueryClient();
   // TODO: Handle Auth when the shared token is made available from the console.
   // https://github.com/openshift/api/pull/1020
   return (
     <QueryClientProvider client={queryClient}>
-      <StorageReposList></StorageReposList>
+      <ClustersList></ClustersList>
     </QueryClientProvider>
   );
 };
 
-export default StorageReposPage;
+export default ClustersPage;

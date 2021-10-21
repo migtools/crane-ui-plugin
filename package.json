@@ -54,9 +54,9 @@
     "description": "Plugin for MTC within the console.",
     "exposedModules": {
       "barUtils": "./utils/bar",
-      "clustersComp": "./components/ClustersPage.tsx",
-      "plansComp": "./components/PlansPage.tsx",
-      "storageReposComp": "./components/StorageReposPage.tsx"
+      "clustersComp": "./app/Clusters/ClustersPage.tsx",
+      "plansComp": "./app/Plans/PlansPage.tsx",
+      "storageReposComp": "./app/StorageRepos/StorageReposPage.tsx"
     },
     "dependencies": {
       "@console/pluginAPI": "*"

@@ -13,7 +13,7 @@ import {
   Thead,
   Tr,
 } from "@patternfly/react-table";
-import { useCreatePlanMutation } from "./plans";
+import { useCreatePlanMutation } from "../../queries/plans";
 
 interface IPlansTableProps {
   planList: any[];
@@ -59,7 +59,6 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
       }, // See comments on onSelect
     };
   });
-  console.log("rows", rows);
   const createPlanMutation = useCreatePlanMutation();
 
   return (

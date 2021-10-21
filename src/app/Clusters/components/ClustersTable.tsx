@@ -12,7 +12,7 @@ import {
   Thead,
   Tr,
 } from "@patternfly/react-table";
-import { useCreateClusterMutation } from "./clusters";
+import { useCreateClusterMutation } from "../..//queries/clusters";
 
 interface IPlansTableProps {
   planList: any[];

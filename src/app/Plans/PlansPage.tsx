@@ -1,6 +1,6 @@
 import * as React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import PlansList from "./PlansList";
+import PlansList from "./components/PlansList";
 
 const PlansPage: React.FC = () => {
   const queryClient = new QueryClient();

@@ -9,37 +9,34 @@ import { EmptyStateIcon } from "@patternfly/react-core/dist/esm/components/Empty
 import { PlusCircleIcon } from "@patternfly/react-icons";
 import { Title } from "@patternfly/react-core/dist/esm/components/Title/Title";
 import { EmptyStateBody } from "@patternfly/react-core/dist/esm/components/EmptyState/EmptyStateBody";
-import CreatePlanButton from "./CreatePlanButton";
-import { useStorageReposQuery } from "./storageRepos";
-import StorageReposTable from "./StorageReposTable";
+import CreatePlanButton from "../../common/CreatePlanButton";
+import PlansTable from "./PlansTable";
+import { usePlansQuery } from "../../queries/plans";
 
-const StorageReposList: React.FC = () => {
-  const storageReposQuery = useStorageReposQuery();
+const PlansList: React.FC = () => {
+  const plansQuery = usePlansQuery();
   return (
     <PageSection>
       <ResolvedQuery
-        result={storageReposQuery}
-        errorTitle={"Could not load clusters"}
+        result={plansQuery}
+        errorTitle={"Could not load plans"}
         errorsInline={false}
       >
         <Card>
           <CardBody>
-            {!storageReposQuery.data ? null : storageReposQuery.data.items
-                .length === 0 ? (
+            {!plansQuery.data ? null : plansQuery.data.items.length === 0 ? (
               <EmptyState className={spacing.my_2xl}>
                 <EmptyStateIcon icon={PlusCircleIcon} />
                 <Title size="lg" headingLevel="h2">
-                  No clusters
+                  No migration plans
                 </Title>
                 <EmptyStateBody>
-                  Create a cluster to migrate to or from{" "}
+                  Create a migration plan to select clusters to migrate to{" "}
                 </EmptyStateBody>
                 <CreatePlanButton />
               </EmptyState>
             ) : (
-              <StorageReposTable
-                storageList={storageReposQuery.data?.items || []}
-              />
+              <PlansTable planList={plansQuery.data?.items || []} />
             )}
           </CardBody>
         </Card>
@@ -48,4 +45,4 @@ const StorageReposList: React.FC = () => {
   );
 };
 
-export default StorageReposList;
+export default PlansList;
