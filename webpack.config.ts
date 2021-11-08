@@ -7,12 +7,14 @@ import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk/lib/i
 const { stylePaths } = require('./stylePaths');
 
 const config: webpack.Configuration = {
-  mode: 'development',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   context: path.resolve(__dirname, 'src'),
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-bundle.js',
-    chunkFilename: '[name]-chunk.js',
+    filename:
+      process.env.NODE_ENV === 'production' ? '[name]-bundle-[hash].min.js' : '[name]-bundle.js',
+    chunkFilename:
+      process.env.NODE_ENV === 'production' ? '[name]-chunk-[chunkhash].min.js' : '[name]-chunk.js',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -76,17 +78,9 @@ const config: webpack.Configuration = {
   plugins: [new ConsoleRemotePlugin()],
   devtool: 'source-map',
   optimization: {
-    chunkIds: 'named',
-    minimize: false,
+    chunkIds: process.env.NODE_ENV === 'production' ? 'deterministic' : 'named',
+    minimize: process.env.NODE_ENV === 'production' ? true : false,
   },
 };
-
-if (process.env.NODE_ENV === 'production') {
-  config.mode = 'production';
-  config.output.filename = '[name]-bundle-[hash].min.js';
-  config.output.chunkFilename = '[name]-chunk-[chunkhash].min.js';
-  config.optimization.chunkIds = 'deterministic';
-  config.optimization.minimize = true;
-}
 
 export default config;

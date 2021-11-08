@@ -92,13 +92,13 @@ export const useStorageReposQuery = (): UseQueryResult<IKubeList<any>> => {
       refetchInterval: 5000,
       select: sortKubeListByNameCallback,
     },
-    mockKubeList(null, 'Storage')
+    mockKubeList([], 'Storage')
   );
   return result;
 };
 
 export const mockKubeList = <T>(items: T[], kind: string): IKubeList<T> => ({
-  apiVersion: null,
+  apiVersion: '',
   items,
   kind,
   metadata: {
@@ -140,7 +140,7 @@ export const useMockableMutation = <
       return await mutationFn(vars);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error) {
-      console.error(error.response);
+      console.error(error);
       checkExpiry(error, history);
       throw error;
     }
