@@ -1,6 +1,6 @@
-import * as React from "react";
-import { Button, Flex, FlexItem } from "@patternfly/react-core";
-import spacing from "@patternfly/react-styles/css/utilities/Spacing/spacing";
+import * as React from 'react';
+import { Button, Flex, FlexItem } from '@patternfly/react-core';
+import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
   sortable,
   truncate,
@@ -12,35 +12,33 @@ import {
   Th,
   Thead,
   Tr,
-} from "@patternfly/react-table";
-import { useCreatePlanMutation } from "../../queries/plans";
+} from '@patternfly/react-table';
+import { useCreatePlanMutation } from '../../queries/plans';
 
 interface IPlansTableProps {
   planList: any[];
 }
 
-const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
-  planList,
-}: IPlansTableProps) => {
+const PlansTable: React.FunctionComponent<IPlansTableProps> = ({ planList }: IPlansTableProps) => {
   const columns = [
-    { title: "Name", transforms: [sortable, cellWidth(10)] },
-    { title: "Source", transforms: [sortable, cellWidth(10)] },
-    { title: "Target", transforms: [sortable, cellWidth(10)] },
-    { title: "Repository", transforms: [sortable, cellWidth(10)] },
+    { title: 'Name', transforms: [sortable, cellWidth(10)] },
+    { title: 'Source', transforms: [sortable, cellWidth(10)] },
+    { title: 'Target', transforms: [sortable, cellWidth(10)] },
+    { title: 'Repository', transforms: [sortable, cellWidth(10)] },
     {
-      title: "Namespaces",
+      title: 'Namespaces',
       transforms: [sortable, cellWidth(15)],
     },
     {
-      title: "Last state",
+      title: 'Last state',
       transforms: [sortable, cellWidth(40)],
       cellTransforms: [truncate],
     },
   ];
-  console.log("columns", columns);
+  console.log('columns', columns);
 
   const rows = planList.map((plan: any) => {
-    console.log("plan", plan);
+    console.log('plan', plan);
     return {
       cells: [
         plan.metadata.name,
@@ -52,10 +50,10 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
             <li>Namespace: {ns}</li>;
           })}
         </ul>,
-        "Status",
+        'Status',
       ],
       meta: {
-        id: "thisid",
+        id: 'thisid',
       }, // See comments on onSelect
     };
   });
@@ -67,7 +65,7 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
         <FlexItem>
           <Button
             onClick={() => {
-              createPlanMutation.mutate("mockvals");
+              createPlanMutation.mutate('mockvals');
             }}
             id="add-plan-btn"
             variant="secondary"
@@ -77,8 +75,8 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
         </FlexItem>
         <FlexItem
           className={`${spacing.mrLg}`}
-          alignSelf={{ default: "alignSelfFlexEnd" }}
-          flex={{ default: "flex_1" }}
+          alignSelf={{ default: 'alignSelfFlexEnd' }}
+          flex={{ default: 'flex_1' }}
         ></FlexItem>
       </Flex>
       <TableComposable aria-label="Simple table">
@@ -97,7 +95,7 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({
           {rows.map((row, rowIndex) => (
             <Tr key={rowIndex}>
               {row.cells.map((cell, cellIndex) => {
-                console.log("what is cell", cell);
+                console.log('what is cell', cell);
                 return (
                   <>
                     <Td key={`${rowIndex}_${cellIndex}`}>{cell}</Td>

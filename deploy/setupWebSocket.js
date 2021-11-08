@@ -50,7 +50,7 @@ function setupWebSocket(app) {
               if (error) {
                 console.log(`error: ${error}`);
               }
-            },
+            }
           );
       }
     });
@@ -59,7 +59,7 @@ function setupWebSocket(app) {
     ctx.on('close', () => {});
   });
 
-  server.listen(port, function() {
+  server.listen(port, function () {
     console.log(`http/ws server listening on ${port}`);
   });
 }

@@ -1,6 +1,6 @@
-import * as React from "react";
-import { Route } from "react-router-dom";
-import RedirectToLogin from "./RedirectToLogin";
+import * as React from 'react';
+import { Route } from 'react-router-dom';
+import RedirectToLogin from './RedirectToLogin';
 
 interface IProps {
   component: React.FunctionComponent;
@@ -15,11 +15,6 @@ const PrivateRoute: React.FunctionComponent<IProps> = ({
   componentProps = {},
   path,
   ...rest
-}) => (
-  <Route
-    {...rest}
-    render={(props) => (isLoggedIn ? <Component /> : <RedirectToLogin />)}
-  />
-);
+}) => <Route {...rest} render={(props) => (isLoggedIn ? <Component /> : <RedirectToLogin />)} />;
 
 export default PrivateRoute;
