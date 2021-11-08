@@ -1,3 +1,11 @@
+# Crane UI - OpenShift Dynamic Plugin
+
+NOTE: This repo is brand new and under active prerelease development.
+
+TODO: Update README. The below contents are copied from https://github.com/openshift/console/tree/master/dynamic-demo-plugin
+
+---
+
 # OpenShift Console Demo Plugin
 
 This project emulates a standalone repository hosting a sample
