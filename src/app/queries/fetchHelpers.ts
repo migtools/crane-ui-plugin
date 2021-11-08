@@ -40,7 +40,7 @@ export const useFetchContext = (): IFetchContext => {
   // const { checkExpiry, currentUser } = useNetworkContext();
 
   let checkExpiry;
-  let currentUser = {
+  const currentUser = {
     access_token: 'SHA-TOKEN-HERE',
     expiry_time: 8333,
   };
@@ -132,7 +132,7 @@ export const useAuthorizedK8sClient = () => {
 
 export const useClientInstance = (): ClusterClient => {
   // const { currentUser } = useNetworkContext();
-  let currentUser = {
+  const currentUser = {
     access_token: 'SHA-TOKEN-HERE',
     expiry_time: 86400,
   };
