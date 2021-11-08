@@ -13,7 +13,8 @@
     "lint:fix": "yarn lint --fix",
     "format": "./node_modules/.bin/prettier --check --write ./**/*.{tsx,ts,js}",
     "tsc": "./node_modules/.bin/tsc --project ./tsconfig.json --noEmit",
-    "type-check": "yarn tsc"
+    "type-check": "yarn tsc",
+    "ci": "yarn type-check && yarn lint"
   },
   "dependencies": {
     "@konveyor/lib-ui": "^5.2.0",
