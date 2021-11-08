@@ -1,4 +1,5 @@
 /* eslint-env node */
+/* eslint-disable @typescript-eslint/no-var-requires */
 
 import * as webpack from 'webpack';
 import * as path from 'path';

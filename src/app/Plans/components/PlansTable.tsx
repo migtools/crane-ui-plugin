@@ -45,10 +45,10 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({ planList }: IPl
         plan.spec.srcMigClusterRef.name,
         plan.spec.destMigClusterRef.name,
         plan.spec.migStorageRef.name,
-        <ul>
-          {plan.spec?.namespaces.map((ns) => {
-            <li>Namespace: {ns}</li>;
-          })}
+        <ul key="namespaces">
+          {plan.spec?.namespaces.map((ns) => (
+            <li key={ns}>Namespace: {ns}</li>
+          ))}
         </ul>,
         'Status',
       ],
@@ -96,11 +96,7 @@ const PlansTable: React.FunctionComponent<IPlansTableProps> = ({ planList }: IPl
             <Tr key={rowIndex}>
               {row.cells.map((cell, cellIndex) => {
                 console.log('what is cell', cell);
-                return (
-                  <>
-                    <Td key={`${rowIndex}_${cellIndex}`}>{cell}</Td>
-                  </>
-                );
+                return <Td key={`${rowIndex}_${cellIndex}`}>{cell}</Td>;
               })}
             </Tr>
           ))}

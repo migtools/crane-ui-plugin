@@ -94,7 +94,6 @@ export const usePlansQuery = (): UseQueryResult<IKubeList<any>> => {
     },
     mockKubeList(null, 'Plan')
   );
-  debugger;
   console.log('result', result);
   return result;
 };
