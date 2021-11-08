@@ -92,7 +92,7 @@ export const usePlansQuery = (): UseQueryResult<IKubeList<any>> => {
       refetchInterval: 5000,
       select: sortKubeListByNameCallback,
     },
-    mockKubeList([], 'Plan')
+    mockKubeList(null, 'Plan')
   );
   console.log('result', result);
   return result;
