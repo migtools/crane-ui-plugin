@@ -1,13 +1,13 @@
-import { useLocation, Redirect } from "react-router-dom";
-import { useHistory } from "react-router-dom";
-import { useEffect } from "react";
-import * as React from "react";
+import { useLocation, Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import { useEffect } from 'react';
+import * as React from 'react';
 
 const LoginHandlerComponent: React.FunctionComponent = () => {
   const history = useHistory();
   const searchParams = new URLSearchParams(useLocation().search);
-  const userStr = searchParams.get("user");
-  const errorStr = searchParams.get("error");
+  const userStr = searchParams.get('user');
+  const errorStr = searchParams.get('error');
   let user: any;
   let loginError: any;
   try {
@@ -20,8 +20,8 @@ const LoginHandlerComponent: React.FunctionComponent = () => {
 
   useEffect(() => {
     if (loginError) {
-      console.log("Authentication error: ", loginError.message);
-      history.push("/auth-error");
+      console.log('Authentication error: ', loginError.message);
+      history.push('/auth-error');
     } else if (user) {
       //redirect
     }

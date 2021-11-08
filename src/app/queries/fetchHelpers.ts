@@ -1,14 +1,14 @@
-import { QueryFunction, MutateFunction } from "react-query/types/core/types";
-import { useHistory } from "react-router-dom";
-import { History, LocationState } from "history";
-import { KubeResource } from "@konveyor/lib-ui";
+import { QueryFunction, MutateFunction } from 'react-query/types/core/types';
+import { useHistory } from 'react-router-dom';
+import { History, LocationState } from 'history';
+import { KubeResource } from '@konveyor/lib-ui';
 import {
   ClusterClient,
   ClientFactory,
   // NamespacedResource,
   // CoreNamespacedResourceKind,
   // CoreNamespacedResource,
-} from "@konveyor/lib-ui";
+} from '@konveyor/lib-ui';
 
 interface IFetchContext {
   history: History<LocationState>;
@@ -40,8 +40,8 @@ export const useFetchContext = (): IFetchContext => {
   // const { checkExpiry, currentUser } = useNetworkContext();
 
   let checkExpiry;
-  let currentUser = {
-    access_token: "SHA-TOKEN-HERE",
+  const currentUser = {
+    access_token: 'SHA-TOKEN-HERE',
     expiry_time: 8333,
   };
   return { history: useHistory(), checkExpiry, currentUser };
@@ -50,7 +50,7 @@ export const useFetchContext = (): IFetchContext => {
 export const authorizedFetch = async <T>(
   url: string,
   fetchContext: IFetchContext,
-  extraHeaders: RequestInit["headers"] = {}
+  extraHeaders: RequestInit['headers'] = {}
 ): Promise<T> => {
   // const { history, checkExpiry } = fetchContext;
   try {
@@ -66,7 +66,7 @@ export const authorizedFetch = async <T>(
       throw response;
     }
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error);
     // checkExpiry(error, history);
     throw error;
   }
@@ -81,13 +81,9 @@ export const authorizedPost = async <T, TData>(
   url: string,
   fetchContext: IFetchContext,
   data?: TData
-): Promise<T> =>
-  authorizedFetch(url, fetchContext, { body: JSON.stringify(data) });
+): Promise<T> => authorizedFetch(url, fetchContext, { body: JSON.stringify(data) });
 
-export const useAuthorizedPost = <T, TData>(
-  url: string,
-  data: TData
-): MutateFunction<T, TData> => {
+export const useAuthorizedPost = <T, TData>(url: string, data: TData): MutateFunction<T, TData> => {
   const fetchContext = useFetchContext();
   return () => authorizedPost(url, fetchContext, data);
 };
@@ -106,7 +102,7 @@ export const authorizedK8sRequest = async <T>(
       throw response;
     }
   } catch (error) {
-    console.log("error", error);
+    console.log('error', error);
     // checkExpiry(error, history);
     throw error;
   }
@@ -119,54 +115,32 @@ export const useAuthorizedK8sClient = () => {
   /* eslint-disable @typescript-eslint/ban-types */
   return {
     get: <T>(resource: KubeResource, name: string, params?: object) =>
-      authorizedK8sRequest<T>(fetchContext, () =>
-        client.get(resource, name, params)
-      ),
+      authorizedK8sRequest<T>(fetchContext, () => client.get(resource, name, params)),
     list: <T>(resource: KubeResource, params?: object) =>
-      authorizedK8sRequest<T>(fetchContext, () =>
-        client.list(resource, params)
-      ),
+      authorizedK8sRequest<T>(fetchContext, () => client.list(resource, params)),
     create: <T>(resource: KubeResource, newObject: object, params?: object) =>
-      authorizedK8sRequest<T>(fetchContext, () =>
-        client.create(resource, newObject, params)
-      ),
+      authorizedK8sRequest<T>(fetchContext, () => client.create(resource, newObject, params)),
     delete: <T = any>(resource: KubeResource, name: string, params?: object) =>
-      authorizedK8sRequest<T>(fetchContext, () =>
-        client.delete(resource, name, params)
-      ),
-    patch: <T>(
-      resource: KubeResource,
-      name: string,
-      patch: object,
-      params?: object
-    ) =>
-      authorizedK8sRequest<T>(fetchContext, () =>
-        client.patch(resource, name, patch, params)
-      ),
-    put: <T>(
-      resource: KubeResource,
-      name: string,
-      object: object,
-      params?: object
-    ) =>
-      authorizedK8sRequest<T>(fetchContext, () =>
-        client.put(resource, name, object, params)
-      ),
+      authorizedK8sRequest<T>(fetchContext, () => client.delete(resource, name, params)),
+    patch: <T>(resource: KubeResource, name: string, patch: object, params?: object) =>
+      authorizedK8sRequest<T>(fetchContext, () => client.patch(resource, name, patch, params)),
+    put: <T>(resource: KubeResource, name: string, object: object, params?: object) =>
+      authorizedK8sRequest<T>(fetchContext, () => client.put(resource, name, object, params)),
   };
   /* eslint-enable @typescript-eslint/ban-types */
 };
 
 export const useClientInstance = (): ClusterClient => {
   // const { currentUser } = useNetworkContext();
-  let currentUser = {
-    access_token: "SHA-TOKEN-HERE",
+  const currentUser = {
+    access_token: 'SHA-TOKEN-HERE',
     expiry_time: 86400,
   };
   const user = {
-    access_token: currentUser.access_token || "",
+    access_token: currentUser.access_token || '',
     expiry_time: currentUser.expiry_time || 0,
   };
-  return ClientFactory.cluster(user, "/api/plugins/mig-ui-plugin/mig-api");
+  return ClientFactory.cluster(user, '/api/plugins/mig-ui-plugin/mig-api');
 };
 
 export type AuthorizedClusterClient = ReturnType<typeof useAuthorizedK8sClient>;

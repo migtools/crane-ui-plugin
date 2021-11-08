@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const axios = require('axios');
 
 function setupWebSocket(app) {
@@ -17,7 +19,8 @@ function setupWebSocket(app) {
       try {
         message = JSON.parse(data);
       } catch (e) {
-        sendError(ws, 'Wrong format');
+        // TODO re-enable this line: sendError and ws are both undefined here?
+        // sendError(ws, 'Wrong format');
         return;
       }
 
@@ -50,16 +53,17 @@ function setupWebSocket(app) {
               if (error) {
                 console.log(`error: ${error}`);
               }
-            },
+            }
           );
       }
     });
 
     // handle close event
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     ctx.on('close', () => {});
   });
 
-  server.listen(port, function() {
+  server.listen(port, function () {
     console.log(`http/ws server listening on ${port}`);
   });
 }

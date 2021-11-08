@@ -1,6 +1,6 @@
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
-import StorageReposList from "./components/StorageReposList";
+import * as React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import StorageReposList from './components/StorageReposList';
 
 const StorageReposPage: React.FC = () => {
   const queryClient = new QueryClient();

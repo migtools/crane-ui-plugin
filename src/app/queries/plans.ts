@@ -7,17 +7,13 @@ import {
   MutationFunction,
   UseMutationOptions,
   useMutation,
-} from "react-query";
-import * as React from "react";
-import { IGroupVersionKindPlural, NamespacedResource } from "@konveyor/lib-ui";
+} from 'react-query';
+import * as React from 'react';
+import { IGroupVersionKindPlural, NamespacedResource } from '@konveyor/lib-ui';
 
-import { AxiosError } from "axios";
-import { useHistory } from "react-router-dom";
-import {
-  IKubeResponse,
-  useAuthorizedK8sClient,
-  useFetchContext,
-} from "./fetchHelpers";
+import { AxiosError } from 'axios';
+import { useHistory } from 'react-router-dom';
+import { IKubeResponse, useAuthorizedK8sClient, useFetchContext } from './fetchHelpers';
 export type KubeClientError = AxiosError<{ message: string }>;
 
 export type MockPlanFormState = ReturnType<any>;
@@ -39,11 +35,7 @@ export interface IKubeList<T> extends IMetaTypeMeta {
   };
 }
 
-export const useMockableQuery = <
-  TQueryFnData = unknown,
-  TError = unknown,
-  TData = TQueryFnData
->(
+export const useMockableQuery = <TQueryFnData = unknown, TError = unknown, TData = TQueryFnData>(
   params: UseQueryOptions<TQueryFnData, TError, TData>,
   mockData: TQueryFnData
 ) =>
@@ -53,7 +45,7 @@ export const useMockableQuery = <
   });
 
 export const sortByName = <T extends IHasName>(data?: T[]): T[] => {
-  const getName = (obj: T) => obj.name || obj.metadata?.name || "";
+  const getName = (obj: T) => obj.name || obj.metadata?.name || '';
   return (data || []).sort((a, b) => (getName(a) < getName(b) ? -1 : 1));
 };
 
@@ -62,15 +54,15 @@ export const sortKubeListByName = <T>(result: IKubeList<T>) => ({
   items: sortByName(result.items || []),
 });
 export enum MigResourceKind {
-  MigPlan = "migplans",
-  MigStorage = "migstorages",
-  MigAssetCollection = "migassetcollections",
-  MigStage = "migstages",
-  MigMigration = "migmigrations",
-  MigCluster = "migclusters",
-  MigHook = "mighooks",
-  MigToken = "migtokens",
-  MigAnalytic = "miganalytics",
+  MigPlan = 'migplans',
+  MigStorage = 'migstorages',
+  MigAssetCollection = 'migassetcollections',
+  MigStage = 'migstages',
+  MigMigration = 'migmigrations',
+  MigCluster = 'migclusters',
+  MigHook = 'mighooks',
+  MigToken = 'migtokens',
+  MigAnalytic = 'miganalytics',
 }
 
 export class MigResource extends NamespacedResource {
@@ -79,8 +71,8 @@ export class MigResource extends NamespacedResource {
     super(namespace);
 
     this._gvk = {
-      group: "migration.openshift.io",
-      version: "v1alpha1",
+      group: 'migration.openshift.io',
+      version: 'v1alpha1',
       kindPlural: kind,
     };
   }
@@ -88,40 +80,32 @@ export class MigResource extends NamespacedResource {
     return this._gvk;
   }
 }
-const planResource = new MigResource(
-  MigResourceKind.MigPlan,
-  "openshift-migration"
-);
+const planResource = new MigResource(MigResourceKind.MigPlan, 'openshift-migration');
 
 export const usePlansQuery = (): UseQueryResult<IKubeList<any>> => {
   const client = useAuthorizedK8sClient();
-  const sortKubeListByNameCallback = React.useCallback(
-    (data): IKubeList<any> => data,
-    []
-  );
+  const sortKubeListByNameCallback = React.useCallback((data): IKubeList<any> => data, []);
   const result = useMockableQuery<IKubeList<any>>(
     {
-      queryKey: "plans",
-      queryFn: async () =>
-        (await client.list<IKubeList<any>>(planResource)).data,
+      queryKey: 'plans',
+      queryFn: async () => (await client.list<IKubeList<any>>(planResource)).data,
       refetchInterval: 5000,
       select: sortKubeListByNameCallback,
     },
-    mockKubeList(null, "Plan")
+    mockKubeList([], 'Plan')
   );
-  debugger;
-  console.log("result", result);
+  console.log('result', result);
   return result;
 };
 
 export const mockKubeList = <T>(items: T[], kind: string): IKubeList<T> => ({
-  apiVersion: null,
+  apiVersion: '',
   items,
   kind,
   metadata: {
-    continue: "",
-    resourceVersion: "",
-    selfLink: "/foo/list/selfLink",
+    continue: '',
+    resourceVersion: '',
+    selfLink: '/foo/list/selfLink',
   },
 });
 
@@ -148,62 +132,48 @@ export const useMockableMutation = <
   TSnapshot = unknown
 >(
   mutationFn: MutationFunction<TQueryFnData, TVariables>,
-  config:
-    | UseMutationOptions<TQueryFnData, TError, TVariables, TSnapshot>
-    | undefined
+  config: UseMutationOptions<TQueryFnData, TError, TVariables, TSnapshot> | undefined
 ) => {
   const { checkExpiry } = useFetchContext();
   const history = useHistory();
-  return useMutation<TQueryFnData, TError, TVariables, TSnapshot>(
-    async (vars: TVariables) => {
-      try {
-        return await mutationFn(vars);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error) {
-        console.error(error.response);
-        checkExpiry(error, history);
-        throw error;
-      }
-    },
-    config
-  );
+  return useMutation<TQueryFnData, TError, TVariables, TSnapshot>(async (vars: TVariables) => {
+    try {
+      return await mutationFn(vars);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error) {
+      console.error(error);
+      checkExpiry(error, history);
+      throw error;
+    }
+  }, config);
 };
 
 export const useCreatePlanMutation = (
   onSuccess?: () => void
-): UseMutationResult<
-  IKubeResponse<any>,
-  KubeClientError,
-  MockPlanFormState,
-  unknown
-> => {
+): UseMutationResult<IKubeResponse<any>, KubeClientError, MockPlanFormState, unknown> => {
   const client = useAuthorizedK8sClient();
   const queryClient = useQueryClient();
-  return useMockableMutation<
-    IKubeResponse<any>,
-    KubeClientError,
-    MockPlanFormState
-  >(
+  return useMockableMutation<IKubeResponse<any>, KubeClientError, MockPlanFormState>(
     async (forms) => {
       const mockPlan = {
-        apiVersion: "migration.openshift.io/v1alpha1",
-        kind: "MigPlan",
+        apiVersion: 'migration.openshift.io/v1alpha1',
+        kind: 'MigPlan',
         metadata: {
-          name: "plan",
-          namespace: "openshift-migration",
+          name: 'plan',
+          namespace: 'openshift-migration',
         },
         spec: {
           destMigClusterRef: {
-            name: "host",
-            namespace: "openshift-migration",
+            name: 'host',
+            namespace: 'openshift-migration',
           },
           migStorageRef: {
-            name: "s43",
-            namespace: "openshift-migration",
+            name: 's43',
+            namespace: 'openshift-migration',
           },
           srcMigClusterRef: {
-            name: "src332",
-            namespace: "openshift-migration",
+            name: 'src332',
+            namespace: 'openshift-migration',
           },
         },
       };
@@ -214,7 +184,7 @@ export const useCreatePlanMutation = (
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("plans");
+        queryClient.invalidateQueries('plans');
         onSuccess && onSuccess();
       },
     }

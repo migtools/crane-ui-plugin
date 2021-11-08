@@ -1,23 +1,27 @@
-const express = require("express");
-const path = require("path");
-const axios = require("axios");
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const express = require('express');
+const path = require('path');
+const axios = require('axios');
+const dayjs = require('dayjs');
+
 const app = express();
 const port = 9001;
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
-const HttpsProxyAgent = require("https-proxy-agent");
-const { AuthorizationCode } = require("simple-oauth2");
+const HttpsProxyAgent = require('https-proxy-agent');
+const { AuthorizationCode } = require('simple-oauth2');
 
-app.get("/testing", (req, res) => {
-  res.send("Hello World!");
+app.get('/testing', (req, res) => {
+  res.send('Hello World!');
 });
 
-console.log("path", __dirname);
+console.log('path', __dirname);
 
 let cachedOAuthMeta = null;
 
 // const clusterSvcUrl = "https://kubernetes.default.svc.cluster.local";
-const clusterSvcUrl = "https://c116-e.us-south.containers.cloud.ibm.com:31468";
+const clusterSvcUrl = 'https://c116-e.us-south.containers.cloud.ibm.com:31468';
 let clusterApiProxyOptions = {
   target: clusterSvcUrl,
   changeOrigin: true,
@@ -25,9 +29,9 @@ let clusterApiProxyOptions = {
   //   "^/cluster-api/": "/",
   // },
   pathRewrite: {
-    "^/mig-api/": "/",
+    '^/mig-api/': '/',
   },
-  logLevel: process.env.DEBUG ? "debug" : "info",
+  logLevel: process.env.DEBUG ? 'debug' : 'info',
   secure: false,
   ws: true,
   onProxyReq: (proxyReq, req, res) => {
@@ -36,16 +40,16 @@ let clusterApiProxyOptions = {
     // or log the req
   },
   onProxyRes: (proxyRes, req, res) => {
-    proxyRes.headers["Content-Security-Policy"] = "sandbox";
-    proxyRes.headers["X-Content-Security-Policy"] = "sandbox";
+    proxyRes.headers['Content-Security-Policy'] = 'sandbox';
+    proxyRes.headers['X-Content-Security-Policy'] = 'sandbox';
   },
 };
 
 const clusterApiProxy = createProxyMiddleware(clusterApiProxyOptions);
-app.use("/mig-api/", clusterApiProxy);
+app.use('/mig-api/', clusterApiProxy);
 // app.use("/cluster-api/", clusterApiProxy);
 
-app.get("/login", async (req, res, next) => {
+app.get('/login', async (req, res, next) => {
   try {
     const clusterAuth = await getClusterAuth();
 
@@ -54,19 +58,15 @@ app.get("/login", async (req, res, next) => {
     // - http://localhost:9000/api/plugins/mig-ui-plugin/login/callback
 
     const authorizationUri = clusterAuth.authorizeURL({
-      redirect_uri:
-        "http://localhost:9000/api/plugins/mig-ui-plugin/login/callback",
+      redirect_uri: 'http://localhost:9000/api/plugins/mig-ui-plugin/login/callback',
       // redirect_uri: "http://localhost:9000/login/callback",
-      scope: "user:full",
+      scope: 'user:full',
     });
 
     res.redirect(authorizationUri);
   } catch (error) {
     console.error(error);
-    if (
-      error.response.statusText === "Service Unavailable" ||
-      error.response.status === 503
-    ) {
+    if (error.response.statusText === 'Service Unavailable' || error.response.status === 503) {
       res.status(503).send(error.response.data);
     } else {
       const params = new URLSearchParams({ error: JSON.stringify(error) });
@@ -76,17 +76,16 @@ app.get("/login", async (req, res, next) => {
     }
   }
 });
-app.get("/login/callback", async (req, res, next) => {
+app.get('/login/callback', async (req, res, next) => {
   const { code } = req.query;
   const options = {
     code,
-    redirect_uri:
-      "http://localhost:9000/api/plugins/mig-ui-plugin/login/callback",
+    redirect_uri: 'http://localhost:9000/api/plugins/mig-ui-plugin/login/callback',
   };
   try {
     const clusterAuth = await getClusterAuth();
 
-    const proxyString = process.env["HTTPS_PROXY"] || process.env["HTTP_PROXY"];
+    const proxyString = process.env['HTTPS_PROXY'] || process.env['HTTP_PROXY'];
     let httpOptions = {};
     if (proxyString) {
       httpOptions = {
@@ -110,8 +109,8 @@ app.get("/login/callback", async (req, res, next) => {
     const uri = `/handle-login?${params.toString()}`;
     res.redirect(uri);
   } catch (error) {
-    console.error("Access Token Error", error.message);
-    return res.status(500).json("Authentication failed");
+    console.error('Access Token Error', error.message);
+    return res.status(500).json('Authentication failed');
   }
 });
 
@@ -131,8 +130,8 @@ const getClusterAuth = async () => {
   const oAuthMeta = await getOAuthMeta();
   return new AuthorizationCode({
     client: {
-      id: "mig-ui",
-      secret: "OAUTH-SECRET-HERE",
+      id: 'mig-ui',
+      secret: 'OAUTH-SECRET-HERE',
     },
     auth: {
       tokenHost: oAuthMeta.token_endpoint,
@@ -141,7 +140,7 @@ const getClusterAuth = async () => {
   });
 };
 
-app.use(express.static(path.join(__dirname, "../dist"))); //  "public" off of current is root
+app.use(express.static(path.join(__dirname, '../dist'))); //  "public" off of current is root
 
 app.listen(port, () => {
   console.log(`Mig UI plugin app listening at http://localhost:${port}`);

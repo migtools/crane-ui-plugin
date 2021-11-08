@@ -1,0 +1,23 @@
+name: PR CI Checks
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - release*
+
+jobs:
+  tests:
+    name: Continuous Integration
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: yarn install
+      - name: Run checks
+        run: yarn ci

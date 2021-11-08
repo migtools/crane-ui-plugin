@@ -1,6 +1,6 @@
-import * as React from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
-import ClustersList from "./components/ClustersList";
+import * as React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import ClustersList from './components/ClustersList';
 
 const ClustersPage: React.FC = () => {
   const queryClient = new QueryClient();
