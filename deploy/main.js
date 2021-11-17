@@ -29,7 +29,7 @@ let clusterApiProxyOptions = {
   //   "^/cluster-api/": "/",
   // },
   pathRewrite: {
-    '^/mig-api/': '/',
+    '^/crane-api/': '/',
   },
   logLevel: process.env.DEBUG ? 'debug' : 'info',
   secure: false,
@@ -46,7 +46,7 @@ let clusterApiProxyOptions = {
 };
 
 const clusterApiProxy = createProxyMiddleware(clusterApiProxyOptions);
-app.use('/mig-api/', clusterApiProxy);
+app.use('/crane-api/', clusterApiProxy);
 // app.use("/cluster-api/", clusterApiProxy);
 
 app.get('/login', async (req, res, next) => {
@@ -130,7 +130,7 @@ const getClusterAuth = async () => {
   const oAuthMeta = await getOAuthMeta();
   return new AuthorizationCode({
     client: {
-      id: 'mig-ui',
+      id: 'crane-ui',
       secret: 'OAUTH-SECRET-HERE',
     },
     auth: {
@@ -143,5 +143,5 @@ const getClusterAuth = async () => {
 app.use(express.static(path.join(__dirname, '../dist'))); //  "public" off of current is root
 
 app.listen(port, () => {
-  console.log(`Mig UI plugin app listening at http://localhost:${port}`);
+  console.log(`Crane UI plugin app listening at http://localhost:${port}`);
 });

@@ -80,7 +80,7 @@ kind: ConsolePlugin
 metadata:
   name: crane-ui-plugin
 spec:
-  displayName: 'Mig UI Plugin'
+  displayName: 'Crane UI Plugin'
   service:
     name: crane-ui-plugin
     namespace: crane-ui-plugin

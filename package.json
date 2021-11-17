@@ -64,8 +64,8 @@
   "consolePlugin": {
     "name": "crane-ui-plugin",
     "version": "0.0.1",
-    "displayName": "Mig UI Plugin",
-    "description": "Plugin for MTC within the console.",
+    "displayName": "Crane UI Plugin",
+    "description": "Plugin for Crane within the console.",
     "exposedModules": {
       "barUtils": "./utils/bar",
       "clustersComp": "./app/Clusters/ClustersPage.tsx",
