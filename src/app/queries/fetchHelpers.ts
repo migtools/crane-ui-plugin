@@ -140,7 +140,7 @@ export const useClientInstance = (): ClusterClient => {
     access_token: currentUser.access_token || '',
     expiry_time: currentUser.expiry_time || 0,
   };
-  return ClientFactory.cluster(user, '/api/plugins/mig-ui-plugin/mig-api');
+  return ClientFactory.cluster(user, '/api/plugins/crane-ui-plugin/mig-api');
 };
 
 export type AuthorizedClusterClient = ReturnType<typeof useAuthorizedK8sClient>;

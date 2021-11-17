@@ -55,10 +55,10 @@ app.get('/login', async (req, res, next) => {
 
     //TODO: operator needs to use this redirect uri
     // redirectURIs:
-    // - http://localhost:9000/api/plugins/mig-ui-plugin/login/callback
+    // - http://localhost:9000/api/plugins/crane-ui-plugin/login/callback
 
     const authorizationUri = clusterAuth.authorizeURL({
-      redirect_uri: 'http://localhost:9000/api/plugins/mig-ui-plugin/login/callback',
+      redirect_uri: 'http://localhost:9000/api/plugins/crane-ui-plugin/login/callback',
       // redirect_uri: "http://localhost:9000/login/callback",
       scope: 'user:full',
     });
@@ -80,7 +80,7 @@ app.get('/login/callback', async (req, res, next) => {
   const { code } = req.query;
   const options = {
     code,
-    redirect_uri: 'http://localhost:9000/api/plugins/mig-ui-plugin/login/callback',
+    redirect_uri: 'http://localhost:9000/api/plugins/crane-ui-plugin/login/callback',
   };
   try {
     const clusterAuth = await getClusterAuth();

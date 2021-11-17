@@ -79,7 +79,7 @@ oc edit console.operator.openshift.io cluster
 # ...
 spec:
   plugins:
-    - mig-ui-plugin
+    - crane-ui-plugin
 # ...
 ```
 
@@ -89,15 +89,15 @@ Following commands should be executed in Console repository root.
 
 1. Build the image:
    ```sh
-   docker build -f Dockerfile.plugins.demo -t quay.io/$USER/mig-ui-plugin .
+   docker build -f Dockerfile.plugins.demo -t quay.io/$USER/crane-ui-plugin .
    ```
 2. Run the image:
    ```sh
-   docker run -it -p 9001:9001 quay.io/$USER/mig-ui-plugin
+   docker run -it -p 9001:9001 quay.io/$USER/crane-ui-plugin
    ```
 3. Push the image to image registry:
    ```sh
-   docker push quay.io/$USER/mig-ui-plugin
+   docker push quay.io/$USER/crane-ui-plugin
    ```
 
 Update and apply `oc-manifest.yaml` to use a custom plugin image.

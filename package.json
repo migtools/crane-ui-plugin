@@ -1,8 +1,8 @@
 {
-  "name": "mig-ui-plugin",
+  "name": "crane-ui-plugin",
   "version": "0.0.0",
   "private": true,
-  "repository": "git@github.com:rawagner/mig-ui-plugin.git",
+  "repository": "git@github.com:rawagner/crane-ui-plugin.git",
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "yarn clean && NODE_ENV=production yarn ts-node ./node_modules/.bin/webpack",
@@ -62,7 +62,7 @@
     "webpack-cli": "4.5.x"
   },
   "consolePlugin": {
-    "name": "mig-ui-plugin",
+    "name": "crane-ui-plugin",
     "version": "0.0.1",
     "displayName": "Mig UI Plugin",
     "description": "Plugin for MTC within the console.",

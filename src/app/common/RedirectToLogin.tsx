@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 const RedirectToLogin: React.FunctionComponent = () => {
   useEffect(() => {
     // window.location.href = "/k8s/login"
-    window.location.href = '/api/plugins/mig-ui-plugin/login';
+    window.location.href = '/api/plugins/crane-ui-plugin/login';
   }, []);
   return null;
 };
