@@ -20,6 +20,7 @@ console.log('path', __dirname);
 
 let cachedOAuthMeta = null;
 
+// TODO: this proxy is likely unnecessary if we are going to use the k8s helpers from the dynamic-plugin-sdk
 // const clusterSvcUrl = "https://kubernetes.default.svc.cluster.local";
 const clusterSvcUrl = 'https://c116-e.us-south.containers.cloud.ibm.com:31468';
 let clusterApiProxyOptions = {

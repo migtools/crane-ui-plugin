@@ -3,12 +3,12 @@
 
 import * as webpack from 'webpack';
 import * as path from 'path';
-import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk/lib/index-webpack';
-const { stylePaths } = require('./stylePaths');
+import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
 
 const config: webpack.Configuration = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   context: path.resolve(__dirname, 'src'),
+  entry: {},
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename:
@@ -22,43 +22,7 @@ const config: webpack.Configuration = {
   module: {
     rules: [
       {
-        test: /\.(jpg|jpeg|png|gif)$/i,
-        include: [
-          path.resolve(__dirname, './src'),
-          path.resolve(__dirname, './node_modules/patternfly'),
-          path.resolve(__dirname, './node_modules/@patternfly/patternfly/assets/images'),
-          path.resolve(__dirname, './node_modules/@patternfly/react-styles/css/assets/images'),
-          path.resolve(
-            __dirname,
-            './node_modules/@patternfly/react-core/dist/styles/assets/images'
-          ),
-          path.resolve(
-            __dirname,
-            './node_modules/@patternfly/react-core/node_modules/@patternfly/react-styles/css/assets/images'
-          ),
-          path.resolve(
-            __dirname,
-            './node_modules/@patternfly/react-table/node_modules/@patternfly/react-styles/css/assets/images'
-          ),
-          path.resolve(
-            __dirname,
-            './node_modules/@patternfly/react-inline-edit-extension/node_modules/@patternfly/react-styles/css/assets/images'
-          ),
-        ],
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 5000,
-              outputPath: 'images',
-              name: '[name].[ext]',
-            },
-          },
-        ],
-        type: 'javascript/auto',
-      },
-      {
-        test: /(\.jsx?)|(\.tsx?)$/,
+        test: /\.(jsx?|tsx?)$/,
         exclude: /node_modules/,
         use: [
           {
@@ -70,8 +34,15 @@ const config: webpack.Configuration = {
         ],
       },
       {
-        test: /\.css$/,
-        use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
+        test: /\.(css)$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif|svg|woff2?|ttf|eot|otf)(\?.*$|$)/,
+        loader: 'file-loader',
+        options: {
+          name: 'assets/[name].[ext]',
+        },
       },
     ],
   },
