@@ -5,10 +5,10 @@
   "repository": "git@github.com:konveyor/crane-ui-plugin.git",
   "scripts": {
     "clean": "rm -rf ./dist",
-    "build": "yarn clean && NODE_ENV=production yarn ts-node ./node_modules/.bin/webpack",
-    "build-dev": "yarn clean && yarn ts-node ./node_modules/.bin/webpack",
+    "build": "yarn clean && NODE_ENV=production yarn ts-node node_modules/.bin/webpack",
+    "build-dev": "yarn clean && yarn ts-node node_modules/.bin/webpack",
     "http-server": "./http-server.sh ./dist",
-    "ts-node": "./node_modules/.bin/ts-node -O '{\"module\":\"commonjs\"}' -I '/node_modules/(?!(@console)/)/'",
+    "ts-node": "./node_modules/.bin/ts-node -O '{\"module\":\"commonjs\"}'",
     "lint": "./node_modules/.bin/eslint .",
     "lint:fix": "yarn lint --fix",
     "format": "./node_modules/.bin/prettier --check --write ./**/*.{tsx,ts,js}",
