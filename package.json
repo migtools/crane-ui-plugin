@@ -2,7 +2,7 @@
   "name": "crane-ui-plugin",
   "version": "0.0.0",
   "private": true,
-  "repository": "git@github.com:rawagner/crane-ui-plugin.git",
+  "repository": "git@github.com:konveyor/crane-ui-plugin.git",
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "yarn clean && NODE_ENV=production yarn ts-node ./node_modules/.bin/webpack",
@@ -13,8 +13,8 @@
     "lint:fix": "yarn lint --fix",
     "format": "./node_modules/.bin/prettier --check --write ./**/*.{tsx,ts,js}",
     "tsc": "./node_modules/.bin/tsc --project ./tsconfig.json --noEmit",
-    "type-check": "yarn tsc",
-    "ci": "yarn type-check && yarn lint"
+    "ci": "yarn tsc && yarn lint",
+    "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js"
   },
   "dependencies": {
     "@konveyor/lib-ui": "^5.2.0",
