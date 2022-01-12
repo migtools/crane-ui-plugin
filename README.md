@@ -1,3 +1,28 @@
+TODO:
+
+- make a full copy of the repo as-is
+- wholesale replacement of everything in here with console-plugin-template stuff (copy readme contents below, delete all other files except CI
+- repeat changes to oc-manifest using the mtk-operator namespace (it's template.yaml in the new one? figure out what the real name should be)
+- bring over tsconfig/eslint/prettier stuff? it's already pretty good!
+- bring over other configs like CODEOWNERS
+- review dependencies, update PF and anything else notable
+- do a test install/run
+- change console-extensions.json to use the Add flow
+- Wizard boilerplate
+- Talk to Joachim, this is probably a good point for him to start
+- Basic form state with a few trivial fields from lib-ui (maybe make that PR for the isDirty stuff first...)
+- Do some basic reading of CRs using the SDK
+- PREVIEW MODE? do we want to find a way to reuse this webpack? probably not, right? maybe just use CRA for that? how does the SDK CRUD stuff handle it, how do we mock that?
+- Get Surge deployments working in CI (maybe use better job names, reference forklift)
+- Actually implement the wizard steps presentation layer (available options for form fields can be from temp mocks)
+- Talk to backend folks about loading stuff from the proxy service?
+- Watch stuff from hackathon about Tekton pipelines? talk to Erik
+- Full read implementation, all the stuff we need for form fields, mock data for all of it
+- Full write implementation, create the pipelines
+- Navigate to the pipeline page on submit
+- ???
+- Profit
+
 # Crane UI - OpenShift Dynamic Plugin
 
 The Crane UI plugin provides a UI for container migration within the OpenShift console.
