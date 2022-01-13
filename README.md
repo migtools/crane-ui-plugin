@@ -1,8 +1,6 @@
 # TODO
 
-- do a test install/run
 - bring over tsconfig/eslint/prettier stuff? it's already pretty good!
-- bring over other configs like CODEOWNERS
 - review dependencies, update PF and anything else notable
 - do a test install/run
 - change console-extensions.json to use the Add flow
