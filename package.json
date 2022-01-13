@@ -1,8 +1,8 @@
 {
-  "name": "console-plugin-template",
+  "name": "crane-ui-plugin",
   "version": "0.0.1",
   "private": true,
-  "repository": "git@github.com:spadgett/console-plugin-template.git",
+  "repository": "git@github.com:konveyor/crane-ui-plugin.git",
   "scripts": {
     "clean": "rm -rf dist",
     "build": "yarn clean && NODE_ENV=production yarn ts-node node_modules/.bin/webpack",
@@ -46,10 +46,10 @@
     "webpack-dev-server": "^4.6.0"
   },
   "consolePlugin": {
-    "name": "console-plugin-template",
+    "name": "crane-ui-plugin",
     "version": "0.0.1",
-    "displayName": "OpenShift Console Plugin Template",
-    "description": "Template project for OpenShift console plugins. Edit package.json to change this message and the plugin name.",
+    "displayName": "Konveyor Crane UI Plugin",
+    "description": "Provides a UI for constructing container migration pipelines within the OpenShift console",
     "exposedModules": {
       "ExamplePage": "./components/ExamplePage"
     },

@@ -1,12 +1,14 @@
 # TODO
 
-- repeat changes to template.yaml using the mtk-operator namespace (it's template.yaml in the new one? figure out what the real name should be)
+- do a test install/run
 - bring over tsconfig/eslint/prettier stuff? it's already pretty good!
 - bring over other configs like CODEOWNERS
 - review dependencies, update PF and anything else notable
 - do a test install/run
 - change console-extensions.json to use the Add flow
 - Wizard boilerplate
+- do a test install/run
+- do a test full deployment?
 - Talk to Joachim, this is probably a good point for him to start
 - Basic form state with a few trivial fields from lib-ui (maybe make that PR for the isDirty stuff first...)
 - Do some basic reading of CRs using the SDK
@@ -20,12 +22,14 @@
 - Navigate to the pipeline page on submit
 - ???
 - Replace quay.io/konveyor/crane-ui-plugin:latest with the real image URL if it changes
+- Double check final plugin name and description, replace "Konveyor Crane UI Plugin" in various places
+- Customize iconClass and tags in template.yaml?
 
 # Crane UI - OpenShift Dynamic Plugin
 
 **NOTE: This repository is brand new and under active prerelease development.**
 
-The Crane UI plugin provides a UI for container migration within the OpenShift console.
+The Crane UI plugin provides a UI for constructing container migration pipelines within the OpenShift console.
 
 It is provided as an OpenShift Console dynamic plugin which requires OpenShift 4.10 or greater.
 
@@ -33,7 +37,7 @@ You can run the plugin using a local development environment or build an image t
 
 ## Local development
 
-To run the plugin locally, you'll need a local clone of the [openshift/console](https://github.com/openshift/console) repository.
+To run the plugin locally, you'll need a local clone of the [openshift/console](https://github.com/openshift/console) repository. You'll need Node.js 16+ and Yarn 1.x installed.
 
 1. From the `crane-ui-plugin` directory, build and run the plugin:
 
