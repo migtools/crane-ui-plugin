@@ -37,19 +37,32 @@ You can run the plugin using a local development environment or build an image t
 
 ## Local development
 
-To run the plugin locally, you'll need a local clone of the [openshift/console](https://github.com/openshift/console) repository. You'll need Node.js 16+ and Yarn 1.x installed.
+You'll need:
 
-1. From the `crane-ui-plugin` directory, build and run the plugin:
+- Node.js 16+ and Yarn 1.x installed
+- A local clone of the [openshift/console](https://github.com/openshift/console) repository
+- An OpenShift cluster (the Console UI will run locally, but it needs a real cluster on the backend)
 
-   ```
-   yarn install      # Install dependencies
-   yarn run start    # Start an HTTP server hosting the generated assets on port 9001
+The cluster does not necessarily need to be running OpenShift 4.10+ since you will be running the latest Console UI locally.
+
+To run the plugin locally:
+
+1. From the `crane-ui-plugin` directory:
+
+   ```sh
+   yarn install  # Install dependencies
+   yarn build    # Build the plugin, generating output to `dist` directory
+   yarn start    # Start an HTTP server hosting the generated assets on port 9001
    ```
 
    The server runs on port 9001 with CORS enabled.
 
-2. In a separate shell, from a clone of the [openshift/console](https://github.com/openshift/console) repository:
-   - `source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/`
+2. In a separate shell, from a clone of the [openshift/console](https://github.com/openshift/console) repository, `oc login` to your cluster and then:
+
+   ```sh
+   source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/
+   ```
+
 3. Open the Console in your browser at http://localhost:9000/
 
 ## Docker image
@@ -61,6 +74,9 @@ push it to an image registry.
    ```sh
    docker build -t quay.io/konveyor/crane-ui-plugin:latest .
    ```
+
+````
+
 2. Run the image:
    ```sh
    docker run -it --rm -d -p 9001:80 quay.io/konveyor/crane-ui-plugin:latest
@@ -105,3 +121,4 @@ oc patch consoles.operator.openshift.io cluster \
 - [Dynamic Plugin Enhancement Proposal](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 
 The structure of this repository is based on [spadgett/console-plugin-template](https://github.com/spadgett/console-plugin-template).
+````
