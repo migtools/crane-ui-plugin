@@ -1,8 +1,5 @@
 # TODO
 
-- bring over tsconfig/eslint/prettier stuff? it's already pretty good!
-- review dependencies, update PF and anything else notable
-- do a test install/run
 - change console-extensions.json to use the Add flow
 - Wizard boilerplate
 - do a test install/run
