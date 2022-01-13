@@ -1,78 +1,29 @@
 [
   {
-    "type": "console.flag",
-    "properties": {
-      "handler": { "$codeRef": "barUtils.testHandler" }
-    }
-  },
-  {
-    "type": "console.flag/model",
-    "properties": {
-      "flag": "EXAMPLE",
-      "model": {
-        "group": "kubevirt.io",
-        "version": "v1alpha3",
-        "kind": "ExampleModel"
-      }
-    }
-  },
-  {
     "type": "console.page/route",
     "properties": {
-      "exact": false,
-      "path": "/clusters",
-      "component": { "$codeRef": "clustersComp" }
+      "exact": true,
+      "path": "/import-application/ns/:namespace",
+      "component": { "$codeRef": "ImportWizardPage" }
     }
   },
   {
-    "type": "console.page/route",
+    "type": "dev-console.add/action-group",
     "properties": {
-      "exact": false,
-      "path": "/storagerepos",
-      "component": { "$codeRef": "storageReposComp" }
+      "id": "smart-import",
+      "name": "Smart Import",
+      "insertAfter": "container-images"
     }
   },
   {
-    "type": "console.page/route",
+    "type": "dev-console.add/action",
     "properties": {
-      "exact": false,
-      "path": "/plans",
-      "component": { "$codeRef": "plansComp" }
-    }
-  },
-  {
-    "type": "console.navigation/href",
-    "properties": {
-      "id": "clusters-page",
-      "name": "Clusters",
-      "href": "/clusters",
-      "section": "admin-migrations-section"
-    }
-  },
-  {
-    "type": "console.navigation/href",
-    "properties": {
-      "id": "storage-repos-page",
-      "name": "Replication repositories",
-      "href": "/storagerepos",
-      "section": "admin-migrations-section"
-    }
-  },
-  {
-    "type": "console.navigation/href",
-    "properties": {
-      "id": "plans-page",
-      "name": "Migration plans",
-      "href": "/plans",
-      "section": "admin-migrations-section"
-    }
-  },
-  {
-    "type": "console.navigation/section",
-    "properties": {
-      "id": "admin-migrations-section",
-      "perspective": "admin",
-      "name": "Migrations"
+      "id": "import-application",
+      "groupId": "smart-import",
+      "label": "Import application",
+      "description": "Import an application and associated resources from this cluster or a remote cluster",
+      "href": "/import-application/ns/:namespace",
+      "icon": { "$codeRef": "icons.importIconElement" }
     }
   }
 ]
