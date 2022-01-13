@@ -3,18 +3,27 @@
     "type": "console.page/route",
     "properties": {
       "exact": true,
-      "path": "/example",
-      "component": { "$codeRef": "ExamplePage" }
+      "path": "/import-application/ns/:namespace",
+      "component": { "$codeRef": "ImportWizardPage" }
     }
   },
   {
-    "type": "console.navigation/href",
+    "type": "dev-console.add/action-group",
     "properties": {
-      "id": "example",
-      "name": "Plugin Example",
-      "href": "/example",
-      "perspective": "admin",
-      "section": "home"
+      "id": "smart-import",
+      "name": "Smart Import",
+      "insertAfter": "container-images"
+    }
+  },
+  {
+    "type": "dev-console.add/action",
+    "properties": {
+      "id": "import-application",
+      "groupId": "smart-import",
+      "label": "Import application",
+      "description": "Import an application and associated resources from this cluster or a remote cluster",
+      "href": "/import-application/ns/:namespace",
+      "icon": { "$codeRef": "icons.importIconElement" }
     }
   }
 ]

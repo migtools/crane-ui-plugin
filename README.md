@@ -1,6 +1,5 @@
 # TODO
 
-- change console-extensions.json to use the Add flow
 - Wizard boilerplate
 - do a test install/run
 - do a test full deployment?
@@ -16,6 +15,8 @@
 - Full write implementation, create the pipelines
 - Navigate to the pipeline page on submit
 - ???
+- Determine final URL path? /smart-import seems too generic?
+- Determine if we need accessReview restrictions? see [example here](https://github.com/openshift/console/blob/3fd316564da4937798e11ca2024852cfa817681c/frontend/packages/dev-console/console-extensions.json#L115)
 - Replace quay.io/konveyor/crane-ui-plugin:latest with the real image URL if it changes
 - Double check final plugin name and description, replace "Konveyor Crane UI Plugin" in various places
 - Customize iconClass and tags in template.yaml?
