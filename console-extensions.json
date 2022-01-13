@@ -1,78 +1,20 @@
 [
   {
-    "type": "console.flag",
-    "properties": {
-      "handler": { "$codeRef": "barUtils.testHandler" }
-    }
-  },
-  {
-    "type": "console.flag/model",
-    "properties": {
-      "flag": "EXAMPLE",
-      "model": {
-        "group": "kubevirt.io",
-        "version": "v1alpha3",
-        "kind": "ExampleModel"
-      }
-    }
-  },
-  {
     "type": "console.page/route",
     "properties": {
-      "exact": false,
-      "path": "/clusters",
-      "component": { "$codeRef": "clustersComp" }
-    }
-  },
-  {
-    "type": "console.page/route",
-    "properties": {
-      "exact": false,
-      "path": "/storagerepos",
-      "component": { "$codeRef": "storageReposComp" }
-    }
-  },
-  {
-    "type": "console.page/route",
-    "properties": {
-      "exact": false,
-      "path": "/plans",
-      "component": { "$codeRef": "plansComp" }
+      "exact": true,
+      "path": "/example",
+      "component": { "$codeRef": "ExamplePage" }
     }
   },
   {
     "type": "console.navigation/href",
     "properties": {
-      "id": "clusters-page",
-      "name": "Clusters",
-      "href": "/clusters",
-      "section": "admin-migrations-section"
-    }
-  },
-  {
-    "type": "console.navigation/href",
-    "properties": {
-      "id": "storage-repos-page",
-      "name": "Replication repositories",
-      "href": "/storagerepos",
-      "section": "admin-migrations-section"
-    }
-  },
-  {
-    "type": "console.navigation/href",
-    "properties": {
-      "id": "plans-page",
-      "name": "Migration plans",
-      "href": "/plans",
-      "section": "admin-migrations-section"
-    }
-  },
-  {
-    "type": "console.navigation/section",
-    "properties": {
-      "id": "admin-migrations-section",
+      "id": "example",
+      "name": "Plugin Example",
+      "href": "/example",
       "perspective": "admin",
-      "name": "Migrations"
+      "section": "home"
     }
   }
 ]
