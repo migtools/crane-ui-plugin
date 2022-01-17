@@ -119,7 +119,3 @@ oc patch consoles.operator.openshift.io cluster \
 - [Dynamic Plugin Enhancement Proposal](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 
 The structure of this repository is based on [spadgett/console-plugin-template](https://github.com/spadgett/console-plugin-template).
-
-```
-
-```
