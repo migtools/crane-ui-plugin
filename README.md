@@ -67,17 +67,19 @@ Before you can deploy your plugin on a cluster, you must build an image and
 push it to an image registry.
 
 1. Build the image:
+
    ```sh
    docker build -t quay.io/konveyor/crane-ui-plugin:latest .
    ```
 
-````
-
 2. Run the image:
+
    ```sh
    docker run -it --rm -d -p 9001:80 quay.io/konveyor/crane-ui-plugin:latest
    ```
+
 3. Push the image:
+
    ```sh
    docker push quay.io/konveyor/crane-ui-plugin:latest
    ```
@@ -117,4 +119,7 @@ oc patch consoles.operator.openshift.io cluster \
 - [Dynamic Plugin Enhancement Proposal](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 
 The structure of this repository is based on [spadgett/console-plugin-template](https://github.com/spadgett/console-plugin-template).
-````
+
+```
+
+```
