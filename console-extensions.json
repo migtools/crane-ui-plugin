@@ -12,7 +12,7 @@
     "properties": {
       "id": "smart-import",
       "name": "Smart Import",
-      "insertAfter": "container-images"
+      "insertBefore": "pipelines"
     }
   },
   {

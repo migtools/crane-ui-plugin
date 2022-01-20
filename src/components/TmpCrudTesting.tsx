@@ -7,7 +7,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useMutation } from 'react-query';
 import { MOCK_NEW_PIPELINE } from '../mock/pipelines';
-import { Button, Flex, FlexItem, TextInput } from '@patternfly/react-core';
+import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
 
 // TODO -- move these helpers elsewhere? do we need them at all? Taken from https://github.com/spadgett/console-customization-plugin/blob/main/src/k8s/resources.ts
 /*
@@ -60,27 +60,35 @@ export const TmpCrudTesting: React.FunctionComponent<TmpCrudTestingProps> = ({ n
   console.log('RENDERED!');
   const createPipelineMutation = useCreatePipelineMutation();
   const [newPipelineName, setNewPipelineName] = React.useState('');
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   return (
-    <div>
-      Testing creation of a pipeline:
-      <Flex>
-        <FlexItem>
-          <TextInput value={newPipelineName} onChange={setNewPipelineName} />
-        </FlexItem>
-        <Button
-          onClick={() => {
-            createPipelineMutation.mutate(getNewMockPipeline(newPipelineName, namespace));
-            setNewPipelineName('');
-          }}
-        >
-          Create pipeline
-        </Button>
-        <FlexItem>Status: {createPipelineMutation.status}</FlexItem>
-      </Flex>
-      <br />
-      Testing a watch for pipeline CRs:
-      <br />
-      <pre>{JSON.stringify({ data, loaded, error }, null, 4)}</pre>
-    </div>
+    <>
+      <Button onClick={() => setIsModalOpen(true)}>CRUD debugging (ignore me)</Button>
+      <Modal
+        isOpen={isModalOpen}
+        title="CRUD debugging (ignore me)"
+        onClose={() => setIsModalOpen(false)}
+      >
+        Testing creation of a pipeline:
+        <Flex>
+          <FlexItem>
+            <TextInput value={newPipelineName} onChange={setNewPipelineName} />
+          </FlexItem>
+          <Button
+            onClick={() => {
+              createPipelineMutation.mutate(getNewMockPipeline(newPipelineName, namespace));
+              setNewPipelineName('');
+            }}
+          >
+            Create pipeline
+          </Button>
+          <FlexItem>Status: {createPipelineMutation.status}</FlexItem>
+        </Flex>
+        <br />
+        Testing a watch for pipeline CRs:
+        <br />
+        <pre>{JSON.stringify({ data, loaded, error }, null, 4)}</pre>
+      </Modal>
+    </>
   );
 };
