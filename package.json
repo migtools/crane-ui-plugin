@@ -53,7 +53,7 @@
     "displayName": "Konveyor Crane UI Plugin",
     "description": "Provides a UI for constructing container migration pipelines within the OpenShift console",
     "exposedModules": {
-      "ImportWizardPage": "./components/ImportWizardPage",
+      "ImportPage": "./components/ImportPage",
       "icons": "./utils/icons.tsx"
     },
     "dependencies": {

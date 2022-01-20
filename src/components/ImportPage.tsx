@@ -4,6 +4,7 @@ import { match as RouteMatch } from 'react-router-dom';
 import { Page, PageSection, Text, TextContent, TextVariants, Title } from '@patternfly/react-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { TmpCrudTesting } from './TmpCrudTesting';
+import { ImportWizard } from './ImportWizard/ImportWizard';
 
 const queryClient = new QueryClient();
 
@@ -11,7 +12,7 @@ interface PipelineWizardPageProps {
   match: RouteMatch<{ namespace: string }>;
 }
 
-const ImportWizardPage: React.FunctionComponent<PipelineWizardPageProps> = ({
+const ImportPage: React.FunctionComponent<PipelineWizardPageProps> = ({
   match: {
     params: { namespace },
   },
@@ -22,16 +23,14 @@ const ImportWizardPage: React.FunctionComponent<PipelineWizardPageProps> = ({
     </Helmet>
     <Page>
       <PageSection variant="light">
-        <Title headingLevel="h1">Hello, Crane!</Title>
-      </PageSection>
-      <PageSection variant="light">
-        <TextContent>
-          <Text component={TextVariants.p}>Wizard goes here! Using namespace: {namespace}</Text>
-        </TextContent>
+        <Title headingLevel="h1">Smart Import Wizard Name</Title>
         <TmpCrudTesting namespace={namespace} />
+      </PageSection>
+      <PageSection variant="light" type="wizard">
+        <ImportWizard />
       </PageSection>
     </Page>
   </QueryClientProvider>
 );
 
-export default ImportWizardPage;
+export default ImportPage;

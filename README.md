@@ -1,7 +1,5 @@
 # TODO
 
-- Test creating a placeholder pipeline? types?
-- Wizard boilerplate
 - Talk to Joachim, this is probably a good point for him to start
 - Basic form state with a few trivial fields from lib-ui (maybe make that PR for the isDirty stuff first...)
 - PREVIEW MODE? do we want to find a way to reuse this webpack? probably not, right? maybe just use CRA for that? how does the SDK CRUD stuff handle it, how do we mock that?
