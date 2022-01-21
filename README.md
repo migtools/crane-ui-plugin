@@ -1,5 +1,6 @@
 # TODO
 
+- Get the project switcher to work?
 - Talk to Joachim, this is probably a good point for him to start
 - Basic form state with a few trivial fields from lib-ui (maybe make that PR for the isDirty stuff first...)
 - PREVIEW MODE? do we want to find a way to reuse this webpack? probably not, right? maybe just use CRA for that? how does the SDK CRUD stuff handle it, how do we mock that?
@@ -112,6 +113,5 @@ oc patch consoles.operator.openshift.io cluster \
 - [Console Dynamic Plugin SDK README](https://github.com/openshift/console/tree/master/frontend/packages/console-dynamic-plugin-sdk)
 - [Console Dynamic Plugins feature page](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 - [Customization Plugin Example](https://github.com/spadgett/console-customization-plugin)
-- [Dynamic Plugin Enhancement Proposal](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 
 The structure of this repository is based on [spadgett/console-plugin-template](https://github.com/spadgett/console-plugin-template).
