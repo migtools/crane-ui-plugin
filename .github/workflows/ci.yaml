@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: Continuous Integration
+    name: Typecheck and Lint
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -19,5 +19,7 @@ jobs:
           node-version: 16
       - name: Install dependencies
         run: yarn install
+      - name: Run tsc
+        run: yarn tsc
       - name: Run eslint
         run: yarn lint
