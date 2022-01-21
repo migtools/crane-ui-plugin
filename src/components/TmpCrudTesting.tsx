@@ -8,6 +8,7 @@ import {
 import { useMutation } from 'react-query';
 import { MOCK_NEW_PIPELINE } from '../mock/pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
+import { useNamespaceContext } from '../context/NamespaceContext';
 
 // TODO -- move these helpers elsewhere? do we need them at all? Taken from https://github.com/spadgett/console-customization-plugin/blob/main/src/k8s/resources.ts
 /*
@@ -46,11 +47,8 @@ const useCreatePipelineMutation = () => {
   return useMutation<any, any, any, any>((data) => k8sCreate<any>({ model, data }));
 };
 
-interface TmpCrudTestingProps {
-  namespace: string;
-}
-
-export const TmpCrudTesting: React.FunctionComponent<TmpCrudTestingProps> = ({ namespace }) => {
+export const TmpCrudTesting: React.FunctionComponent = () => {
+  const namespace = useNamespaceContext();
   const [data, loaded, error] = useK8sWatchResource<any[]>({
     groupVersionKind: pipelineResource,
     isList: true,
@@ -63,7 +61,12 @@ export const TmpCrudTesting: React.FunctionComponent<TmpCrudTestingProps> = ({ n
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)}>CRUD debugging (ignore me)</Button>
+      <Button
+        onClick={() => setIsModalOpen(true)}
+        style={{ position: 'absolute', top: 100, right: 15 }}
+      >
+        CRUD debugging (ignore me)
+      </Button>
       <Modal
         isOpen={isModalOpen}
         title="CRUD debugging (ignore me)"

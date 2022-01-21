@@ -1,24 +1,3 @@
-# TODO
-
-- Test creating a placeholder pipeline? types?
-- Wizard boilerplate
-- Talk to Joachim, this is probably a good point for him to start
-- Basic form state with a few trivial fields from lib-ui (maybe make that PR for the isDirty stuff first...)
-- PREVIEW MODE? do we want to find a way to reuse this webpack? probably not, right? maybe just use CRA for that? how does the SDK CRUD stuff handle it, how do we mock that?
-- Get Surge deployments working in CI (maybe use better job names, reference forklift)
-- Actually implement the wizard steps presentation layer (available options for form fields can be from temp mocks)
-- Talk to backend folks about loading stuff from the proxy service?
-- Watch stuff from hackathon about Tekton pipelines? talk to Erik
-- Full read implementation, all the stuff we need for form fields, mock data for all of it
-- Full write implementation, create the pipelines
-- Navigate to the pipeline page on submit
-- ???
-- Determine final URL path? /smart-import seems too generic?
-- Determine if we need accessReview restrictions? see [example here](https://github.com/openshift/console/blob/3fd316564da4937798e11ca2024852cfa817681c/frontend/packages/dev-console/console-extensions.json#L115)
-- Replace quay.io/konveyor/crane-ui-plugin:latest with the real image URL if it changes
-- Double check final plugin name and description, replace "Konveyor Crane UI Plugin" in various places
-- Customize iconClass and tags in template.yaml?
-
 # Crane UI - OpenShift Dynamic Plugin
 
 **NOTE: This repository is brand new and under active prerelease development.**
@@ -114,6 +93,5 @@ oc patch consoles.operator.openshift.io cluster \
 - [Console Dynamic Plugin SDK README](https://github.com/openshift/console/tree/master/frontend/packages/console-dynamic-plugin-sdk)
 - [Console Dynamic Plugins feature page](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 - [Customization Plugin Example](https://github.com/spadgett/console-customization-plugin)
-- [Dynamic Plugin Enhancement Proposal](https://github.com/openshift/enhancements/blob/master/enhancements/console/dynamic-plugins.md)
 
 The structure of this repository is based on [spadgett/console-plugin-template](https://github.com/spadgett/console-plugin-template).

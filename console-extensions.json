@@ -4,7 +4,7 @@
     "properties": {
       "exact": true,
       "path": "/import-application/ns/:namespace",
-      "component": { "$codeRef": "ImportWizardPage" }
+      "component": { "$codeRef": "ImportPage" }
     }
   },
   {
