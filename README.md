@@ -8,6 +8,8 @@ It is provided as an OpenShift Console dynamic plugin which requires OpenShift 4
 
 You can run the plugin using a local development environment or build an image to deploy it to a cluster.
 
+TEST
+
 ## Local development
 
 You'll need:
