@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { Wizard, WizardStepFunctionType } from '@patternfly/react-core';
 import { useNamespaceContext } from '../../context/NamespaceContext'; // Should we use tsconfig-paths?
+import { SourceClusterProjectStep } from './SourceClusterProjectStep';
+import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
+import { PVsSelectStep } from './PVsSelectStep';
+import { PVsEditStep } from './PVsEditStep';
+import { PipelineSettingsStep } from './PipelineSettingsStep';
+import { ReviewStep } from './ReviewStep';
 
 export const ImportWizard: React.FunctionComponent = () => {
   enum StepId {
@@ -11,7 +17,6 @@ export const ImportWizard: React.FunctionComponent = () => {
     PipelineSettings,
     Review,
   }
-
   const steps = [
     {
       name: 'Source information',
@@ -19,13 +24,13 @@ export const ImportWizard: React.FunctionComponent = () => {
         {
           id: StepId.SourceClusterProject,
           name: 'Cluster and project',
-          component: <>TODO</>,
+          component: <SourceClusterProjectStep />,
           enableNext: true,
         },
         {
           id: StepId.SourceProjectDetails,
           name: 'Project details',
-          component: <>TODO</>,
+          component: <SourceProjectDetailsStep />,
           enableNext: true,
         },
       ],
@@ -36,13 +41,13 @@ export const ImportWizard: React.FunctionComponent = () => {
         {
           id: StepId.PVsSelect,
           name: 'Select',
-          component: <>TODO</>,
+          component: <PVsSelectStep />,
           enableNext: true,
         },
         {
           id: StepId.PVsEdit,
           name: 'Edit',
-          component: <>TODO</>,
+          component: <PVsEditStep />,
           enableNext: true,
         },
       ],
@@ -50,13 +55,13 @@ export const ImportWizard: React.FunctionComponent = () => {
     {
       id: StepId.PipelineSettings,
       name: 'Pipeline settings',
-      component: <>TODO</>,
+      component: <PipelineSettingsStep />,
       enableNext: true,
     },
     {
       id: StepId.Review,
       name: 'Review',
-      component: <>TODO</>,
+      component: <ReviewStep />,
     },
   ];
 
