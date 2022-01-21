@@ -61,7 +61,12 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   return (
     <>
-      <Button onClick={() => setIsModalOpen(true)}>CRUD debugging (ignore me)</Button>
+      <Button
+        onClick={() => setIsModalOpen(true)}
+        style={{ position: 'absolute', top: 100, right: 15 }}
+      >
+        CRUD debugging (ignore me)
+      </Button>
       <Modal
         isOpen={isModalOpen}
         title="CRUD debugging (ignore me)"
