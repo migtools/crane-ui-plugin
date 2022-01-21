@@ -10,6 +10,7 @@
     "start": "yarn ts-node node_modules/.bin/webpack serve",
     "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
     "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
+    "tsc": "tsc --noEmit",
     "lint": "eslint ./src",
     "lint:fix": "yarn lint --fix"
   },
