@@ -1,5 +1,6 @@
-import { Wizard } from '@patternfly/react-core';
 import * as React from 'react';
+import { Wizard, WizardStepFunctionType } from '@patternfly/react-core';
+import { useNamespaceContext } from '../../context/NamespaceContext'; // Should we use tsconfig-paths?
 
 export const ImportWizard: React.FunctionComponent = () => {
   enum StepId {
@@ -18,13 +19,13 @@ export const ImportWizard: React.FunctionComponent = () => {
         {
           id: StepId.SourceClusterProject,
           name: 'Cluster and project',
-          component: <></>,
+          component: <>TODO</>,
           enableNext: true,
         },
         {
           id: StepId.SourceProjectDetails,
           name: 'Project details',
-          component: <></>,
+          component: <>TODO</>,
           enableNext: true,
         },
       ],
@@ -35,13 +36,13 @@ export const ImportWizard: React.FunctionComponent = () => {
         {
           id: StepId.PVsSelect,
           name: 'Select',
-          component: <></>,
+          component: <>TODO</>,
           enableNext: true,
         },
         {
           id: StepId.PVsEdit,
-          name: '',
-          component: <></>,
+          name: 'Edit',
+          component: <>TODO</>,
           enableNext: true,
         },
       ],
@@ -49,22 +50,33 @@ export const ImportWizard: React.FunctionComponent = () => {
     {
       id: StepId.PipelineSettings,
       name: 'Pipeline settings',
-      component: <></>,
+      component: <>TODO</>,
       enableNext: true,
     },
     {
       id: StepId.Review,
       name: 'Review',
-      component: <></>,
+      component: <>TODO</>,
     },
   ];
+
+  const allMutationResults = []; // TODO do we need this?
+
+  // TODO do we need this?
+  const resetResultsOnNav: WizardStepFunctionType = (_newStep, prevStep) => {
+    if (prevStep.prevId === StepId.Review) {
+      allMutationResults.forEach((result) => result.reset());
+    }
+  };
+
+  const namespace = useNamespaceContext();
 
   return (
     <Wizard
       steps={steps}
       onSubmit={(event) => event.preventDefault()}
-      onSave={onSave}
-      onClose={onClose}
+      onSave={() => console.log('SAVE WIZARD!')}
+      onClose={() => (document.location = `/add/ns/${namespace}`)}
       onBack={resetResultsOnNav}
       onGoToStep={resetResultsOnNav}
     />
