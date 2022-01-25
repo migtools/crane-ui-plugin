@@ -4,16 +4,16 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
-export const PipelineSettingsStep: React.FunctionComponent = () => {
-  const form = React.useContext(ImportWizardFormContext).pipelineSettings;
-  console.log('pipeline settings form', form);
+export const PVEditStep: React.FunctionComponent = () => {
+  const form = React.useContext(ImportWizardFormContext).pvEdit;
+  console.log('pvs edit form', form);
 
   return (
     <>
       <TextContent className={spacing.mbMd}>
-        <Text component="h2">Pipeline settings</Text>
+        <Text component="h2">Edit PVs</Text>
       </TextContent>
-      <Form>TODO: form fields for pipeline settings</Form>
+      <Form>TODO: form fields for edit PVs</Form>
     </>
   );
 };

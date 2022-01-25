@@ -15,6 +15,7 @@
     "lint:fix": "yarn lint --fix"
   },
   "devDependencies": {
+    "@konveyor/lib-ui": "^6.0.0",
     "@openshift-console/dynamic-plugin-sdk": "0.0.3",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
     "@patternfly/react-core": "^4.181.1",
@@ -24,6 +25,7 @@
     "@types/react-router-dom": "^5.3.2",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
+    "axios": "^0.21.1",
     "comment-json": "^4.1.1",
     "css-loader": "^6.5.1",
     "eslint": "^8.6.0",
