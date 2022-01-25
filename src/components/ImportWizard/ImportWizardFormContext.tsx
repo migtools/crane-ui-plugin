@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { useFormState } from '@konveyor/lib-ui';
+import * as yup from 'yup';
+import { useFormField, useFormState } from '@konveyor/lib-ui';
 
 export const useImportWizardFormState = () => ({
-  sourceClusterProject: useFormState({}),
+  sourceClusterProject: useFormState({
+    projectName: useFormField('', yup.string().label('Project name').required()),
+  }),
   sourceProjectDetails: useFormState({}),
   pvSelect: useFormState({}),
   pvEdit: useFormState({}),
