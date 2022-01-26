@@ -4,8 +4,8 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export const ReviewStep: React.FunctionComponent = () => {
-  const form = React.useContext(ImportWizardFormContext).review;
-  console.log('review form', form);
+  const forms = React.useContext(ImportWizardFormContext);
+  console.log('all forms', forms);
 
   return (
     <>

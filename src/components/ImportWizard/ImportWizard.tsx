@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Wizard, WizardStepFunctionType } from '@patternfly/react-core';
+import { Wizard } from '@patternfly/react-core';
 
-import { useNamespaceContext } from '../../context/NamespaceContext'; // Should we use tsconfig-paths?
+import { useNamespaceContext } from '../../context/NamespaceContext'; // TODO should we use tsconfig-paths?
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
 import { PVSelectStep } from './PVSelectStep';
@@ -20,8 +20,9 @@ enum StepId {
 }
 
 export const ImportWizard: React.FunctionComponent = () => {
-  const formState = useImportWizardFormState();
+  const forms = useImportWizardFormState();
 
+  /*
   const allMutationResults = []; // TODO do we need this?
 
   // TODO do we need this?
@@ -30,11 +31,12 @@ export const ImportWizard: React.FunctionComponent = () => {
       allMutationResults.forEach((result) => result.reset());
     }
   };
+  */
 
   const namespace = useNamespaceContext();
 
   return (
-    <ImportWizardFormContext.Provider value={formState}>
+    <ImportWizardFormContext.Provider value={forms}>
       <Wizard
         steps={[
           {
@@ -44,13 +46,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.SourceClusterProject,
                 name: 'Cluster and project',
                 component: <SourceClusterProjectStep />,
-                enableNext: true,
+                enableNext: forms.sourceClusterProject.isValid,
               },
               {
                 id: StepId.SourceProjectDetails,
                 name: 'Project details',
                 component: <SourceProjectDetailsStep />,
-                enableNext: true,
+                enableNext: forms.sourceProjectDetails.isValid,
               },
             ],
           },
@@ -61,13 +63,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.PVSelect,
                 name: 'Select',
                 component: <PVSelectStep />,
-                enableNext: true,
+                enableNext: forms.pvSelect.isValid,
               },
               {
                 id: StepId.PVEdit,
                 name: 'Edit',
                 component: <PVEditStep />,
-                enableNext: true,
+                enableNext: forms.pvEdit.isValid,
               },
             ],
           },
@@ -75,19 +77,20 @@ export const ImportWizard: React.FunctionComponent = () => {
             id: StepId.PipelineSettings,
             name: 'Pipeline settings',
             component: <PipelineSettingsStep />,
-            enableNext: true,
+            enableNext: forms.pipelineSettings.isValid,
           },
           {
             id: StepId.Review,
             name: 'Review',
             component: <ReviewStep />,
+            nextButtonText: 'Finish',
           },
         ]}
         onSubmit={(event) => event.preventDefault()}
         onSave={() => console.log('SAVE WIZARD!')}
         onClose={() => (document.location = `/add/ns/${namespace}`)}
-        onBack={resetResultsOnNav}
-        onGoToStep={resetResultsOnNav}
+        // onBack={resetResultsOnNav} // TODO do we need this?
+        // onGoToStep={resetResultsOnNav} // TODO do we need this?
       />
     </ImportWizardFormContext.Provider>
   );
