@@ -52,7 +52,7 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.SourceProjectDetails,
                 name: 'Project details',
                 component: <SourceProjectDetailsStep />,
-                enableNext: forms.sourceProjectDetails.isValid,
+                enableNext: true, // No form fields on this step
               },
             ],
           },

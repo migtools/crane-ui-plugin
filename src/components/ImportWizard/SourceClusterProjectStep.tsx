@@ -7,10 +7,7 @@ import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
-  console.log('source cluster and project form', form);
-
-  console.log('SCHEMA DESCRIBE:', form.fields.apiUrl.schema.describe());
-
+  // TODO validation -- creating Secret and ConfigMap? Do we drive that from yup async validation?
   return (
     <>
       <TextContent className={spacing.mbMd}>
@@ -29,9 +26,10 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           isRequired
           fieldId="token"
         />
+        {/* TODO this should be a typeahead select with values from the source cluster, disabled until ready */}
         <ValidatedTextInput
-          field={form.fields.projectName}
-          label={form.fields.projectName.schema.describe().label} // TODO derive this automatically in lib-ui?
+          field={form.fields.namespace}
+          label={form.fields.namespace.schema.describe().label} // TODO derive this automatically in lib-ui?
           isRequired
           fieldId="project-name"
         />
