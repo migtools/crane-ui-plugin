@@ -9,7 +9,7 @@ import {
 export interface PersistentVolume extends K8sResourceCommon {
   kind: 'PersistentVolume';
   metadata: ObjectMetadata & {
-    labels: {
+    labels?: {
       // TODO are these actually optional?
       CapacityGb?: string;
       Datacenter?: string;
@@ -31,11 +31,11 @@ export interface PersistentVolume extends K8sResourceCommon {
       storage: string; // e.g. '100Gi'
     };
     claimRef: ObjectReference;
-    nfs: {
+    nfs?: {
       path: string;
       server: string;
     };
-    nodeAffinity: {
+    nodeAffinity?: {
       required: {
         nodeSelectorTerms: {
           matchExpressions: {

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as yup from 'yup';
 import { useFormField, useFormState } from '@konveyor/lib-ui';
+import { PersistentVolume } from 'src/types/PersistentVolume';
 
 export const useImportWizardFormState = () => ({
   sourceClusterProject: useFormState({
@@ -8,7 +9,9 @@ export const useImportWizardFormState = () => ({
     token: useFormField('', yup.string().label('OAuth token').required()), // TODO format validation, and async connection validation?
     namespace: useFormField('', yup.string().label('Project name').required()), // TODO format validation, and async exists validation?
   }),
-  pvSelect: useFormState({}),
+  pvSelect: useFormState({
+    selectedPVs: useFormField<PersistentVolume[]>([], yup.array().required().min(1)),
+  }),
   pvEdit: useFormState({}),
   pipelineSettings: useFormState({}),
 });
