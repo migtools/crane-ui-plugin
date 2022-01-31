@@ -16,7 +16,7 @@ parameters:
   required: true
 - description: Namespace for your plugin. The namespace will be created by the template.
   name: NAMESPACE
-  value: mtk-operator
+  value: openshift-migration
   required: true
 - description: Container image of the plugin.
   name: IMAGE
