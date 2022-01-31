@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextContent, Text } from '@patternfly/react-core';
+import { TextContent, Text, MenuContent, MenuItem, MenuList } from '@patternfly/react-core';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useSelectionState } from '@konveyor/lib-ui';
@@ -9,6 +9,9 @@ import { PersistentVolume } from '../../types/PersistentVolume';
 import { MOCK_PERSISTENT_VOLUMES } from '../../mock/PersistentVolumes.mock';
 import { isSameResource } from '../../utils/helpers';
 import { useSortState } from '../../common/hooks/useSortState';
+import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
+
+export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
 
 export const PVSelectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).pvSelect;
@@ -73,7 +76,21 @@ export const PVSelectStep: React.FunctionComponent = () => {
               <Td dataLabel={columnNames.pvcName}>{pv.spec.claimRef.name}</Td>
               <Td dataLabel={columnNames.storageClass}>{pv.spec.storageClassName}</Td>
               <Td dataLabel={columnNames.capacity}>{pv.spec.capacity.storage}</Td>
-              <Td dataLabel={columnNames.pvMigrationType}>TODO state</Td>
+              <Td dataLabel={columnNames.pvMigrationType}>
+                <SimpleSelectMenu<PVMigrationType>
+                  selected={selected}
+                  setSelected={setSelected}
+                  toggleProps={{ isDisabled: false }}
+                >
+                  <MenuContent>
+                    <MenuList>
+                      <MenuItem itemId="fs-copy">Filesystem copy</MenuItem>
+                      <MenuItem itemId="ns-copy">Namespace copy</MenuItem>
+                      <MenuItem itemId="move">Move</MenuItem>
+                    </MenuList>
+                  </MenuContent>
+                </SimpleSelectMenu>
+              </Td>
               <Td modifier="fitContent">
                 <a href="#" onClick={() => alert('TODO!')}>
                   View JSON {/* TODO see how this is done in MTC, or open a modal? */}

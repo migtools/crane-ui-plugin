@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as yup from 'yup';
 import { useFormField, useFormState } from '@konveyor/lib-ui';
-import { PersistentVolume } from 'src/types/PersistentVolume';
+import { PersistentVolume } from '../../types/PersistentVolume';
 
 export const useImportWizardFormState = () => ({
   sourceClusterProject: useFormState({
@@ -11,6 +11,7 @@ export const useImportWizardFormState = () => ({
   }),
   pvSelect: useFormState({
     selectedPVs: useFormField<PersistentVolume[]>([], yup.array().required().min(1)),
+    migrationTypeByPV: null, // TODO
   }),
   pvEdit: useFormState({}),
   pipelineSettings: useFormState({}),
