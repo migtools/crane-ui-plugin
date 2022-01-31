@@ -20,8 +20,8 @@
     "properties": {
       "id": "import-application",
       "groupId": "smart-import",
-      "label": "Import application",
-      "description": "Import an application and associated resources from this cluster or a remote cluster",
+      "label": "Import from cluster",
+      "description": "Migrate a manually deployed application to an automated gitops workflow.",
       "href": "/import-application/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
     }

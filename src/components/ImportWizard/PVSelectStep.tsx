@@ -5,10 +5,10 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useSelectionState } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
-import { PersistentVolume } from '../../types/PersistentVolume';
-import { MOCK_PERSISTENT_VOLUMES } from '../../mock/PersistentVolumes.mock';
-import { isSameResource } from '../../utils/helpers';
-import { useSortState } from '../../common/hooks/useSortState';
+import { PersistentVolume } from 'src/types/PersistentVolume';
+import { MOCK_PERSISTENT_VOLUMES } from 'src/mock/PersistentVolumes.mock';
+import { isSameResource } from 'src/utils/helpers';
+import { useSortState } from 'src/common/hooks/useSortState';
 
 export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
 

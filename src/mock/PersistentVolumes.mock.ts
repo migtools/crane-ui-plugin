@@ -1,4 +1,4 @@
-import { PersistentVolume } from '../types/PersistentVolume'; // TODO try tsconfig-paths?
+import { PersistentVolume } from 'src/types/PersistentVolume';
 
 export let MOCK_PERSISTENT_VOLUMES: PersistentVolume[] = [];
 

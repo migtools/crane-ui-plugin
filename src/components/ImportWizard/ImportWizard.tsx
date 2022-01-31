@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Wizard } from '@patternfly/react-core';
 
-import { useNamespaceContext } from '../../context/NamespaceContext'; // TODO should we use tsconfig-paths?
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
 import { PVSelectStep } from './PVSelectStep';

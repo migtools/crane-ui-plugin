@@ -4,6 +4,7 @@ import { Configuration as WebpackConfiguration } from 'webpack';
 import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 import * as path from 'path';
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
@@ -21,6 +22,7 @@ const config: Configuration = {
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
+    plugins: [new TsconfigPathsPlugin()],
   },
   module: {
     rules: [
