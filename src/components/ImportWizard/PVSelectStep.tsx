@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextContent, Text, MenuContent, MenuItem, MenuList } from '@patternfly/react-core';
+import { TextContent, Text } from '@patternfly/react-core';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useSelectionState } from '@konveyor/lib-ui';
@@ -9,7 +9,6 @@ import { PersistentVolume } from '../../types/PersistentVolume';
 import { MOCK_PERSISTENT_VOLUMES } from '../../mock/PersistentVolumes.mock';
 import { isSameResource } from '../../utils/helpers';
 import { useSortState } from '../../common/hooks/useSortState';
-import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 
 export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
 
@@ -34,7 +33,6 @@ export const PVSelectStep: React.FunctionComponent = () => {
     pvcName: 'PVC Name',
     storageClass: 'Storage class',
     capacity: 'Capacity',
-    pvMigrationType: 'PV migration type',
   };
 
   return (
@@ -59,7 +57,6 @@ export const PVSelectStep: React.FunctionComponent = () => {
             <Th sort={{ sortBy, onSort, columnIndex: 0 }}>{columnNames.pvcName}</Th>
             <Th>{columnNames.storageClass}</Th>
             <Th>{columnNames.capacity}</Th>
-            <Th>{columnNames.pvMigrationType}</Th>
             <Th />
           </Tr>
         </Thead>
@@ -76,21 +73,6 @@ export const PVSelectStep: React.FunctionComponent = () => {
               <Td dataLabel={columnNames.pvcName}>{pv.spec.claimRef.name}</Td>
               <Td dataLabel={columnNames.storageClass}>{pv.spec.storageClassName}</Td>
               <Td dataLabel={columnNames.capacity}>{pv.spec.capacity.storage}</Td>
-              <Td dataLabel={columnNames.pvMigrationType}>
-                <SimpleSelectMenu<PVMigrationType>
-                  selected={selected}
-                  setSelected={setSelected}
-                  toggleProps={{ isDisabled: false }}
-                >
-                  <MenuContent>
-                    <MenuList>
-                      <MenuItem itemId="fs-copy">Filesystem copy</MenuItem>
-                      <MenuItem itemId="ns-copy">Namespace copy</MenuItem>
-                      <MenuItem itemId="move">Move</MenuItem>
-                    </MenuList>
-                  </MenuContent>
-                </SimpleSelectMenu>
-              </Td>
               <Td modifier="fitContent">
                 <a href="#" onClick={() => alert('TODO!')}>
                   View JSON {/* TODO see how this is done in MTC, or open a modal? */}

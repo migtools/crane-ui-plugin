@@ -11,7 +11,6 @@ export const useImportWizardFormState = () => ({
   }),
   pvSelect: useFormState({
     selectedPVs: useFormField<PersistentVolume[]>([], yup.array().required().min(1)),
-    migrationTypeByPV: null, // TODO
   }),
   pvEdit: useFormState({}),
   pipelineSettings: useFormState({}),
