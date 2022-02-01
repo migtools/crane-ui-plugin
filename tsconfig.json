@@ -11,4 +11,7 @@
     "skipLibCheck": true
   },
   "include": ["src"],
+  "paths": {
+    "src": ["src"]
+  }
 }

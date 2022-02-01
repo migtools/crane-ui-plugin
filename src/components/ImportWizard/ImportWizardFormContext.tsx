@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as yup from 'yup';
 import { useFormField, useFormState } from '@konveyor/lib-ui';
-import { PersistentVolume } from '../../types/PersistentVolume';
+import { PersistentVolume } from 'src/types/PersistentVolume';
 
 export const useImportWizardFormState = () => ({
   sourceClusterProject: useFormState({

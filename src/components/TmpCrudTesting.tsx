@@ -6,9 +6,9 @@ import {
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useMutation } from 'react-query';
-import { MOCK_NEW_PIPELINE } from '../mock/pipelines.mock';
+import { MOCK_NEW_PIPELINE } from 'src/mock/pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
-import { useNamespaceContext } from '../context/NamespaceContext';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 
 // TODO -- move these helpers elsewhere? do we need them at all? Taken from https://github.com/spadgett/console-customization-plugin/blob/main/src/k8s/resources.ts
 /*

@@ -5,7 +5,7 @@ import { Page, PageSection, Title } from '@patternfly/react-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { TmpCrudTesting } from './TmpCrudTesting';
 import { ImportWizard } from './ImportWizard/ImportWizard';
-import { NamespaceContext } from '../context/NamespaceContext';
+import { NamespaceContext } from 'src/context/NamespaceContext';
 
 const queryClient = new QueryClient();
 
