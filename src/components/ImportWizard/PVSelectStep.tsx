@@ -4,11 +4,11 @@ import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-tab
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useSelectionState } from '@konveyor/lib-ui';
 
-import { getDefaultEditValuesForPV, ImportWizardFormContext } from './ImportWizardFormContext';
 import { PersistentVolume } from 'src/types/PersistentVolume';
 import { MOCK_PERSISTENT_VOLUMES } from 'src/mock/PersistentVolumes.mock';
 import { isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
+import { getDefaultEditValuesForPV, ImportWizardFormContext } from './ImportWizardFormContext';
 
 export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
 

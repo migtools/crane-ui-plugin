@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { TextContent, Text, Form } from '@patternfly/react-core';
+import { TableComposable, Thead, Tr, Th, Tbody } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-import { ImportWizardFormContext } from './ImportWizardFormContext';
-import { TableComposable, Thead, Tr, Th, Tbody } from '@patternfly/react-table';
 import { useSortState } from 'src/common/hooks/useSortState';
-
+import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { PVEditStepTableRow } from './PVEditStepTableRow';
 
 export const columnNames = {
@@ -29,7 +28,7 @@ export const PVEditStep: React.FunctionComponent = () => {
   return (
     <>
       <TextContent className={spacing.mbMd}>
-        <Text component="h2">Edit PVs</Text>
+        <Text component="h2">Edit persistent volumes</Text>
         <Text component="p">
           Change properties of persistent volumes when copied to the target project. Also, select
           whether the copy should be verified on the target.
