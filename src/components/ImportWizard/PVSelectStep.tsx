@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { TextContent, Text } from '@patternfly/react-core';
+import { TextContent, Text, Form } from '@patternfly/react-core';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useSelectionState } from '@konveyor/lib-ui';
 
-import { ImportWizardFormContext } from './ImportWizardFormContext';
+import { getDefaultEditValuesForPV, ImportWizardFormContext } from './ImportWizardFormContext';
 import { PersistentVolume } from 'src/types/PersistentVolume';
 import { MOCK_PERSISTENT_VOLUMES } from 'src/mock/PersistentVolumes.mock';
 import { isSameResource } from 'src/utils/helpers';
@@ -13,7 +13,8 @@ import { useSortState } from 'src/common/hooks/useSortState';
 export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
 
 export const PVSelectStep: React.FunctionComponent = () => {
-  const form = React.useContext(ImportWizardFormContext).pvSelect;
+  const forms = React.useContext(ImportWizardFormContext);
+  const form = forms.pvSelect;
 
   const pvs = MOCK_PERSISTENT_VOLUMES; // TODO load from a real query via proxy
 
@@ -22,11 +23,21 @@ export const PVSelectStep: React.FunctionComponent = () => {
 
   // TODO figure out if we need infinite-scroll? Look into how VirtualizedTable works in the SDK / Console?
 
+  const setSelectedPVsAndPrefillEdit = (selectedPVs: PersistentVolume[]) => {
+    form.fields.selectedPVs.setValue(selectedPVs);
+    const defaultValuesByPVName = {};
+    selectedPVs.forEach((pv) => {
+      defaultValuesByPVName[pv.metadata.name] =
+        forms.pvEdit.values.valuesByPVName[pv.metadata.name] || getDefaultEditValuesForPV(pv);
+    });
+    forms.pvEdit.fields.valuesByPVName.setValue(defaultValuesByPVName);
+  };
+
   const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } =
     useSelectionState<PersistentVolume>({
       items: pvs,
       isEqual: (a, b) => isSameResource(a.metadata, b.metadata),
-      externalState: [form.fields.selectedPVs.value, form.fields.selectedPVs.setValue],
+      externalState: [form.fields.selectedPVs.value, setSelectedPVsAndPrefillEdit],
     });
 
   const columnNames = {
@@ -45,43 +56,45 @@ export const PVSelectStep: React.FunctionComponent = () => {
       </TextContent>
       {/* TODO FilterToolbar -- do we want to actually move it to lib-ui now? */}
       {/* TODO do we need to remove the border on the bottom of the header row as in the mockups? */}
-      <TableComposable borders={false} variant="compact">
-        <Thead>
-          <Tr>
-            <Th
-              select={{
-                onSelect: (_event, isSelecting) => selectAll(isSelecting),
-                isSelected: areAllSelected,
-              }}
-            />
-            <Th sort={{ sortBy, onSort, columnIndex: 0 }}>{columnNames.pvcName}</Th>
-            <Th>{columnNames.storageClass}</Th>
-            <Th>{columnNames.capacity}</Th>
-            <Th />
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sortedItems.map((pv, rowIndex) => (
-            <Tr key={pv.metadata.name}>
-              <Td
+      <Form>
+        <TableComposable borders={false} variant="compact">
+          <Thead>
+            <Tr>
+              <Th
                 select={{
-                  rowIndex,
-                  onSelect: (_event, isSelecting) => toggleItemSelected(pv, isSelecting),
-                  isSelected: isItemSelected(pv),
+                  onSelect: (_event, isSelecting) => selectAll(isSelecting),
+                  isSelected: areAllSelected,
                 }}
               />
-              <Td dataLabel={columnNames.pvcName}>{pv.spec.claimRef.name}</Td>
-              <Td dataLabel={columnNames.storageClass}>{pv.spec.storageClassName}</Td>
-              <Td dataLabel={columnNames.capacity}>{pv.spec.capacity.storage}</Td>
-              <Td modifier="fitContent">
-                <a href="#" onClick={() => alert('TODO!')}>
-                  View JSON {/* TODO see how this is done in MTC, or open a modal? */}
-                </a>
-              </Td>
+              <Th sort={{ sortBy, onSort, columnIndex: 0 }}>{columnNames.pvcName}</Th>
+              <Th>{columnNames.storageClass}</Th>
+              <Th>{columnNames.capacity}</Th>
+              <Th />
             </Tr>
-          ))}
-        </Tbody>
-      </TableComposable>
+          </Thead>
+          <Tbody>
+            {sortedItems.map((pv, rowIndex) => (
+              <Tr key={pv.metadata.name}>
+                <Td
+                  select={{
+                    rowIndex,
+                    onSelect: (_event, isSelecting) => toggleItemSelected(pv, isSelecting),
+                    isSelected: isItemSelected(pv),
+                  }}
+                />
+                <Td dataLabel={columnNames.pvcName}>{pv.spec.claimRef.name}</Td>
+                <Td dataLabel={columnNames.storageClass}>{pv.spec.storageClassName}</Td>
+                <Td dataLabel={columnNames.capacity}>{pv.spec.capacity.storage}</Td>
+                <Td modifier="fitContent">
+                  <a href="#" onClick={() => alert('TODO!')}>
+                    View JSON {/* TODO see how this is done in MTC, or open a modal? */}
+                  </a>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </TableComposable>
+      </Form>
     </>
   );
 };
