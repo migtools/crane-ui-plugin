@@ -4,8 +4,30 @@ import { useFormField, useFormState } from '@konveyor/lib-ui';
 import { PersistentVolume } from 'src/types/PersistentVolume';
 
 export const useImportWizardFormState = () => {
-  // TODO move the setSelectedPVsAndPrefillEdit behavior from PVSelectStep here somehow? replace the setValue? useEffect?
-  const selectedPVsField = useFormField<PersistentVolume[]>([], yup.array().required().min(1));
+  const baseSelectedPVsField = useFormField<PersistentVolume[]>([], yup.array().required().min(1));
+  const selectedPVsField = {
+    ...baseSelectedPVsField,
+    setValue: (selectedPVs: PersistentVolume[]) => {
+      baseSelectedPVsField.setValue(selectedPVs);
+      // When selected PVs change, initialize the per-PV form values for the Edit PVs step
+      const defaultEditValuesByPV = {};
+      selectedPVs.forEach((pv) => {
+        const defaultEditValues = {
+          targetPvcName: pv.spec.claimRef.name,
+          storageClass: '',
+          capacity: '',
+          verifyCopy: false,
+        };
+        defaultEditValuesByPV[pv.metadata.name] =
+          editValuesByPVField.value[pv.metadata.name] || defaultEditValues;
+      });
+      editValuesByPVField.reinitialize(defaultEditValuesByPV);
+    },
+  };
+  const editValuesByPVField = useFormField<PVEditValuesByPVName>(
+    {},
+    yup.mixed<PVEditValuesByPVName>().required(),
+  );
   return {
     sourceClusterProject: useFormState({
       apiUrl: useFormField('', yup.string().label('Cluster API URL').required()), // TODO format validation, and async connection validation?
@@ -16,10 +38,7 @@ export const useImportWizardFormState = () => {
       selectedPVs: selectedPVsField,
     }),
     pvEdit: useFormState({
-      valuesByPVName: useFormField<PVEditValuesByPVName>(
-        {},
-        yup.mixed<PVEditValuesByPVName>().required(),
-      ),
+      valuesByPV: editValuesByPVField,
     }),
     pipelineSettings: useFormState({}),
   };
@@ -53,10 +72,3 @@ export const usePVEditRowFormState = (existing: PVEditRowFormValues) =>
   });
 
 export type PVEditValuesByPVName = Record<string, PVEditRowFormValues>;
-
-export const getDefaultEditValuesForPV = (pv: PersistentVolume): PVEditRowFormValues => ({
-  targetPvcName: pv.spec.claimRef.name,
-  storageClass: '',
-  capacity: '',
-  verifyCopy: false,
-});

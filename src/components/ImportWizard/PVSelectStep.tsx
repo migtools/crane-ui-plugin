@@ -8,7 +8,7 @@ import { PersistentVolume } from 'src/types/PersistentVolume';
 import { MOCK_PERSISTENT_VOLUMES } from 'src/mock/PersistentVolumes.mock';
 import { isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
-import { getDefaultEditValuesForPV, ImportWizardFormContext } from './ImportWizardFormContext';
+import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
 
@@ -23,21 +23,11 @@ export const PVSelectStep: React.FunctionComponent = () => {
 
   // TODO figure out if we need infinite-scroll? Look into how VirtualizedTable works in the SDK / Console?
 
-  const setSelectedPVsAndPrefillEdit = (selectedPVs: PersistentVolume[]) => {
-    form.fields.selectedPVs.setValue(selectedPVs);
-    const defaultValuesByPVName = {};
-    selectedPVs.forEach((pv) => {
-      defaultValuesByPVName[pv.metadata.name] =
-        forms.pvEdit.values.valuesByPVName[pv.metadata.name] || getDefaultEditValuesForPV(pv);
-    });
-    forms.pvEdit.fields.valuesByPVName.setValue(defaultValuesByPVName);
-  };
-
   const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } =
     useSelectionState<PersistentVolume>({
       items: pvs,
       isEqual: (a, b) => isSameResource(a.metadata, b.metadata),
-      externalState: [form.fields.selectedPVs.value, setSelectedPVsAndPrefillEdit],
+      externalState: [form.fields.selectedPVs.value, form.fields.selectedPVs.setValue],
     });
 
   const columnNames = {
