@@ -54,10 +54,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
               variant="link"
               icon={<CheckIcon />}
               onClick={() => {
-                // Save edits
-                Object.keys(rowForm.values).forEach((key) =>
-                  rowForm.fields[key].prefill(rowForm.values[key]),
-                );
+                rowForm.markSaved();
                 setEditedValues(rowForm.values);
                 setIsEditMode(!isEditMode);
               }}
@@ -66,7 +63,6 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
               variant="plain"
               icon={<TimesIcon />}
               onClick={() => {
-                // Cancel edits
                 rowForm.revert();
                 setEditedValues(existingValues);
                 setIsEditMode(!isEditMode);
