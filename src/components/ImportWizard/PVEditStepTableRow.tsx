@@ -61,7 +61,13 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
           existingValues.storageClass
         )}
       </Td>
-      <Td dataLabel={columnNames.capacity}>TODO: TextInput</Td>
+      <Td dataLabel={columnNames.capacity}>
+        {isEditMode ? (
+          <ValidatedTextInput field={rowForm.fields.capacity} fieldId="capacity" />
+        ) : (
+          existingValues.capacity
+        )}
+      </Td>
       <Td dataLabel={columnNames.verifyCopy}>TODO</Td>
       <Td modifier="nowrap">
         {!isEditMode ? (
@@ -83,6 +89,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
                 setEditedValues(rowForm.values);
                 setIsEditMode(!isEditMode);
               }}
+              isDisabled={!rowForm.isValid}
             />
             <Button
               variant="plain"

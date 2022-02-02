@@ -20,7 +20,7 @@ export const useImportWizardFormState = () => {
         const defaultEditValues: PVEditRowFormValues = {
           targetPvcName: pv.spec.claimRef.name,
           storageClass: defaultStorageClass.metadata.name,
-          capacity: '',
+          capacity: pv.spec.capacity.storage, // TODO format? suffix?
           verifyCopy: false,
         };
         defaultEditValuesByPV[pv.metadata.name] =
