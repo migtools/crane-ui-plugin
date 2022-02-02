@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { Wizard } from '@patternfly/react-core';
+import { Wizard, WizardFooter, WizardContextConsumer, Button } from '@patternfly/react-core';
+import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
+import { IFormState } from '@konveyor/lib-ui';
 
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
@@ -21,6 +23,20 @@ enum StepId {
 
 export const ImportWizard: React.FunctionComponent = () => {
   const forms = useImportWizardFormState();
+
+  const formsByStepId: Record<StepId, IFormState<unknown> | null> = {
+    [StepId.SourceClusterProject]: forms.sourceClusterProject,
+    [StepId.SourceProjectDetails]: null,
+    [StepId.PVSelect]: forms.pvSelect,
+    [StepId.PVEdit]: forms.pvEdit,
+    [StepId.PipelineSettings]: forms.pipelineSettings,
+    [StepId.Review]: null,
+  };
+  const firstInvalidFormStepId = Object.values(StepId).find(
+    (id: StepId) => formsByStepId[id] && !formsByStepId[id].isValid,
+  ) as StepId | undefined;
+  const stepIdReached =
+    firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review;
 
   /*
   const allMutationResults = []; // TODO do we need this?
@@ -46,13 +62,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.SourceClusterProject,
                 name: 'Cluster and project',
                 component: <SourceClusterProjectStep />,
-                enableNext: forms.sourceClusterProject.isValid,
+                canJumpTo: stepIdReached >= StepId.SourceClusterProject,
               },
               {
                 id: StepId.SourceProjectDetails,
                 name: 'Project details',
                 component: <SourceProjectDetailsStep />,
-                enableNext: true, // No form fields on this step
+                canJumpTo: stepIdReached >= StepId.SourceProjectDetails,
               },
             ],
           },
@@ -63,13 +79,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.PVSelect,
                 name: 'Select',
                 component: <PVSelectStep />,
-                enableNext: forms.pvSelect.isValid,
+                canJumpTo: stepIdReached >= StepId.PVSelect,
               },
               {
                 id: StepId.PVEdit,
                 name: 'Edit',
                 component: <PVEditStep />,
-                enableNext: forms.pvEdit.isValid,
+                canJumpTo: stepIdReached >= StepId.PVEdit,
               },
             ],
           },
@@ -77,13 +93,13 @@ export const ImportWizard: React.FunctionComponent = () => {
             id: StepId.PipelineSettings,
             name: 'Pipeline settings',
             component: <PipelineSettingsStep />,
-            enableNext: forms.pipelineSettings.isValid,
+            canJumpTo: stepIdReached >= StepId.PipelineSettings,
           },
           {
             id: StepId.Review,
             name: 'Review',
             component: <ReviewStep />,
-            nextButtonText: 'Finish',
+            canJumpTo: stepIdReached >= StepId.Review,
           },
         ]}
         onSubmit={(event) => event.preventDefault()}
@@ -91,6 +107,38 @@ export const ImportWizard: React.FunctionComponent = () => {
         onClose={() => (document.location = `/add/ns/${namespace}`)}
         // onBack={resetResultsOnNav} // TODO do we need this?
         // onGoToStep={resetResultsOnNav} // TODO do we need this?
+        footer={
+          <WizardFooter>
+            <WizardContextConsumer>
+              {({ activeStep, onNext, onBack, onClose }) => {
+                const onFinalStep = activeStep.id === StepId.Review;
+                const stepForm = formsByStepId[activeStep.id as StepId];
+                const isNextDisabled = !!stepForm && !stepForm.isValid;
+                const isBackDisabled = false;
+                return (
+                  <>
+                    <Button
+                      variant="primary"
+                      type="submit"
+                      onClick={onNext}
+                      isDisabled={isNextDisabled}
+                    >
+                      {onFinalStep ? 'Finish' : 'Next'}
+                    </Button>
+                    <Button variant="secondary" onClick={onBack} isDisabled={isBackDisabled}>
+                      Back
+                    </Button>
+                    <div className={wizardStyles.wizardFooterCancel}>
+                      <Button variant="link" onClick={onClose}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </>
+                );
+              }}
+            </WizardContextConsumer>
+          </WizardFooter>
+        }
       />
     </ImportWizardFormContext.Provider>
   );
