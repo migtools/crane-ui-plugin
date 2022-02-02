@@ -42,7 +42,7 @@ export const PVEditStep: React.FunctionComponent = () => {
             <Tr>
               <Th sort={{ sortBy, onSort, columnIndex: 0 }}>{columnNames.sourcePvcName}</Th>
               <Th>{columnNames.targetPvcName}</Th>
-              <Th>{columnNames.storageClass}</Th>
+              <Th width={20}>{columnNames.storageClass}</Th>
               <Th>{columnNames.capacity}</Th>
               <Th>{columnNames.verifyCopy}</Th>
               <Th />

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { MenuToggle, Menu, Popper, MenuToggleProps } from '@patternfly/react-core';
+import { MenuToggle, Menu, Popper, MenuToggleProps, MenuProps } from '@patternfly/react-core';
 
 // Based on https://www.patternfly.org/v4/demos/composable-menu#select-menu
 
-interface SimpleSelectMenuProps<T extends string | number> {
+interface SimpleSelectMenuProps<T extends string | number> extends MenuProps {
   selected: T;
   setSelected: (value: T) => void;
   children: React.ReactNode;
@@ -15,6 +15,7 @@ export const SimpleSelectMenu = <T extends string | number>({
   setSelected,
   children,
   toggleProps = {},
+  ...props
 }: React.PropsWithChildren<SimpleSelectMenuProps<T>>): JSX.Element | null => {
   const [isOpen, setIsOpen] = React.useState(false);
   const toggleRef = React.useRef<HTMLButtonElement>();
@@ -22,15 +23,15 @@ export const SimpleSelectMenu = <T extends string | number>({
 
   React.useEffect(() => {
     const handleMenuKeys = (event: KeyboardEvent) => {
-      if (isOpen && menuRef.current.contains(event.target as Node)) {
+      if (isOpen && menuRef.current?.contains(event.target as Node)) {
         if (event.key === 'Escape' || event.key === 'Tab') {
           setIsOpen(!isOpen);
-          toggleRef.current.focus();
+          toggleRef.current?.focus();
         }
       }
     };
     const handleClickOutside = (event: MouseEvent) => {
-      if (isOpen && !menuRef.current.contains(event.target as Node)) {
+      if (isOpen && !menuRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -67,6 +68,7 @@ export const SimpleSelectMenu = <T extends string | number>({
         setIsOpen(false);
       }}
       selected={selected}
+      {...props}
     >
       {children}
     </Menu>
