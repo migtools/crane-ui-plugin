@@ -45,6 +45,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
           <SimpleSelectMenu<string>
             selected={rowForm.values.storageClass}
             setSelected={rowForm.fields.storageClass.setValue}
+            toggleProps={{ style: { width: '100%' } }}
           >
             <MenuContent>
               <MenuList>
