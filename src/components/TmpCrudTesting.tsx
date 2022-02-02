@@ -55,7 +55,6 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
     namespaced: true,
     namespace,
   });
-  console.log('RENDERED!');
   const createPipelineMutation = useCreatePipelineMutation();
   const [newPipelineName, setNewPipelineName] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
