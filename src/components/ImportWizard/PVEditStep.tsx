@@ -44,7 +44,7 @@ export const PVEditStep: React.FunctionComponent = () => {
               <Th>{columnNames.targetPvcName}</Th>
               <Th width={20}>{columnNames.storageClass}</Th>
               <Th>{columnNames.capacity}</Th>
-              <Th>{columnNames.verifyCopy}</Th>
+              <Th textCenter>{columnNames.verifyCopy}</Th>
               <Th />
             </Tr>
           </Thead>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Tr, Td } from '@patternfly/react-table';
-import { Button, MenuContent, MenuItem, MenuList } from '@patternfly/react-core';
+import { Button, Checkbox, MenuContent, MenuItem, MenuList } from '@patternfly/react-core';
 import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-icon';
 import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 import CheckIcon from '@patternfly/react-icons/dist/esm/icons/check-icon';
@@ -37,7 +37,10 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
       <Td dataLabel={columnNames.sourcePvcName}>{pv.spec.claimRef.name}</Td>
       <Td dataLabel={columnNames.targetPvcName}>
         {isEditMode ? (
-          <ValidatedTextInput field={rowForm.fields.targetPvcName} fieldId="target-pvc-name" />
+          <ValidatedTextInput
+            field={rowForm.fields.targetPvcName}
+            fieldId={`target-pvc-name-${pv.spec.claimRef.name}`}
+          />
         ) : (
           existingValues.targetPvcName
         )}
@@ -48,6 +51,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
             selected={rowForm.values.storageClass}
             setSelected={rowForm.fields.storageClass.setValue}
             toggleProps={{ style: { width: '100%' } }}
+            id={`storage-class-select-${pv.spec.claimRef.name}`}
           >
             <MenuContent>
               <MenuList>
@@ -65,12 +69,23 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
       </Td>
       <Td dataLabel={columnNames.capacity}>
         {isEditMode ? (
-          <ValidatedTextInput field={rowForm.fields.capacity} fieldId="capacity" />
+          <ValidatedTextInput
+            field={rowForm.fields.capacity}
+            fieldId={`capacity-${pv.spec.claimRef.name}`}
+          />
         ) : (
           existingValues.capacity
         )}
       </Td>
-      <Td dataLabel={columnNames.verifyCopy}>TODO</Td>
+      <Td dataLabel={columnNames.verifyCopy} textCenter>
+        <Checkbox
+          aria-label={`Verify copy for PVC ${pv.spec.claimRef.name}`}
+          isDisabled={!isEditMode}
+          isChecked={rowForm.values.verifyCopy}
+          onChange={rowForm.fields.verifyCopy.setValue}
+          id={`verify-copy-${pv.spec.claimRef.name}`}
+        />
+      </Td>
       <Td modifier="nowrap">
         {!isEditMode ? (
           <Button
