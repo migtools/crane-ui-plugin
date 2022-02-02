@@ -16,19 +16,21 @@ interface PVEditStepTableRowProps {
   pv: PersistentVolume;
   existingValues: PVEditRowFormValues;
   setEditedValues: (values: PVEditRowFormValues) => void;
+  isEditMode: boolean;
+  setIsEditMode: (isEditMode: boolean) => void;
 }
 
 export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps> = ({
   pv,
   existingValues,
   setEditedValues,
+  isEditMode,
+  setIsEditMode,
 }) => {
   // TODO load this from the host cluster via the SDK
   const storageClasses = MOCK_STORAGE_CLASSES;
 
   const rowForm = usePVEditRowFormState(existingValues);
-
-  const [isEditMode, setIsEditMode] = React.useState(false);
 
   return (
     <Tr key={pv.metadata.name}>
@@ -75,7 +77,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
             variant="link"
             icon={<PencilAltIcon />}
             iconPosition="right"
-            onClick={() => setIsEditMode(!isEditMode)}
+            onClick={() => setIsEditMode(true)}
           >
             Edit
           </Button>
@@ -87,7 +89,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
               onClick={() => {
                 rowForm.markSaved();
                 setEditedValues(rowForm.values);
-                setIsEditMode(!isEditMode);
+                setIsEditMode(false);
               }}
               isDisabled={!rowForm.isValid}
             />
@@ -97,7 +99,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
               onClick={() => {
                 rowForm.revert();
                 setEditedValues(existingValues);
-                setIsEditMode(!isEditMode);
+                setIsEditMode(false);
               }}
             >
               <TimesIcon />

@@ -53,11 +53,18 @@ export const PVEditStep: React.FunctionComponent = () => {
               <PVEditStepTableRow
                 key={pv.metadata.name}
                 pv={pv}
-                existingValues={form.values.valuesByPV[pv.metadata.name]}
+                existingValues={form.values.editValuesByPV[pv.metadata.name]}
                 setEditedValues={(newValues) => {
-                  form.fields.valuesByPV.setValue((oldValues) => ({
+                  form.fields.editValuesByPV.setValue((oldValues) => ({
                     ...oldValues,
                     [pv.metadata.name]: newValues,
+                  }));
+                }}
+                isEditMode={form.values.isEditModeByPV[pv.metadata.name]}
+                setIsEditMode={(isEditMode) => {
+                  form.fields.isEditModeByPV.setValue((oldValues) => ({
+                    ...oldValues,
+                    [pv.metadata.name]: isEditMode,
                   }));
                 }}
               />

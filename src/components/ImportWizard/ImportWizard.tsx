@@ -1,5 +1,11 @@
 import * as React from 'react';
-import { Wizard, WizardFooter, WizardContextConsumer, Button } from '@patternfly/react-core';
+import {
+  Wizard,
+  WizardFooter,
+  WizardContextConsumer,
+  Button,
+  Tooltip,
+} from '@patternfly/react-core';
 import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
 import { IFormState } from '@konveyor/lib-ui';
 
@@ -38,6 +44,16 @@ export const ImportWizard: React.FunctionComponent = () => {
   const stepIdReached =
     firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review;
 
+  const somePVRowIsEditMode = Object.values(forms.pvEdit.values.isEditModeByPV).some(
+    (isEditMode) => isEditMode,
+  );
+  const allNavDisabled = somePVRowIsEditMode;
+  const navDisabledReason = somePVRowIsEditMode
+    ? 'Confirm or cancel row edits before proceeding'
+    : null;
+  const canMoveToStep = (stepId: StepId) =>
+    !allNavDisabled && stepId >= 0 && stepIdReached >= stepId;
+
   /*
   const allMutationResults = []; // TODO do we need this?
 
@@ -62,13 +78,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.SourceClusterProject,
                 name: 'Cluster and project',
                 component: <SourceClusterProjectStep />,
-                canJumpTo: stepIdReached >= StepId.SourceClusterProject,
+                canJumpTo: canMoveToStep(StepId.SourceClusterProject),
               },
               {
                 id: StepId.SourceProjectDetails,
                 name: 'Project details',
                 component: <SourceProjectDetailsStep />,
-                canJumpTo: stepIdReached >= StepId.SourceProjectDetails,
+                canJumpTo: canMoveToStep(StepId.SourceProjectDetails),
               },
             ],
           },
@@ -79,13 +95,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.PVSelect,
                 name: 'Select',
                 component: <PVSelectStep />,
-                canJumpTo: stepIdReached >= StepId.PVSelect,
+                canJumpTo: canMoveToStep(StepId.PVSelect),
               },
               {
                 id: StepId.PVEdit,
                 name: 'Edit',
                 component: <PVEditStep />,
-                canJumpTo: stepIdReached >= StepId.PVEdit,
+                canJumpTo: canMoveToStep(StepId.PVEdit),
               },
             ],
           },
@@ -93,13 +109,13 @@ export const ImportWizard: React.FunctionComponent = () => {
             id: StepId.PipelineSettings,
             name: 'Pipeline settings',
             component: <PipelineSettingsStep />,
-            canJumpTo: stepIdReached >= StepId.PipelineSettings,
+            canJumpTo: canMoveToStep(StepId.PipelineSettings),
           },
           {
             id: StepId.Review,
             name: 'Review',
             component: <ReviewStep />,
-            canJumpTo: stepIdReached >= StepId.Review,
+            canJumpTo: canMoveToStep(StepId.Review),
           },
         ]}
         onSubmit={(event) => event.preventDefault()}
@@ -112,22 +128,31 @@ export const ImportWizard: React.FunctionComponent = () => {
             <WizardContextConsumer>
               {({ activeStep, onNext, onBack, onClose }) => {
                 const onFinalStep = activeStep.id === StepId.Review;
-                const stepForm = formsByStepId[activeStep.id as StepId];
-                const isNextDisabled = !!stepForm && !stepForm.isValid;
-                const isBackDisabled = false;
+                const isNextDisabled = !canMoveToStep((activeStep.id as StepId) + 1);
+                const isBackDisabled = !canMoveToStep((activeStep.id as StepId) - 1);
                 return (
                   <>
-                    <Button
-                      variant="primary"
-                      type="submit"
-                      onClick={onNext}
-                      isDisabled={isNextDisabled}
+                    <Tooltip
+                      content={navDisabledReason}
+                      trigger={navDisabledReason ? 'mouseenter focus' : ''}
                     >
-                      {onFinalStep ? 'Finish' : 'Next'}
-                    </Button>
-                    <Button variant="secondary" onClick={onBack} isDisabled={isBackDisabled}>
-                      Back
-                    </Button>
+                      <Button
+                        variant="primary"
+                        type="submit"
+                        onClick={onNext}
+                        isAriaDisabled={isNextDisabled}
+                      >
+                        {onFinalStep ? 'Finish' : 'Next'}
+                      </Button>
+                    </Tooltip>
+                    <Tooltip
+                      content={navDisabledReason}
+                      trigger={navDisabledReason ? 'mouseenter focus' : ''}
+                    >
+                      <Button variant="secondary" onClick={onBack} isAriaDisabled={isBackDisabled}>
+                        Back
+                      </Button>
+                    </Tooltip>
                     <div className={wizardStyles.wizardFooterCancel}>
                       <Button variant="link" onClick={onClose}>
                         Cancel

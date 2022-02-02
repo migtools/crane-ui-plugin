@@ -15,8 +15,10 @@ export const useImportWizardFormState = () => {
     setValue: (selectedPVs: PersistentVolume[]) => {
       baseSelectedPVsField.setValue(selectedPVs);
       // When selected PVs change, initialize the per-PV form values for the Edit PVs step
+      const defaultIsEditModeByPV: PVIsEditModeByPVName = {};
       const defaultEditValuesByPV: PVEditValuesByPVName = {};
       selectedPVs.forEach((pv) => {
+        defaultIsEditModeByPV[pv.metadata.name] = false;
         const defaultEditValues: PVEditRowFormValues = {
           targetPvcName: pv.spec.claimRef.name,
           storageClass: defaultStorageClass.metadata.name,
@@ -26,10 +28,15 @@ export const useImportWizardFormState = () => {
         defaultEditValuesByPV[pv.metadata.name] =
           editValuesByPVField.value[pv.metadata.name] || defaultEditValues;
       });
+      isEditModeByPVField.reinitialize(defaultIsEditModeByPV);
       editValuesByPVField.reinitialize(defaultEditValuesByPV);
     },
   };
 
+  const isEditModeByPVField = useFormField<PVIsEditModeByPVName>(
+    {},
+    yup.mixed<PVIsEditModeByPVName>(),
+  );
   const editValuesByPVField = useFormField<PVEditValuesByPVName>(
     {},
     yup.mixed<PVEditValuesByPVName>().required(),
@@ -45,7 +52,8 @@ export const useImportWizardFormState = () => {
       selectedPVs: selectedPVsField,
     }),
     pvEdit: useFormState({
-      valuesByPV: editValuesByPVField,
+      isEditModeByPV: isEditModeByPVField,
+      editValuesByPV: editValuesByPVField,
     }),
     pipelineSettings: useFormState({}),
   };
@@ -75,3 +83,4 @@ export const usePVEditRowFormState = (existingValues: PVEditRowFormValues) => {
 };
 
 export type PVEditValuesByPVName = Record<string, PVEditRowFormValues>;
+export type PVIsEditModeByPVName = Record<string, boolean>;
