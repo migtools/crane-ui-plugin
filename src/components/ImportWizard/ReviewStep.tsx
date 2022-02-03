@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { TextContent, Text, Flex, FlexItem } from '@patternfly/react-core';
+import useSize from '@react-hook/size';
+import { TextContent, Text, Flex } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import flex from '@patternfly/react-styles/css/layouts/Flex/flex';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export const ReviewStep: React.FunctionComponent = () => {
@@ -10,13 +12,16 @@ export const ReviewStep: React.FunctionComponent = () => {
   // TODO dropdown for switching between Pipeline and PipelineRun
   // TODO warn somehow if the user is going to override their manual edits here when they go to another step (use isTouched)? not sure how to do that if they use canJumpTo
 
+  const editorContainerRef = React.useRef<HTMLDivElement>(null);
+  const editorContainerHeight = useSize(editorContainerRef)[1];
+
   return (
     <Flex direction={{ default: 'column' }} style={{ height: '100%' }}>
       <TextContent className={spacing.mbMd}>
         <Text component="h2">Review</Text>
         <Text component="p">Review the YAML for the OpenShift pipeline that will be created.</Text>
       </TextContent>
-      <FlexItem grow={{ default: 'grow' }}>
+      <div className={flex.modifiers.grow} style={{ overflow: 'hidden' }} ref={editorContainerRef}>
         <CodeEditor
           isLineNumbersVisible
           isLanguageLabelVisible
@@ -24,9 +29,9 @@ export const ReviewStep: React.FunctionComponent = () => {
           code={forms.review.values.pipelineYaml}
           onChange={forms.review.fields.pipelineYaml.setValue}
           language={Language.yaml}
-          height="400px"
+          height={`${editorContainerHeight - 60}px`}
         />
-      </FlexItem>
+      </div>
     </Flex>
   );
 };
