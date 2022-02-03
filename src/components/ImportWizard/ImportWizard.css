@@ -1,0 +1,7 @@
+#crane-import-wizard .project-details-description-list.pf-c-description-list.pf-m-horizontal {
+  --pf-c-description-list--m-horizontal__term--width: 30ch;
+}
+
+#crane-import-wizard .pf-c-wizard__main-body {
+  height: 100%;
+}

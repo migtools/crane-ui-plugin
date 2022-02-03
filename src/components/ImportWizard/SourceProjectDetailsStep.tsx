@@ -10,8 +10,6 @@ import {
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
-import './SourceProjectDetailsStep.css';
-
 export const SourceProjectDetailsStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
   return (
