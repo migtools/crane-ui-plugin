@@ -43,7 +43,7 @@ export const ReviewStep: React.FunctionComponent = () => {
           setSelected={setSelectedEditorKey}
           selectedLabel={selectedEditorFormField.schema.describe().label}
           id="editor-select"
-          toggleProps={{ style: { width: '200px' } }}
+          toggleProps={{ style: { width: '150px' } }}
         >
           <MenuContent>
             <MenuList>
@@ -59,6 +59,7 @@ export const ReviewStep: React.FunctionComponent = () => {
       <div className={flex.modifiers.grow} style={{ overflow: 'hidden' }} ref={editorContainerRef}>
         <CodeEditor
           key={selectedEditorKey}
+          isDarkTheme
           isLineNumbersVisible
           isLanguageLabelVisible
           isMinimapVisible
