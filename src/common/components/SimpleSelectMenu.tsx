@@ -7,6 +7,7 @@ interface SimpleSelectMenuProps<T extends string | number> extends MenuProps {
   selected: T;
   setSelected: (value: T) => void;
   children: React.ReactNode;
+  selectedLabel?: React.ReactNode;
   toggleProps?: Partial<MenuToggleProps>;
 }
 
@@ -14,6 +15,7 @@ export const SimpleSelectMenu = <T extends string | number>({
   selected,
   setSelected,
   children,
+  selectedLabel = selected,
   toggleProps = {},
   ...props
 }: React.PropsWithChildren<SimpleSelectMenuProps<T>>): JSX.Element | null => {
@@ -56,7 +58,7 @@ export const SimpleSelectMenu = <T extends string | number>({
 
   const toggle = (
     <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen} {...toggleProps}>
-      {selected}
+      {selectedLabel}
     </MenuToggle>
   );
   const menu = (

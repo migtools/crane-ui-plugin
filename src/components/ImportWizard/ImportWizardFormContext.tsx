@@ -61,8 +61,8 @@ export const useImportWizardFormState = () => {
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
-      pipelineYaml: useFormField('', yup.string().label('Pipeline YAML').required()), // TODO validate yaml
-      pipelineRunYaml: useFormField('', yup.string().label('PipelineRun YAML').required()), // TODO validate yaml
+      pipelineYaml: useFormField('', yup.string().label('Pipeline').required()), // TODO validate yaml
+      pipelineRunYaml: useFormField('', yup.string().label('PipelineRun').required()), // TODO validate yaml
     }),
   };
 };
