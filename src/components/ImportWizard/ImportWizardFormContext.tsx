@@ -9,6 +9,7 @@ export const useImportWizardFormState = () => {
   const storageClasses = MOCK_STORAGE_CLASSES; // TODO do we need to pass this in? call the SDK hook here?
   const defaultStorageClass = storageClasses[0]; // TODO how to determine this?
 
+  // pvSelect and pvEdit form fields are lifted out so they can reference each other
   const baseSelectedPVsField = useFormField<PersistentVolume[]>([], yup.array().required().min(1));
   const selectedPVsField = {
     ...baseSelectedPVsField,
@@ -22,7 +23,7 @@ export const useImportWizardFormState = () => {
         const defaultEditValues: PVEditRowFormValues = {
           targetPvcName: pv.spec.claimRef.name,
           storageClass: defaultStorageClass.metadata.name,
-          capacity: pv.spec.capacity.storage, // TODO format? suffix?
+          capacity: pv.spec.capacity.storage, // TODO validate format. Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
           verifyCopy: false,
         };
         defaultEditValuesByPV[pv.metadata.name] =
@@ -55,7 +56,10 @@ export const useImportWizardFormState = () => {
       isEditModeByPV: isEditModeByPVField,
       editValuesByPV: editValuesByPVField,
     }),
-    pipelineSettings: useFormState({}),
+    pipelineSettings: useFormState({
+      pipelineName: useFormField('', yup.string().label('Pipeline name').required()), // TODO format validation, check if it already exists
+      startImmediately: useFormField(false, yup.boolean().required()),
+    }),
   };
 };
 
