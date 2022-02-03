@@ -60,6 +60,10 @@ export const useImportWizardFormState = () => {
       pipelineName: useFormField('', yup.string().label('Pipeline name').required()), // TODO format validation, check if it already exists
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
+    review: useFormState({
+      pipelineYaml: useFormField('', yup.string().label('Pipeline YAML').required()), // TODO validate yaml
+      pipelineRunYaml: useFormField('', yup.string().label('PipelineRun YAML').required()), // TODO validate yaml
+    }),
   };
 };
 

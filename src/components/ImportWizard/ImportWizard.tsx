@@ -5,6 +5,7 @@ import {
   WizardContextConsumer,
   Button,
   Tooltip,
+  WizardStepFunctionType,
 } from '@patternfly/react-core';
 import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
 import { IFormState } from '@konveyor/lib-ui';
@@ -17,6 +18,8 @@ import { PVEditStep } from './PVEditStep';
 import { PipelineSettingsStep } from './PipelineSettingsStep';
 import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
+
+import './ImportWizard.css';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -67,9 +70,18 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const namespace = useNamespaceContext();
 
+  const onMoveToStep: WizardStepFunctionType = (newStep, prevStep) => {
+    if (newStep.id === StepId.Review) {
+      // TODO generate YAML from forms
+      forms.review.fields.pipelineYaml.prefill('TODO generate yaml here');
+      forms.review.fields.pipelineRunYaml.prefill('TODO generate yaml here');
+    }
+  };
+
   return (
     <ImportWizardFormContext.Provider value={forms}>
       <Wizard
+        id="crane-import-wizard"
         steps={[
           {
             name: 'Source information',
@@ -121,8 +133,9 @@ export const ImportWizard: React.FunctionComponent = () => {
         onSubmit={(event) => event.preventDefault()}
         onSave={() => console.log('SAVE WIZARD!')}
         onClose={() => (document.location = `/add/ns/${namespace}`)}
-        // onBack={resetResultsOnNav} // TODO do we need this?
-        // onGoToStep={resetResultsOnNav} // TODO do we need this?
+        onNext={onMoveToStep}
+        onBack={onMoveToStep}
+        onGoToStep={onMoveToStep}
         footer={
           <WizardFooter>
             <WizardContextConsumer>
