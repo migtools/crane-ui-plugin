@@ -1,38 +1,59 @@
-import { PersistentVolume } from 'src/types/PersistentVolume';
+import { PersistentVolume, PersistentVolumeClaim } from 'src/types/PersistentVolume';
 
 export let MOCK_PERSISTENT_VOLUMES: PersistentVolume[] = [];
+export let MOCK_PERSISTENT_VOLUME_CLAIMS: PersistentVolumeClaim[] = [];
 
 if (process.env.NODE_ENV === 'development' || process.env.DATA_SOURCE === 'mock') {
   const mockPV = (nameSuffix: string): PersistentVolume => ({
     kind: 'PersistentVolume',
     metadata: {
-      name: `pv_${nameSuffix}`,
+      name: `pv-${nameSuffix}`,
       namespace: 'openshift-migration',
     },
     spec: {
-      // TODO
-      accessModes: ['ReadWriteMany'], // TODO
       capacity: {
         storage: '100Gi',
       },
+      volumeMode: 'Filesystem',
+      accessModes: ['ReadWriteMany'],
+      persistentVolumeReclaimPolicy: 'Retain',
+      storageClassName: 'mock-storage-1',
       claimRef: {
-        name: `pvc_${nameSuffix}`,
+        name: `pvc-${nameSuffix}`,
         namespace: 'openshift-migration',
       },
-      persistentVolumeReclaimPolicy: 'foo',
-      storageClassName: 'mock-storage-class',
-      volumeMode: 'Filesystem', // TODO
     },
     status: {
       phase: 'Bound',
     },
   });
 
-  MOCK_PERSISTENT_VOLUMES = [
-    mockPV('123456789 1'),
-    mockPV('123456789 2'),
-    mockPV('123456789 3'),
-    mockPV('123456789 4'),
-    mockPV('123456789 5'),
-  ];
+  const mockPVC = (nameSuffix: string): PersistentVolumeClaim => ({
+    kind: 'PersistentVolumeClaim',
+    metadata: {
+      name: `pvc-${nameSuffix}`,
+      namespace: 'openshift-migration',
+    },
+    spec: {
+      volumeMode: 'Filesystem',
+      accessModes: ['ReadWriteMany'],
+      resources: {
+        requests: {
+          storage: '100Gi',
+        },
+      },
+      storageClassName: 'mock-storage-1',
+    },
+    status: {
+      accessModes: ['ReadWriteMany'],
+      capacity: {
+        storage: '100Gi',
+      },
+      phase: 'Bound',
+    },
+  });
+
+  const nameSuffixes = ['123456789-1', '123456789-2', '123456789-3', '123456789-4', '123456789-5'];
+  MOCK_PERSISTENT_VOLUMES = nameSuffixes.map(mockPV);
+  MOCK_PERSISTENT_VOLUME_CLAIMS = nameSuffixes.map(mockPVC);
 }

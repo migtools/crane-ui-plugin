@@ -1,56 +1,63 @@
-import {
-  K8sResourceCommon,
-  ObjectMetadata,
-  ObjectReference,
-} from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, ObjectReference } from '@openshift-console/dynamic-plugin-sdk';
 
-// TODO some of these fields may be optional, too narrow, too wide, or missing. Find the CRD
+// https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistent-volumes
+
+export type VolumeMode = 'Filesystem' | 'Block';
+export type AccessMode = 'ReadWriteOnce' | 'ReadOnlyMany' | 'ReadWriteMany';
+export type ReclaimPolicy = 'Retain' | 'Recycle' | 'Delete';
+export type PVPhase = 'Available' | 'Bound' | 'Released' | 'Failed';
 
 export interface PersistentVolume extends K8sResourceCommon {
   kind: 'PersistentVolume';
-  metadata: ObjectMetadata & {
-    labels?: {
-      // TODO are these actually optional?
-      CapacityGb?: string;
-      Datacenter?: string;
-      Iops?: string;
-      StorageType?: string;
-      Username?: string;
-      billingType?: string;
-      'failure-domain.beta.kubernetes.io/region'?: string;
-      'failure-domain.beta.kubernetes.io/zone'?: string;
-      path?: string;
-      server?: string;
-      volumeId?: string;
-      [key: string]: string;
-    };
-  };
   spec: {
-    accessModes: ('ReadWriteMany' | string)[]; // TODO can we narrow this?
     capacity: {
-      storage: string; // e.g. '100Gi'
+      storage: string; // e.g. '100Gi' - Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
     };
-    claimRef: ObjectReference;
+    volumeMode: VolumeMode;
+    accessModes: AccessMode[];
+    persistentVolumeReclaimPolicy: ReclaimPolicy;
+    storageClassName: string;
+    mountOptions?: string[];
     nfs?: {
       path: string;
       server: string;
     };
-    nodeAffinity?: {
-      required: {
-        nodeSelectorTerms: {
-          matchExpressions: {
-            key: string;
-            operator: string;
-            values: string[];
-          }[];
-        }[];
+    claimRef?: ObjectReference; // TODO is this always present?
+  };
+  status?: {
+    phase: PVPhase;
+  };
+}
+
+// https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+
+export interface PersistentVolumeClaim extends K8sResourceCommon {
+  kind: 'PersistentVolumeClaim';
+  spec: {
+    volumeMode: VolumeMode;
+    accessModes: AccessMode[];
+    resources: {
+      requests: {
+        storage: string; // e.g. '100Gi' - Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
       };
     };
-    persistentVolumeReclaimPolicy: string;
     storageClassName: string;
-    volumeMode: 'Filesystem' | string; // TODO can we narrow this?
+    selector?: {
+      matchLabels: {
+        release: string;
+      };
+      matchExpressions: {
+        key: string;
+        operator: 'In' | 'NotIn' | 'Exists' | 'DoesNotExist';
+        values: string[];
+      }[];
+    };
   };
-  status: {
-    phase: 'Bound' | string; // TODO can we narrow this?
+  status?: {
+    accessModes: AccessMode[];
+    capacity: {
+      storage: string; // e.g. '100Gi' - Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
+    };
+    phase: PVPhase;
   };
 }
