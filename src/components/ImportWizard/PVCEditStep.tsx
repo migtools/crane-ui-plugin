@@ -2,8 +2,14 @@ import * as React from 'react';
 import { TextContent, Text, Form } from '@patternfly/react-core';
 import { TableComposable, Thead, Tr, Th, Tbody } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import {
+  ListPageFilter,
+  RowFilter,
+  useListPageFilter,
+} from '@openshift-console/dynamic-plugin-sdk';
 
 import { useSortState } from 'src/common/hooks/useSortState';
+import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { PVCEditStepTableRow } from './PVCEditStepTableRow';
 
@@ -20,8 +26,9 @@ export const PVCEditStep: React.FunctionComponent = () => {
   const form = forms.pvcEdit;
   const { selectedPVCs } = forms.pvcSelect.values;
 
-  // TODO filter state -- move to lib-ui and add generics?
-  const { sortBy, onSort, sortedItems } = useSortState(selectedPVCs, (pvc) => [pvc.metadata.name]);
+  const rowFilters: RowFilter<PersistentVolumeClaim>[] = []; // TODO do we need to add one here for storage classes, by the available ones in the source?
+  const [data, filteredData, onFilterChange] = useListPageFilter(selectedPVCs, rowFilters);
+  const { sortBy, onSort, sortedItems } = useSortState(filteredData, (pvc) => [pvc.metadata.name]);
 
   return (
     <>
@@ -32,7 +39,13 @@ export const PVCEditStep: React.FunctionComponent = () => {
           select whether the copy should be verified on the target.
         </Text>
       </TextContent>
-      {/* TODO FilterToolbar -- do we want to actually move it to lib-ui now? */}
+      <ListPageFilter
+        data={data}
+        loaded // TODO do we use this while loading or not render this at all while loading?
+        rowFilters={rowFilters}
+        onFilterChange={onFilterChange}
+        hideLabelFilter
+      />
       <Form>
         <TableComposable borders={false} variant="compact">
           <Thead>

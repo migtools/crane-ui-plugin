@@ -4,11 +4,17 @@ import { TextContent, Text, Form, Popover, Button } from '@patternfly/react-core
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import text from '@patternfly/react-styles/css/utilities/Text/text';
+import {
+  ListPageFilter,
+  RowFilter,
+  useListPageFilter,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { useSelectionState } from '@konveyor/lib-ui';
 
 import { MOCK_PERSISTENT_VOLUME_CLAIMS } from 'src/mock/PersistentVolumes.mock';
 import { getCapacity, isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
+import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export const PVCSelectStep: React.FunctionComponent = () => {
@@ -17,8 +23,10 @@ export const PVCSelectStep: React.FunctionComponent = () => {
 
   const pvcs = MOCK_PERSISTENT_VOLUME_CLAIMS; // TODO load from a real query via proxy
 
-  // TODO filter state -- move to lib-ui and add generics?
-  const { sortBy, onSort, sortedItems } = useSortState(pvcs, (pvc) => [pvc.metadata.name]);
+  const rowFilters: RowFilter<PersistentVolumeClaim>[] = []; // TODO do we need to add one here for storage classes, by the available ones in the source?
+  const [data, filteredData, onFilterChange] = useListPageFilter(pvcs, rowFilters);
+
+  const { sortBy, onSort, sortedItems } = useSortState(filteredData, (pvc) => [pvc.metadata.name]);
 
   const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } = useSelectionState({
     items: pvcs,
@@ -40,7 +48,13 @@ export const PVCSelectStep: React.FunctionComponent = () => {
           Select persistent volume claims to be copied to the target project.
         </Text>
       </TextContent>
-      {/* TODO FilterToolbar -- do we want to actually move it to lib-ui now? */}
+      <ListPageFilter
+        data={data}
+        loaded // TODO do we use this while loading or not render this at all while loading?
+        rowFilters={rowFilters}
+        onFilterChange={onFilterChange}
+        hideLabelFilter
+      />
       <Form>
         <TableComposable borders={false} variant="compact">
           <Thead>

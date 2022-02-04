@@ -53,7 +53,7 @@ if (process.env.NODE_ENV === 'development' || process.env.DATA_SOURCE === 'mock'
     },
   });
 
-  const nameSuffixes = ['123456789-1', '123456789-2', '123456789-3', '123456789-4', '123456789-5'];
+  const nameSuffixes = ['foo', 'bar', 'baz', '123456789-4', '123456789-5'];
   MOCK_PERSISTENT_VOLUMES = nameSuffixes.map(mockPV);
   MOCK_PERSISTENT_VOLUME_CLAIMS = nameSuffixes.map(mockPVC);
 }
