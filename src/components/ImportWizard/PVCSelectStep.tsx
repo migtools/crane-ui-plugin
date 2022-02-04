@@ -4,9 +4,8 @@ import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-tab
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useSelectionState } from '@konveyor/lib-ui';
 
-import { PersistentVolume } from 'src/types/PersistentVolume';
-import { MOCK_PERSISTENT_VOLUMES } from 'src/mock/PersistentVolumes.mock';
-import { isSameResource } from 'src/utils/helpers';
+import { MOCK_PERSISTENT_VOLUME_CLAIMS } from 'src/mock/PersistentVolumes.mock';
+import { getCapacity, isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
@@ -16,19 +15,16 @@ export const PVSelectStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
   const form = forms.pvSelect;
 
-  const pvs = MOCK_PERSISTENT_VOLUMES; // TODO load from a real query via proxy
+  const pvcs = MOCK_PERSISTENT_VOLUME_CLAIMS; // TODO load from a real query via proxy
 
   // TODO filter state -- move to lib-ui and add generics?
-  const { sortBy, onSort, sortedItems } = useSortState(pvs, (pv) => [pv.spec.claimRef.name]);
+  const { sortBy, onSort, sortedItems } = useSortState(pvcs, (pvc) => [pvc.metadata.name]);
 
-  // TODO figure out if we need infinite-scroll? Look into how VirtualizedTable works in the SDK / Console?
-
-  const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } =
-    useSelectionState<PersistentVolume>({
-      items: pvs,
-      isEqual: (a, b) => isSameResource(a.metadata, b.metadata),
-      externalState: [form.fields.selectedPVs.value, form.fields.selectedPVs.setValue],
-    });
+  const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } = useSelectionState({
+    items: pvcs,
+    isEqual: (a, b) => isSameResource(a.metadata, b.metadata),
+    externalState: [form.fields.selectedPVCs.value, form.fields.selectedPVCs.setValue],
+  });
 
   const columnNames = {
     pvcName: 'PVC Name',
@@ -39,13 +35,12 @@ export const PVSelectStep: React.FunctionComponent = () => {
   return (
     <>
       <TextContent className={spacing.mbMd}>
-        <Text component="h2">Select persistent volumes</Text>
+        <Text component="h2">Select persistent volume claims</Text>
         <Text component="p">
-          Select persistent volumes to be moved or copied to the target project.
+          Select persistent volume claims to be copied to the target project.
         </Text>
       </TextContent>
       {/* TODO FilterToolbar -- do we want to actually move it to lib-ui now? */}
-      {/* TODO do we need to remove the border on the bottom of the header row as in the mockups? */}
       <Form>
         <TableComposable borders={false} variant="compact">
           <Thead>
@@ -63,18 +58,18 @@ export const PVSelectStep: React.FunctionComponent = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {sortedItems.map((pv, rowIndex) => (
-              <Tr key={pv.metadata.name}>
+            {sortedItems.map((pvc, rowIndex) => (
+              <Tr key={pvc.metadata.name}>
                 <Td
                   select={{
                     rowIndex,
-                    onSelect: (_event, isSelecting) => toggleItemSelected(pv, isSelecting),
-                    isSelected: isItemSelected(pv),
+                    onSelect: (_event, isSelecting) => toggleItemSelected(pvc, isSelecting),
+                    isSelected: isItemSelected(pvc),
                   }}
                 />
-                <Td dataLabel={columnNames.pvcName}>{pv.spec.claimRef.name}</Td>
-                <Td dataLabel={columnNames.storageClass}>{pv.spec.storageClassName}</Td>
-                <Td dataLabel={columnNames.capacity}>{pv.spec.capacity.storage}</Td>
+                <Td dataLabel={columnNames.pvcName}>{pvc.metadata.name}</Td>
+                <Td dataLabel={columnNames.storageClass}>{pvc.spec.storageClassName}</Td>
+                <Td dataLabel={columnNames.capacity}>{getCapacity(pvc)}</Td>
                 <Td modifier="fitContent">
                   <a href="#" onClick={() => alert('TODO!')}>
                     View JSON {/* TODO see how this is done in MTC, or open a modal? */}
