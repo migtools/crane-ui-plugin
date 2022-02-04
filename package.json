@@ -46,6 +46,7 @@
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
     "react-i18next": "^11.15.3",
+    "react-json-view": "^1.21.3",
     "react-monaco-editor": "^0.41.2",
     "react-query": "^3.34.8",
     "react-router": "5.2.0",
