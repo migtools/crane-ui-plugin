@@ -1,7 +1,13 @@
-#crane-import-wizard .project-details-description-list.pf-c-description-list.pf-m-horizontal {
-  --pf-c-description-list--m-horizontal__term--width: 30ch;
-}
-
 #crane-import-wizard .pf-c-wizard__main-body {
   height: 100%;
+}
+
+#crane-import-wizard .project-details-table {
+  width: auto;
+}
+
+.json-popover .pf-c-popover__content {
+  overflow-y: scroll;
+  max-height: 20rem;
+  width: 40rem;
 }

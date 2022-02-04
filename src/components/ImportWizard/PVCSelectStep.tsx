@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { TextContent, Text, Form } from '@patternfly/react-core';
+import ReactJson from 'react-json-view';
+import { TextContent, Text, Form, Popover, Button } from '@patternfly/react-core';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import text from '@patternfly/react-styles/css/utilities/Text/text';
 import { useSelectionState } from '@konveyor/lib-ui';
 
 import { MOCK_PERSISTENT_VOLUME_CLAIMS } from 'src/mock/PersistentVolumes.mock';
@@ -68,10 +70,23 @@ export const PVCSelectStep: React.FunctionComponent = () => {
                 <Td dataLabel={columnNames.pvcName}>{pvc.metadata.name}</Td>
                 <Td dataLabel={columnNames.storageClass}>{pvc.spec.storageClassName}</Td>
                 <Td dataLabel={columnNames.capacity}>{getCapacity(pvc)}</Td>
-                <Td modifier="fitContent">
-                  <a href="#" onClick={() => alert('TODO!')}>
-                    View JSON {/* TODO see how this is done in MTC, or open a modal? */}
-                  </a>
+                <Td>
+                  <Popover
+                    className="json-popover"
+                    position="bottom"
+                    bodyContent={
+                      <div onClick={(event) => event.stopPropagation()}>
+                        <ReactJson src={pvc} enableClipboard={false} />
+                      </div>
+                    }
+                    aria-label={`View JSON for PVC ${pvc.metadata.name}`}
+                    closeBtnAriaLabel="Close JSON view"
+                    maxWidth="200rem"
+                  >
+                    <Button variant="link" className={text.textNowrap}>
+                      View JSON
+                    </Button>
+                  </Popover>
                 </Td>
               </Tr>
             ))}

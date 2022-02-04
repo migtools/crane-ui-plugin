@@ -40,6 +40,7 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
           <ValidatedTextInput
             field={rowForm.fields.targetPvcName}
             fieldId={`target-pvc-name-${pvc.metadata.name}`}
+            label={null}
           />
         ) : (
           existingValues.targetPvcName
@@ -72,6 +73,7 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
           <ValidatedTextInput
             field={rowForm.fields.capacity}
             fieldId={`capacity-${pvc.metadata.name}`}
+            label={null}
           />
         ) : (
           existingValues.capacity
