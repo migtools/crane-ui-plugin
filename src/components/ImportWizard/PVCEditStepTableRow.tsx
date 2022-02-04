@@ -10,17 +10,17 @@ import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
 import { columnNames } from './PVCEditStep';
-import { PVEditRowFormValues, usePVEditRowFormState } from './ImportWizardFormContext';
+import { PVCEditRowFormValues, usePVCEditRowFormState } from './ImportWizardFormContext';
 
-interface PVEditStepTableRowProps {
+interface PVCEditStepTableRowProps {
   pvc: PersistentVolumeClaim;
-  existingValues: PVEditRowFormValues;
-  setEditedValues: (values: PVEditRowFormValues) => void;
+  existingValues: PVCEditRowFormValues;
+  setEditedValues: (values: PVCEditRowFormValues) => void;
   isEditMode: boolean;
   setIsEditMode: (isEditMode: boolean) => void;
 }
 
-export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps> = ({
+export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowProps> = ({
   pvc,
   existingValues,
   setEditedValues,
@@ -30,7 +30,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
   // TODO load this from the host cluster via the SDK
   const storageClasses = MOCK_STORAGE_CLASSES;
 
-  const rowForm = usePVEditRowFormState(existingValues);
+  const rowForm = usePVCEditRowFormState(existingValues);
 
   return (
     <Tr key={pvc.metadata.name}>
