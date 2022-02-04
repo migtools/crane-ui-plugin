@@ -5,7 +5,7 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { useSortState } from 'src/common/hooks/useSortState';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
-import { PVEditStepTableRow } from './PVCEditStepTableRow';
+import { PVCEditStepTableRow } from './PVCEditStepTableRow';
 
 export const columnNames = {
   sourcePvcName: 'Source PVC name',
@@ -15,10 +15,10 @@ export const columnNames = {
   verifyCopy: 'Verify copy',
 };
 
-export const PVEditStep: React.FunctionComponent = () => {
+export const PVCEditStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
-  const form = forms.pvEdit;
-  const { selectedPVCs } = forms.pvSelect.values;
+  const form = forms.pvcEdit;
+  const { selectedPVCs } = forms.pvcSelect.values;
 
   // TODO filter state -- move to lib-ui and add generics?
   const { sortBy, onSort, sortedItems } = useSortState(selectedPVCs, (pvc) => [pvc.metadata.name]);
@@ -47,7 +47,7 @@ export const PVEditStep: React.FunctionComponent = () => {
           </Thead>
           <Tbody>
             {sortedItems.map((pvc) => (
-              <PVEditStepTableRow
+              <PVCEditStepTableRow
                 key={pvc.metadata.name}
                 pvc={pvc}
                 existingValues={form.values.editValuesByPVC[pvc.metadata.name]}

@@ -9,11 +9,9 @@ import { getCapacity, isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
-export type PVMigrationType = 'fs-copy' | 'ns-copy' | 'move';
-
-export const PVSelectStep: React.FunctionComponent = () => {
+export const PVCSelectStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
-  const form = forms.pvSelect;
+  const form = forms.pvcSelect;
 
   const pvcs = MOCK_PERSISTENT_VOLUME_CLAIMS; // TODO load from a real query via proxy
 

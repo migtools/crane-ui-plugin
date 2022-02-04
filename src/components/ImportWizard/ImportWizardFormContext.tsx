@@ -10,7 +10,7 @@ export const useImportWizardFormState = () => {
   const storageClasses = MOCK_STORAGE_CLASSES; // TODO do we need to pass this in? call the SDK hook here?
   const defaultStorageClass = storageClasses[0]; // TODO how to determine this?
 
-  // pvSelect and pvEdit form fields are lifted out so they can reference each other
+  // pvcSelect and pvcEdit form fields are lifted out so they can reference each other
   const baseSelectedPVsField = useFormField<PersistentVolumeClaim[]>(
     [],
     yup.array().required().min(1),
@@ -21,10 +21,10 @@ export const useImportWizardFormState = () => {
       baseSelectedPVsField.setValue(selectedPVCs);
       // When selected PVs change, initialize the per-PV form values for the Edit PVs step
       const defaultIsEditModeByPVC: PVIsEditModeByPVCName = {};
-      const defaultEditValuesByPVC: PVEditValuesByPVCName = {};
+      const defaultEditValuesByPVC: PVCEditValuesByPVCName = {};
       selectedPVCs.forEach((pvc) => {
         defaultIsEditModeByPVC[pvc.metadata.name] = false;
-        const defaultEditValues: PVEditRowFormValues = {
+        const defaultEditValues: PVCEditRowFormValues = {
           targetPvcName: pvc.metadata.name,
           storageClass: defaultStorageClass.metadata.name,
           capacity: getCapacity(pvc),
@@ -42,9 +42,9 @@ export const useImportWizardFormState = () => {
     {},
     yup.mixed<PVIsEditModeByPVCName>(),
   );
-  const editValuesByPVCField = useFormField<PVEditValuesByPVCName>(
+  const editValuesByPVCField = useFormField<PVCEditValuesByPVCName>(
     {},
-    yup.mixed<PVEditValuesByPVCName>().required(),
+    yup.mixed<PVCEditValuesByPVCName>().required(),
   );
 
   return {
@@ -53,10 +53,10 @@ export const useImportWizardFormState = () => {
       token: useFormField('', yup.string().label('OAuth token').required()), // TODO format validation, and async connection validation?
       namespace: useFormField('', yup.string().label('Project name').required()), // TODO format validation, and async exists validation?
     }),
-    pvSelect: useFormState({
+    pvcSelect: useFormState({
       selectedPVCs: selectedPVCsField,
     }),
-    pvEdit: useFormState({
+    pvcEdit: useFormState({
       isEditModeByPVC: isEditModeByPVCField,
       editValuesByPVC: editValuesByPVCField,
     }),
@@ -77,16 +77,16 @@ export const ImportWizardFormContext = React.createContext<ImportWizardFormState
   {} as ImportWizardFormState,
 );
 
-export interface PVEditRowFormValues {
+export interface PVCEditRowFormValues {
   targetPvcName: string;
   storageClass: string;
   capacity: string;
   verifyCopy: boolean;
 }
 
-export const usePVEditRowFormState = (existingValues: PVEditRowFormValues) => {
+export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => {
   const { targetPvcName, storageClass, capacity, verifyCopy } = existingValues;
-  return useFormState<PVEditRowFormValues>({
+  return useFormState<PVCEditRowFormValues>({
     targetPvcName: useFormField(targetPvcName, yup.string().label('Target PVC name').required()), // TODO format validation, check it doesn't already exist?
     storageClass: useFormField(storageClass, yup.string().label('Storage class').required()), // TODO find real default value and type, validate it exists?
     capacity: useFormField(capacity, yup.string().label('Capacity').required()), // TODO validate format. Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
@@ -94,5 +94,5 @@ export const usePVEditRowFormState = (existingValues: PVEditRowFormValues) => {
   });
 };
 
-export type PVEditValuesByPVCName = Record<string, PVEditRowFormValues>;
+export type PVCEditValuesByPVCName = Record<string, PVCEditRowFormValues>;
 export type PVIsEditModeByPVCName = Record<string, boolean>;

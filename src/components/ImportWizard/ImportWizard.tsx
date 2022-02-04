@@ -13,8 +13,8 @@ import { IFormState } from '@konveyor/lib-ui';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
-import { PVSelectStep } from './PVCSelectStep';
-import { PVEditStep } from './PVCEditStep';
+import { PVCSelectStep } from './PVCSelectStep';
+import { PVCEditStep } from './PVCEditStep';
 import { PipelineSettingsStep } from './PipelineSettingsStep';
 import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
@@ -24,8 +24,8 @@ import './ImportWizard.css';
 enum StepId {
   SourceClusterProject = 0,
   SourceProjectDetails,
-  PVSelect,
-  PVEdit,
+  PVCSelect,
+  PVCEdit,
   PipelineSettings,
   Review,
 }
@@ -36,8 +36,8 @@ export const ImportWizard: React.FunctionComponent = () => {
   const formsByStepId: Record<StepId, IFormState<unknown> | null> = {
     [StepId.SourceClusterProject]: forms.sourceClusterProject,
     [StepId.SourceProjectDetails]: null,
-    [StepId.PVSelect]: forms.pvSelect,
-    [StepId.PVEdit]: forms.pvEdit,
+    [StepId.PVCSelect]: forms.pvcSelect,
+    [StepId.PVCEdit]: forms.pvcEdit,
     [StepId.PipelineSettings]: forms.pipelineSettings,
     [StepId.Review]: null,
   };
@@ -47,7 +47,7 @@ export const ImportWizard: React.FunctionComponent = () => {
   const stepIdReached =
     firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review;
 
-  const somePVRowIsEditMode = Object.values(forms.pvEdit.values.isEditModeByPVC).some(
+  const somePVRowIsEditMode = Object.values(forms.pvcEdit.values.isEditModeByPVC).some(
     (isEditMode) => isEditMode,
   );
   const allNavDisabled = somePVRowIsEditMode;
@@ -104,16 +104,16 @@ export const ImportWizard: React.FunctionComponent = () => {
             name: 'Persistent volume claims',
             steps: [
               {
-                id: StepId.PVSelect,
+                id: StepId.PVCSelect,
                 name: 'Select',
-                component: <PVSelectStep />,
-                canJumpTo: canMoveToStep(StepId.PVSelect),
+                component: <PVCSelectStep />,
+                canJumpTo: canMoveToStep(StepId.PVCSelect),
               },
               {
-                id: StepId.PVEdit,
+                id: StepId.PVCEdit,
                 name: 'Edit',
-                component: <PVEditStep />,
-                canJumpTo: canMoveToStep(StepId.PVEdit),
+                component: <PVCEditStep />,
+                canJumpTo: canMoveToStep(StepId.PVCEdit),
               },
             ],
           },
