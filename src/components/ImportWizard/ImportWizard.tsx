@@ -13,8 +13,8 @@ import { IFormState } from '@konveyor/lib-ui';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
-import { PVSelectStep } from './PVSelectStep';
-import { PVEditStep } from './PVEditStep';
+import { PVSelectStep } from './PVCSelectStep';
+import { PVEditStep } from './PVCEditStep';
 import { PipelineSettingsStep } from './PipelineSettingsStep';
 import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
@@ -47,7 +47,7 @@ export const ImportWizard: React.FunctionComponent = () => {
   const stepIdReached =
     firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review;
 
-  const somePVRowIsEditMode = Object.values(forms.pvEdit.values.isEditModeByPV).some(
+  const somePVRowIsEditMode = Object.values(forms.pvEdit.values.isEditModeByPVC).some(
     (isEditMode) => isEditMode,
   );
   const allNavDisabled = somePVRowIsEditMode;
@@ -73,8 +73,8 @@ export const ImportWizard: React.FunctionComponent = () => {
   const onMoveToStep: WizardStepFunctionType = (newStep, prevStep) => {
     if (newStep.id === StepId.Review) {
       // TODO generate YAML from forms
-      forms.review.fields.pipelineYaml.prefill('TODO generate yaml here');
-      forms.review.fields.pipelineRunYaml.prefill('TODO generate yaml here');
+      forms.review.fields.pipelineYaml.prefill('TODO generate Pipeline yaml here');
+      forms.review.fields.pipelineRunYaml.prefill('TODO generate PipelineRun yaml here');
     }
   };
 
@@ -101,7 +101,7 @@ export const ImportWizard: React.FunctionComponent = () => {
             ],
           },
           {
-            name: 'Persistent volumes',
+            name: 'Persistent volume claims',
             steps: [
               {
                 id: StepId.PVSelect,

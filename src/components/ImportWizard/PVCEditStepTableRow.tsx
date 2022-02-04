@@ -6,14 +6,14 @@ import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 import CheckIcon from '@patternfly/react-icons/dist/esm/icons/check-icon';
 import { ValidatedTextInput } from '@konveyor/lib-ui';
 
-import { PersistentVolume } from 'src/types/PersistentVolume';
+import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
-import { columnNames } from './PVEditStep';
+import { columnNames } from './PVCEditStep';
 import { PVEditRowFormValues, usePVEditRowFormState } from './ImportWizardFormContext';
 
 interface PVEditStepTableRowProps {
-  pv: PersistentVolume;
+  pvc: PersistentVolumeClaim;
   existingValues: PVEditRowFormValues;
   setEditedValues: (values: PVEditRowFormValues) => void;
   isEditMode: boolean;
@@ -21,7 +21,7 @@ interface PVEditStepTableRowProps {
 }
 
 export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps> = ({
-  pv,
+  pvc,
   existingValues,
   setEditedValues,
   isEditMode,
@@ -33,13 +33,13 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
   const rowForm = usePVEditRowFormState(existingValues);
 
   return (
-    <Tr key={pv.metadata.name}>
-      <Td dataLabel={columnNames.sourcePvcName}>{pv.spec.claimRef.name}</Td>
+    <Tr key={pvc.metadata.name}>
+      <Td dataLabel={columnNames.sourcePvcName}>{pvc.metadata.name}</Td>
       <Td dataLabel={columnNames.targetPvcName}>
         {isEditMode ? (
           <ValidatedTextInput
             field={rowForm.fields.targetPvcName}
-            fieldId={`target-pvc-name-${pv.spec.claimRef.name}`}
+            fieldId={`target-pvc-name-${pvc.metadata.name}`}
           />
         ) : (
           existingValues.targetPvcName
@@ -51,7 +51,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
             selected={rowForm.values.storageClass}
             setSelected={rowForm.fields.storageClass.setValue}
             toggleProps={{ style: { width: '100%' } }}
-            id={`storage-class-select-${pv.spec.claimRef.name}`}
+            id={`storage-class-select-${pvc.metadata.name}`}
           >
             <MenuContent>
               <MenuList>
@@ -71,7 +71,7 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
         {isEditMode ? (
           <ValidatedTextInput
             field={rowForm.fields.capacity}
-            fieldId={`capacity-${pv.spec.claimRef.name}`}
+            fieldId={`capacity-${pvc.metadata.name}`}
           />
         ) : (
           existingValues.capacity
@@ -79,11 +79,11 @@ export const PVEditStepTableRow: React.FunctionComponent<PVEditStepTableRowProps
       </Td>
       <Td dataLabel={columnNames.verifyCopy} textCenter>
         <Checkbox
-          aria-label={`Verify copy for PVC ${pv.spec.claimRef.name}`}
+          aria-label={`Verify copy for PVC ${pvc.metadata.name}`}
           isDisabled={!isEditMode}
           isChecked={rowForm.values.verifyCopy}
           onChange={rowForm.fields.verifyCopy.setValue}
-          id={`verify-copy-${pv.spec.claimRef.name}`}
+          id={`verify-copy-${pvc.metadata.name}`}
         />
       </Td>
       <Td modifier="nowrap">

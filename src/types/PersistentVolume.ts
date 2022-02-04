@@ -54,10 +54,10 @@ export interface PersistentVolumeClaim extends K8sResourceCommon {
     };
   };
   status?: {
-    accessModes: AccessMode[];
-    capacity: {
+    accessModes?: AccessMode[];
+    capacity?: {
       storage: string; // e.g. '100Gi' - Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
     };
-    phase: PVPhase;
+    phase?: PVPhase;
   };
 }
