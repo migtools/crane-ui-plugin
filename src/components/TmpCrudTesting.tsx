@@ -6,7 +6,7 @@ import {
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useMutation } from 'react-query';
-import { MOCK_NEW_PIPELINE } from 'src/mock/pipelines.mock';
+import { MOCK_NEW_PIPELINE } from 'src/mock/Pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 

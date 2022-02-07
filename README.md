@@ -74,7 +74,7 @@ server to serve your plugin's assets.
 ```sh
 oc process -f template.yaml \
   -p PLUGIN_NAME=crane-ui-plugin \
-  -p NAMESPACE=mtk-operator \
+  -p NAMESPACE=openshift-migration \
   -p IMAGE=quay.io/konveyor/crane-ui-plugin:latest \
   | oc create -f -
 ```

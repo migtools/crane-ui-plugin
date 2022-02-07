@@ -81,3 +81,10 @@ spec:
     namespace: openshift-migration
     port: 9001
     basePath: '/'
+  proxy:
+    - type: Service
+      alias: remote-cluster
+      service:
+        name: proxy
+        namespace: openshift-migration
+        port: 80
