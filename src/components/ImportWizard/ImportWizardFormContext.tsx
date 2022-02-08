@@ -4,7 +4,7 @@ import { useFormField, useFormState } from '@konveyor/lib-ui';
 import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
-import { dnsLabelNameSchema } from 'src/common/constants';
+import { capacitySchema, dnsLabelNameSchema } from 'src/common/schema';
 
 export const useImportWizardFormState = () => {
   // TODO load this from the host cluster via the SDK
@@ -92,8 +92,8 @@ export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => 
       targetPvcName,
       dnsLabelNameSchema.label('Target PVC name').required(),
     ), // TODO check if it exists
-    storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()), // TODO find real default value and type
-    capacity: useFormField(capacity, yup.string().label('Capacity').required()), // TODO validate format. Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
+    storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()), // TODO find real default value
+    capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),
   });
 };

@@ -8,3 +8,9 @@ export const dnsLabelNameSchema = yup
       `${label} can only contain lowercase alphanumeric characters and dashes (-), and must start and end with an alphanumeric character`,
     excludeEmptyString: true,
   });
+
+export const capacitySchema = yup.string().matches(/^(\d+)[KMGTP]i?$/, {
+  message: ({ label }) =>
+    `${label} must be in valid Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (K, M, G, P, T) format`,
+  excludeEmptyString: true,
+});
