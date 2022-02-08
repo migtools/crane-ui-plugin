@@ -5,7 +5,7 @@ import {
   k8sCreate,
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { MOCK_NEW_PIPELINE } from 'src/mock/Pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
@@ -47,6 +47,15 @@ const useCreatePipelineMutation = () => {
   return useMutation<any, any, any, any>((data) => k8sCreate<any>({ model, data }));
 };
 
+const useProxyTestQuery = (enabled: boolean) =>
+  useQuery('proxy-test', {
+    queryFn: () =>
+      fetch(
+        '/api/proxy/plugin/crane-ui-plugin/remote-cluster/mturley-tmp/mturley-proxy-test-secret/api',
+      ).then((res) => res.json()),
+    enabled,
+  });
+
 export const TmpCrudTesting: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();
   const [data, loaded, error] = useK8sWatchResource<any[]>({
@@ -55,9 +64,15 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
     namespaced: true,
     namespace,
   });
+
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const createPipelineMutation = useCreatePipelineMutation();
   const [newPipelineName, setNewPipelineName] = React.useState('');
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const proxyTestQuery = useProxyTestQuery(isModalOpen);
+  if (isModalOpen) {
+    console.log({ proxyTestQuery });
+  }
   return (
     <>
       <Button
@@ -71,6 +86,8 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
         title="CRUD debugging (ignore me)"
         onClose={() => setIsModalOpen(false)}
       >
+        Testing proxy service - Status: {proxyTestQuery.status}
+        <br />
         Testing creation of a pipeline:
         <Flex>
           <FlexItem>
