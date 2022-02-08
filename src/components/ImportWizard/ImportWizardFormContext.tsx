@@ -4,6 +4,7 @@ import { useFormField, useFormState } from '@konveyor/lib-ui';
 import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
+import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
 
 export const useImportWizardFormState = () => {
   // TODO load this from the host cluster via the SDK
@@ -49,9 +50,9 @@ export const useImportWizardFormState = () => {
 
   return {
     sourceClusterProject: useFormState({
-      apiUrl: useFormField('', yup.string().label('Cluster API URL').required()), // TODO format validation, and async connection validation?
-      token: useFormField('', yup.string().label('OAuth token').required()), // TODO format validation, and async connection validation?
-      namespace: useFormField('', yup.string().label('Project name').required()), // TODO format validation, and async exists validation?
+      apiUrl: useFormField('', dnsLabelNameSchema.label('Cluster API URL').required()), // TODO async connection validation
+      token: useFormField('', yup.string().label('OAuth token').required()), // TODO async connection validation
+      namespace: useFormField('', dnsLabelNameSchema.label('Project name').required()), // TODO check if it exists (use list or single lookup?)
     }),
     pvcSelect: useFormState({
       selectedPVCs: selectedPVCsField,
@@ -61,12 +62,12 @@ export const useImportWizardFormState = () => {
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: useFormField('', yup.string().label('Pipeline name').required()), // TODO format validation, check if it already exists
+      pipelineName: useFormField('', dnsLabelNameSchema.label('Pipeline name').required()), // TODO check if it exists (use list or single lookup?)
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
-      pipelineYaml: useFormField('', yup.string().label('Pipeline').required()), // TODO validate yaml
-      pipelineRunYaml: useFormField('', yup.string().label('PipelineRun').required()), // TODO validate yaml
+      pipelineYaml: useFormField('', yamlSchema.label('Pipeline').required()),
+      pipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun').required()),
     }),
   };
 };
@@ -87,9 +88,12 @@ export interface PVCEditRowFormValues {
 export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => {
   const { targetPvcName, storageClass, capacity, verifyCopy } = existingValues;
   return useFormState<PVCEditRowFormValues>({
-    targetPvcName: useFormField(targetPvcName, yup.string().label('Target PVC name').required()), // TODO format validation, check it doesn't already exist?
-    storageClass: useFormField(storageClass, yup.string().label('Storage class').required()), // TODO find real default value and type, validate it exists?
-    capacity: useFormField(capacity, yup.string().label('Capacity').required()), // TODO validate format. Binary SI (Ki, Mi, Gi, Pi, Ti) or Decimal SI (k, M, G, P, T) format
+    targetPvcName: useFormField(
+      targetPvcName,
+      dnsLabelNameSchema.label('Target PVC name').required(),
+    ), // TODO check if it exists
+    storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()), // TODO find real default value
+    capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),
   });
 };

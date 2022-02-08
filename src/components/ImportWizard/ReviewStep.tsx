@@ -8,6 +8,7 @@ import {
   MenuContent,
   MenuItem,
   MenuList,
+  Alert,
 } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
@@ -30,6 +31,11 @@ export const ReviewStep: React.FunctionComponent = () => {
 
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
   const editorContainerHeight = useSize(editorContainerRef)[1];
+
+  const yamlErrors = [
+    forms.review.fields.pipelineYaml.error?.message,
+    forms.review.fields.pipelineRunYaml.error?.message,
+  ].filter((err) => !!err);
 
   return (
     <Flex direction={{ default: 'column' }} style={{ height: '100%' }}>
@@ -69,6 +75,13 @@ export const ReviewStep: React.FunctionComponent = () => {
           height={`${editorContainerHeight - 60}px`}
         />
       </div>
+      {yamlErrors.length > 0 ? (
+        <Alert isInline variant="danger" title="Invalid YAML">
+          {yamlErrors.map((error) => (
+            <div key={error}>{error}</div>
+          ))}
+        </Alert>
+      ) : null}
     </Flex>
   );
 };
