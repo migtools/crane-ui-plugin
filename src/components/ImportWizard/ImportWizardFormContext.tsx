@@ -4,7 +4,7 @@ import { useFormField, useFormState } from '@konveyor/lib-ui';
 import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
 import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
-import { capacitySchema, dnsLabelNameSchema } from 'src/common/schema';
+import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
 
 export const useImportWizardFormState = () => {
   // TODO load this from the host cluster via the SDK
@@ -66,8 +66,8 @@ export const useImportWizardFormState = () => {
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
-      pipelineYaml: useFormField('', yup.string().label('Pipeline').required()), // TODO validate yaml
-      pipelineRunYaml: useFormField('', yup.string().label('PipelineRun').required()), // TODO validate yaml
+      pipelineYaml: useFormField('', yamlSchema.label('Pipeline').required()),
+      pipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun').required()),
     }),
   };
 };

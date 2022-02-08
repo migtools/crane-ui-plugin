@@ -73,8 +73,8 @@ export const ImportWizard: React.FunctionComponent = () => {
   const onMoveToStep: WizardStepFunctionType = (newStep, prevStep) => {
     if (newStep.id === StepId.Review) {
       // TODO generate YAML from forms
-      forms.review.fields.pipelineYaml.prefill('TODO generate Pipeline yaml here');
-      forms.review.fields.pipelineRunYaml.prefill('TODO generate PipelineRun yaml here');
+      forms.review.fields.pipelineYaml.prefill('---\nTODO: generate Pipeline yaml here');
+      forms.review.fields.pipelineRunYaml.prefill('---\nTODO: generate PipelineRun yaml here');
     }
   };
 
