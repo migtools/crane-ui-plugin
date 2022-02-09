@@ -55,7 +55,7 @@ const useProxyTestQuery = (enabled: boolean) => {
   );
   return useQuery('proxy-test', {
     queryFn: () => client.list(namespaceResource),
-    enabled,
+    enabled: false,
   });
 };
 

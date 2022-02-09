@@ -16,9 +16,19 @@ You'll need:
 - A local clone of the [openshift/console](https://github.com/openshift/console) repository
 - An OpenShift cluster (the Console UI will run locally, but it needs a real cluster on the backend)
 
-The cluster does not necessarily need to be running OpenShift 4.10+ since you will be running the latest Console UI locally.
+### To set up for local development:
 
-To run the plugin locally:
+1. Install dependencies on your cluster. You can install them by installing the [mtk-operator](https://github.com/konveyor/mtk-operator), or manually:
+
+   - Install the **Red Hat OpenShift Pipelines** operator from OperatorHub
+   - Install the [crane-reverse-proxy](https://github.com/konveyor/crane-reverse-proxy) service
+
+2. Identify the route URL exposed by the crane-reverse-proxy service on your cluster.
+
+   - Using the Console UI under Networking -> Routes, locate the `proxy` route in the `openshift-migration` project
+   - Copy the URL under Location for use below.
+
+### To run the plugin locally:
 
 1. From the `crane-ui-plugin` directory:
 
@@ -30,15 +40,15 @@ To run the plugin locally:
 
    The server runs on port 9001 with CORS enabled.
 
-2. In a separate shell, from a clone of the [openshift/console](https://github.com/openshift/console) repository, `oc login` to your cluster and then:
+2. In a separate shell, from a clone of the [openshift/console](https://github.com/openshift/console) repository, `oc login` to your cluster and then run:
 
    ```sh
-   source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/
+   source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy='{"services":[{"consoleAPIPath":"/api/proxy/namespace/openshift-migration/service/proxy:80/","endpoint":"https://proxy-openshift-migration.example.route","authorize":false}]}'
    ```
 
-3. Open the Console in your browser at http://localhost:9000/
+   Note: replace `https://proxy-openshift-migration.example.route` with your proxy route URL from the above setup steps.
 
-### TODO: add notes here about how to use the --plugin-proxy flag for Bridge. Need to install proxy service on the cluster before local dev!
+3. Open the Console in your browser at http://localhost:9000/
 
 ## Docker image
 
