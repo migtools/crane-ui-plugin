@@ -20,6 +20,7 @@ import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
 
 import './ImportWizard.css';
+import { TmpCrudTesting } from '../TmpCrudTesting';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -171,6 +172,7 @@ export const ImportWizard: React.FunctionComponent = () => {
                         Cancel
                       </Button>
                     </div>
+                    <TmpCrudTesting />
                   </>
                 );
               }}

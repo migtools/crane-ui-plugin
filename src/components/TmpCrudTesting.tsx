@@ -80,7 +80,8 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
     <>
       <Button
         onClick={() => setIsModalOpen(true)}
-        style={{ position: 'absolute', top: 100, right: 15 }}
+        style={{ position: 'absolute', bottom: 15, right: 15 }}
+        variant="secondary"
       >
         CRUD debugging (ignore me)
       </Button>

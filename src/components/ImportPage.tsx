@@ -3,7 +3,6 @@ import Helmet from 'react-helmet';
 import { match as RouteMatch } from 'react-router-dom';
 import { Page, PageSection, Title } from '@patternfly/react-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { TmpCrudTesting } from './TmpCrudTesting';
 import { ImportWizard } from './ImportWizard/ImportWizard';
 import { NamespaceContext } from 'src/context/NamespaceContext';
 
@@ -27,7 +26,6 @@ const ImportPage: React.FunctionComponent<PipelineWizardPageProps> = ({
         <Page>
           <PageSection variant="light">
             <Title headingLevel="h1">Smart Import Wizard Name</Title>
-            <TmpCrudTesting />
           </PageSection>
           <PageSection variant="light" type="wizard">
             <ImportWizard />
