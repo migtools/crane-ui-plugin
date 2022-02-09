@@ -1,5 +1,5 @@
 import { ObjectReference } from '@openshift-console/dynamic-plugin-sdk';
-import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
 export const isSameResource = (
   refA: ObjectReference | null | undefined,

@@ -11,10 +11,10 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useSelectionState } from '@konveyor/lib-ui';
 
-import { MOCK_PERSISTENT_VOLUME_CLAIMS } from 'src/mock/PersistentVolumes.mock';
+import { MOCK_PERSISTENT_VOLUME_CLAIMS } from 'src/api/mock/PersistentVolumes.mock';
 import { getCapacity, isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
-import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export const PVCSelectStep: React.FunctionComponent = () => {

@@ -6,9 +6,9 @@ import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 import CheckIcon from '@patternfly/react-icons/dist/esm/icons/check-icon';
 import { ValidatedTextInput } from '@konveyor/lib-ui';
 
-import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
-import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
+import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { columnNames } from './PVCEditStep';
 import { PVCEditRowFormValues, usePVCEditRowFormState } from './ImportWizardFormContext';
 

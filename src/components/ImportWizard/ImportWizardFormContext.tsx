@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as yup from 'yup';
 import { useFormField, useFormState } from '@konveyor/lib-ui';
-import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
-import { MOCK_STORAGE_CLASSES } from 'src/mock/StorageClasses.mock';
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
+import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
 import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
 

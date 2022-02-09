@@ -6,9 +6,10 @@ import {
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useMutation, useQuery } from 'react-query';
-import { MOCK_NEW_PIPELINE } from 'src/mock/Pipelines.mock';
+import { MOCK_NEW_PIPELINE } from 'src/api/mock/Pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { namespaceResource, useProxyK8sClient } from 'src/api/proxyHelpers';
 
 // TODO -- move these helpers elsewhere? do we need them at all? Taken from https://github.com/spadgett/console-customization-plugin/blob/main/src/k8s/resources.ts
 /*
@@ -47,14 +48,16 @@ const useCreatePipelineMutation = () => {
   return useMutation<any, any, any, any>((data) => k8sCreate<any>({ model, data }));
 };
 
-const useProxyTestQuery = (enabled: boolean) =>
-  useQuery('proxy-test', {
-    queryFn: () =>
-      fetch(
-        '/api/proxy/plugin/crane-ui-plugin/remote-cluster/mturley-tmp/mturley-proxy-test-secret/api',
-      ).then((res) => res.json()),
+const useProxyTestQuery = (enabled: boolean) => {
+  const client = useProxyK8sClient(
+    { namespace: 'mturley-tmp', name: 'mturley-proxy-test-secret' },
+    { access_token: 'FOO_TOKEN_HERE' },
+  );
+  return useQuery('proxy-test', {
+    queryFn: () => client.list(namespaceResource),
     enabled,
   });
+};
 
 export const TmpCrudTesting: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();
