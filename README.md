@@ -38,6 +38,8 @@ To run the plugin locally:
 
 3. Open the Console in your browser at http://localhost:9000/
 
+### TODO: add notes here about how to use the --plugin-proxy flag for Bridge. Need to install proxy service on the cluster before local dev!
+
 ## Docker image
 
 Before you can deploy your plugin on a cluster, you must build an image and
