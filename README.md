@@ -13,8 +13,7 @@ You can run the plugin using a local development environment or build an image t
 You'll need:
 
 - Node.js 16+ and Yarn 1.x installed
-- A local clone of the [openshift/console](https://github.com/openshift/console) repository
-- An OpenShift cluster (the Console UI will run locally, but it needs a real cluster on the backend)
+- An OpenShift 4.10+ cluster (the Console UI will run locally, but it needs a real cluster on the backend)
 
 ### To set up for local development:
 
@@ -28,6 +27,14 @@ You'll need:
    - Using the Console UI under Networking -> Routes, locate the `proxy` route in the `openshift-migration` project
    - Copy the URL under Location for use below.
 
+3. Clone and build the [openshift/console](https://github.com/openshift/console) repository in a separate directory.
+
+   ```sh
+   git clone https://github.com/openshift/console.git
+   cd console
+   ./build.sh
+   ```
+
 ### To run the plugin locally:
 
 1. From the `crane-ui-plugin` directory:
@@ -40,7 +47,7 @@ You'll need:
 
    The server runs on port 9001 with CORS enabled.
 
-2. In a separate shell, from a clone of the [openshift/console](https://github.com/openshift/console) repository, `oc login` to your cluster and then run:
+2. In a separate shell, from your clone of the [openshift/console](https://github.com/openshift/console) repository, `oc login` to your cluster and then run:
 
    ```sh
    source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy='{"services":[{"consoleAPIPath":"/api/proxy/namespace/openshift-migration/service/proxy:80/","endpoint":"https://proxy-openshift-migration.example.route","authorize":false}]}'
