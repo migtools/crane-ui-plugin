@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { Configuration as WebpackConfiguration, EnvironmentPlugin, optimize } from 'webpack';
+import { Configuration as WebpackConfiguration, EnvironmentPlugin } from 'webpack';
 import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 import * as path from 'path';
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';

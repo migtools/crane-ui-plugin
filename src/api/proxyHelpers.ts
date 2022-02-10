@@ -45,7 +45,7 @@ export const useProxyK8sClient = (
   clusterSecretRef: { name: string; namespace: string },
   user: OAuthUser,
 ) => {
-  const proxyRootUrl = `/api/proxy/namespace/openshift-migration/service/proxy:80`;
+  const proxyRootUrl = `/api/proxy/plugin/crane-ui-plugin/remote-cluster`;
   const clusterApiUrl = `${proxyRootUrl}/${clusterSecretRef.namespace}/${clusterSecretRef.name}`;
   const { access_token, expiry_time = 0 } = user;
   const client = ClientFactory.cluster({ access_token, expiry_time }, clusterApiUrl);

@@ -79,7 +79,7 @@ spec:
   service:
     name: crane-ui-plugin
     namespace: openshift-migration
-    port: 9443
+    port: 9001
     basePath: '/'
   proxy:
     - type: Service
@@ -87,4 +87,4 @@ spec:
       service:
         name: proxy
         namespace: openshift-migration
-        port: 80
+        port: 8080

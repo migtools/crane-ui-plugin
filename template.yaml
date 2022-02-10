@@ -148,4 +148,4 @@ objects:
           service:
             name: proxy
             namespace: openshift-migration
-            port: 80
+            port: 8080
