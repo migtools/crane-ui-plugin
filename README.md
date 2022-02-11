@@ -22,12 +22,7 @@ You'll need:
    - Install the **Red Hat OpenShift Pipelines** operator from OperatorHub
    - Install the [crane-reverse-proxy](https://github.com/konveyor/crane-reverse-proxy) service
 
-2. Identify the route URL exposed by the crane-reverse-proxy service on your cluster.
-
-   - Using the Console UI under Networking -> Routes, locate the `proxy` route in the `openshift-migration` project
-   - Copy the URL under Location for use below.
-
-3. Clone and build the [openshift/console](https://github.com/openshift/console) repository in a separate directory.
+2. Clone and build the [openshift/console](https://github.com/openshift/console) repository in a separate directory.
 
    ```sh
    git clone https://github.com/openshift/console.git
@@ -47,37 +42,47 @@ You'll need:
 
    The server runs on port 9001 with CORS enabled.
 
-2. In a separate shell, from your clone of the [openshift/console](https://github.com/openshift/console) repository, `oc login` to your cluster and then run:
+2. In a separate shell, from your clone of the [openshift/console](https://github.com/openshift/console) repository:
 
-   ```sh
-   source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy='{"services":[{"consoleAPIPath":"/api/proxy/namespace/openshift-migration/service/proxy:80/","endpoint":"https://proxy-openshift-migration.example.route","authorize":false}]}'
-   ```
+   - `oc login` to your cluster
+   - Identify the route exposed by the crane-reverse-proxy service on your cluster:
 
-   Note: replace `https://proxy-openshift-migration.example.route` with your proxy route URL from the above setup steps.
+     ```sh
+     oc get route -n openshift-migration proxy
+     ```
+
+     It will look something like: `proxy-openshift-migration.cluster.example.com`
+
+   - Start the console bridge with the following options:
+
+     ```sh
+     source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy='{"services":[{"consoleAPIPath":"/api/proxy/plugin/crane-ui-plugin/remote-cluster/","endpoint":"https://proxy-openshift-migration.cluster.example.com","authorize":false}]}'
+     ```
+
+     Note: replace `https://proxy-openshift-migration.cluster.example.com` with your proxy route URL from above (be sure to add the `https://`).
 
 3. Open the Console in your browser at http://localhost:9000/
 
 ## Docker image
 
-Before you can deploy your plugin on a cluster, you must build an image and
-push it to an image registry.
+Before you can deploy your plugin on a cluster, you must build an image and push it to an image registry.
 
 1. Build the image:
 
    ```sh
-   docker build -t quay.io/konveyor/crane-ui-plugin:latest .
+   docker build -t quay.io/yourname/crane-ui-plugin:latest .
    ```
 
 2. Run the image:
 
    ```sh
-   docker run -it --rm -d -p 9001:80 quay.io/konveyor/crane-ui-plugin:latest
+   docker run -it --rm -d -p 9001:80 quay.io/yourname/crane-ui-plugin:latest
    ```
 
 3. Push the image:
 
    ```sh
-   docker push quay.io/konveyor/crane-ui-plugin:latest
+   docker push quay.io/yourname/crane-ui-plugin:latest
    ```
 
 ## Deployment on cluster
@@ -94,7 +99,7 @@ server to serve your plugin's assets.
 oc process -f template.yaml \
   -p PLUGIN_NAME=crane-ui-plugin \
   -p NAMESPACE=openshift-migration \
-  -p IMAGE=quay.io/konveyor/crane-ui-plugin:latest \
+  -p IMAGE=quay.io/yourname/crane-ui-plugin:latest \
   | oc create -f -
 ```
 
