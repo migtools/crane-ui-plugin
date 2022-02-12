@@ -4,10 +4,21 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
+import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
-  // TODO validation -- creating Secret and ConfigMap? Do we drive that from yup async validation?
+
+  const configureProxyMutation = useConfigureProxyMutation(); // TODO pass onSuccess to set the sourceApiSecret form field
+
+  // TODO call this onBlur in relevant fields
+  const configureProxy = () => {
+    const { apiUrl, token, sourceApiSecret } = form.values;
+    if (apiUrl && token && !sourceApiSecret) {
+      configureProxyMutation.mutate({ apiUrl, token });
+    }
+  };
+
   return (
     <>
       <TextContent className={spacing.mbMd}>
