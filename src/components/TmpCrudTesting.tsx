@@ -5,11 +5,10 @@ import {
   k8sCreate,
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { MOCK_NEW_PIPELINE } from 'src/api/mock/Pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-import { namespaceResource, useProxyK8sClient } from 'src/api/proxyHelpers';
 
 // TODO -- move these helpers elsewhere? do we need them at all? Taken from https://github.com/spadgett/console-customization-plugin/blob/main/src/k8s/resources.ts
 /*
@@ -48,17 +47,6 @@ const useCreatePipelineMutation = () => {
   return useMutation<any, any, any, any>((data) => k8sCreate<any>({ model, data }));
 };
 
-const useProxyTestQuery = (enabled: boolean) => {
-  const client = useProxyK8sClient(
-    { namespace: 'mturley-tmp', name: 'mturley-proxy-test-secret' },
-    { access_token: 'FOO_TOKEN_HERE' },
-  );
-  return useQuery('proxy-test', {
-    queryFn: () => client.list(namespaceResource),
-    enabled: false,
-  });
-};
-
 export const TmpCrudTesting: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();
   const [data, loaded, error] = useK8sWatchResource<any[]>({
@@ -72,10 +60,6 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
 
   const createPipelineMutation = useCreatePipelineMutation();
   const [newPipelineName, setNewPipelineName] = React.useState('');
-  const proxyTestQuery = useProxyTestQuery(isModalOpen);
-  if (isModalOpen) {
-    console.log({ proxyTestQuery });
-  }
   return (
     <>
       <Button
@@ -90,9 +74,6 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
         title="CRUD debugging (ignore me)"
         onClose={() => setIsModalOpen(false)}
       >
-        Testing proxy service - Status: {proxyTestQuery.status}
-        <br />
-        Testing creation of a pipeline:
         <Flex>
           <FlexItem>
             <TextInput value={newPipelineName} onChange={setNewPipelineName} />

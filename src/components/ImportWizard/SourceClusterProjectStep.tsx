@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { TextContent, Text, Form } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { ResolvedQuery, ValidatedTextInput } from '@konveyor/lib-ui';
+import { ResolvedQueries, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
+import { useSourceNamespacesQuery } from 'src/api/queries/sourceNamespaces';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
@@ -20,10 +21,28 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
 
   const configureProxy = () => {
     const { apiUrl, token, sourceApiSecret } = form.fields;
-    if (apiUrl.isDirty && apiUrl.value && token.isDirty && token.value && !sourceApiSecret.value) {
+    if (
+      (apiUrl.isDirty || token.isDirty) &&
+      apiUrl.value &&
+      token.value &&
+      !sourceApiSecret.value
+    ) {
       configureProxyMutation.mutate({ apiUrl: apiUrl.value, token: token.value });
     }
   };
+
+  const sourceNamespacesQuery = useSourceNamespacesQuery(form.values.sourceApiSecret);
+  const credentialsValidating =
+    configureProxyMutation.isLoading || sourceNamespacesQuery.isFetching;
+  const credentialsAreValid =
+    !form.fields.apiUrl.isDirty &&
+    !form.fields.token.isDirty &&
+    configureProxyMutation.isSuccess &&
+    sourceNamespacesQuery.isSuccess &&
+    !sourceNamespacesQuery.isFetching &&
+    sourceNamespacesQuery.data?.data.items.length > 0;
+
+  // TODO can we move the extra validation props relating to connection test into yup validation?
 
   return (
     <>
@@ -37,7 +56,17 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           fieldId="api-url"
           onBlur={configureProxy}
           formGroupProps={{
-            helperText: configureProxyMutation.isLoading ? 'Validating...' : null,
+            helperText: credentialsValidating ? 'Validating...' : null,
+            ...(credentialsAreValid ? { validated: 'success' } : {}),
+            ...(sourceNamespacesQuery.isError
+              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
+              : {}),
+          }}
+          inputProps={{
+            ...(credentialsAreValid ? { validated: 'success' } : {}),
+            ...(sourceNamespacesQuery.isError
+              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
+              : {}),
           }}
         />
         <ValidatedTextInput
@@ -46,14 +75,26 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           fieldId="token"
           onBlur={configureProxy}
           formGroupProps={{
-            helperText: configureProxyMutation.isLoading ? 'Validating...' : null,
+            helperText: credentialsValidating ? 'Validating...' : null,
+            ...(credentialsAreValid ? { validated: 'success' } : {}),
+            ...(sourceNamespacesQuery.isError
+              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
+              : {}),
+          }}
+          inputProps={{
+            ...(credentialsAreValid ? { validated: 'success' } : {}),
+            ...(sourceNamespacesQuery.isError
+              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
+              : {}),
           }}
         />
         <ValidatedTextInput field={form.fields.namespace} isRequired fieldId="project-name" />
-        <ResolvedQuery
+        <ResolvedQueries
           spinnerMode="none"
-          result={configureProxyMutation}
-          errorTitle="Cannot configure crane-proxy"
+          resultsWithErrorTitles={[
+            { result: configureProxyMutation, errorTitle: 'Cannot configure crane-proxy' },
+            { result: sourceNamespacesQuery, errorTitle: 'Cannot load source cluster namespaces' },
+          ]}
         />
       </Form>
     </>

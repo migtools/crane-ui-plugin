@@ -11,16 +11,6 @@ export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
 
   const sourceApiSecretField = useFormField<OAuthSecret | null>(null, yup.mixed());
-  const apiUrlField = useFormField('', yup.string().label('Cluster API URL').required(), {
-    onChange: () => sourceApiSecretField.setValue(null),
-  });
-  const tokenField = useFormField('', yup.string().label('OAuth token').required(), {
-    onChange: () => sourceApiSecretField.setValue(null),
-  });
-
-  // TODO create secret and configure proxy with a mutation onBlur of both the above fields (if both defined) in the SourceProjectDetailsStep
-  // TODO add a namespaces query that is disabled until the secret field has a value
-  // TODO add a yup test to the apiUrl and token fields to pass validation if the namespaces query data is there, or show errors with that query on the token field?
 
   // TODO load this from the host cluster via the SDK -- probably prefill async
   const storageClasses = MOCK_STORAGE_CLASSES; // TODO do we need to pass this in? call the SDK hook here?
@@ -56,8 +46,12 @@ export const useImportWizardFormState = () => {
 
   return {
     sourceClusterProject: useFormState({
-      apiUrl: apiUrlField,
-      token: tokenField,
+      apiUrl: useFormField('', yup.string().label('Cluster API URL').required(), {
+        onChange: () => sourceApiSecretField.setValue(null),
+      }),
+      token: useFormField('', yup.string().label('OAuth token').required(), {
+        onChange: () => sourceApiSecretField.setValue(null),
+      }),
       namespace: useFormField('', dnsLabelNameSchema.label('Project name').required()), // TODO check if it exists (use list or single lookup?)
       sourceApiSecret: sourceApiSecretField,
     }),
