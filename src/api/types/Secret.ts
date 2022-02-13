@@ -1,8 +1,9 @@
-import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 
 // https://kubernetes.io/docs/concepts/configuration/secret/
 
 export interface Secret extends K8sResourceCommon {
+  apiVersion: 'v1';
   kind: 'Secret';
   data: Record<string, string>;
   type:
@@ -17,6 +18,11 @@ export interface Secret extends K8sResourceCommon {
 }
 
 export interface OAuthSecret extends Secret {
+  metadata: ObjectMetadata & {
+    annotations: ObjectMetadata['annotations'] & {
+      'konveyor.io/crane-ui-plugin'?: 'source-cluster-oauth' | 'target-cluster-oauth';
+    };
+  };
   data: {
     url: string;
     token: string;

@@ -11,7 +11,7 @@ export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
 
   const sourceApiSecretField = useFormField<OAuthSecret | null>(null, yup.mixed());
-  const apiUrlField = useFormField('', dnsLabelNameSchema.label('Cluster API URL').required(), {
+  const apiUrlField = useFormField('', yup.string().label('Cluster API URL').required(), {
     onChange: () => sourceApiSecretField.setValue(null),
   });
   const tokenField = useFormField('', yup.string().label('OAuth token').required(), {
