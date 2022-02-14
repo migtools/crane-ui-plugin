@@ -9,19 +9,20 @@ import {
   RowFilter,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { useSelectionState } from '@konveyor/lib-ui';
+import { ResolvedQuery, useSelectionState } from '@konveyor/lib-ui';
 
-import { MOCK_PERSISTENT_VOLUME_CLAIMS } from 'src/api/mock/PersistentVolumes.mock';
 import { getCapacity, isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
+import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 
 export const PVCSelectStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
   const form = forms.pvcSelect;
 
-  const pvcs = MOCK_PERSISTENT_VOLUME_CLAIMS; // TODO load from a real query via proxy
+  const sourcePVCsQuery = useSourcePVCsQuery(forms.sourceClusterProject.values);
+  const pvcs = sourcePVCsQuery.data?.data.items || [];
 
   const rowFilters: RowFilter<PersistentVolumeClaim>[] = []; // TODO do we need to add one here for storage classes, by the available ones in the source?
   const [data, filteredData, onFilterChange] = useListPageFilter(pvcs, rowFilters);
@@ -40,8 +41,10 @@ export const PVCSelectStep: React.FunctionComponent = () => {
     capacity: 'Capacity',
   };
 
+  // TODO handle empty state and what happens when you proceed with no PVCs selected (see notes)
+
   return (
-    <>
+    <ResolvedQuery result={sourcePVCsQuery} errorTitle="Cannot load PVCs from source cluster">
       <TextContent className={spacing.mbMd}>
         <Text component="h2">Select persistent volume claims</Text>
         <Text component="p">
@@ -50,7 +53,7 @@ export const PVCSelectStep: React.FunctionComponent = () => {
       </TextContent>
       <ListPageFilter
         data={data}
-        loaded // TODO do we use this while loading or not render this at all while loading?
+        loaded
         rowFilters={rowFilters}
         onFilterChange={onFilterChange}
         hideLabelFilter
@@ -107,6 +110,6 @@ export const PVCSelectStep: React.FunctionComponent = () => {
           </Tbody>
         </TableComposable>
       </Form>
-    </>
+    </ResolvedQuery>
   );
 };
