@@ -16,50 +16,6 @@ import { OAuthSecret, Secret } from '../types/Secret';
 const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
 const configMapGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'ConfigMap' };
 
-const getNewSecret = (
-  sourceOrTarget: 'source' | 'target',
-  namespace: string,
-  apiUrl: string,
-  token: string,
-): OAuthSecret => ({
-  apiVersion: 'v1',
-  kind: 'Secret',
-  metadata: {
-    generateName: `${sourceOrTarget}-cluster-`,
-    namespace,
-    annotations: {
-      'konveyor.io/crane-ui-plugin': `${sourceOrTarget}-cluster-oauth`,
-    },
-  },
-  data: {
-    url: btoa(apiUrl),
-    token: btoa(token),
-  },
-  type: 'Opaque',
-});
-
-const parseClustersJSON = (clustersJSON: string): ProxyConfigMapCluster[] => {
-  try {
-    return JSON.parse(clustersJSON);
-  } catch {
-    return [];
-  }
-};
-
-const removeSecretFromClustersJSON = (clustersJSON: string, secret: OAuthSecret): string => {
-  let clusters = parseClustersJSON(clustersJSON);
-  clusters = clusters.filter((secretRef) => !isSameResource(secretRef, secret.metadata));
-  return JSON.stringify(clusters);
-};
-
-const addSecretToClustersJSON = (clustersJSON: string, secret: OAuthSecret): string => {
-  const clusters = parseClustersJSON(clustersJSON);
-  if (!clusters.find((secretRef) => isSameResource(secretRef, secret.metadata))) {
-    clusters.push({ name: secret.metadata.name, namespace: secret.metadata.namespace });
-  }
-  return JSON.stringify(clusters);
-};
-
 interface UseConfigureProxyMutationArgs {
   existingSecretFromState: OAuthSecret | null;
   onSuccess: (newSecret: OAuthSecret) => void;
@@ -138,4 +94,48 @@ export const useConfigureProxyMutation = ({
       onSuccess,
     },
   );
+};
+
+const getNewSecret = (
+  sourceOrTarget: 'source' | 'target',
+  namespace: string,
+  apiUrl: string,
+  token: string,
+): OAuthSecret => ({
+  apiVersion: 'v1',
+  kind: 'Secret',
+  metadata: {
+    generateName: `${sourceOrTarget}-cluster-`,
+    namespace,
+    annotations: {
+      'konveyor.io/crane-ui-plugin': `${sourceOrTarget}-cluster-oauth`,
+    },
+  },
+  data: {
+    url: btoa(apiUrl),
+    token: btoa(token),
+  },
+  type: 'Opaque',
+});
+
+const parseClustersJSON = (clustersJSON: string): ProxyConfigMapCluster[] => {
+  try {
+    return JSON.parse(clustersJSON);
+  } catch {
+    return [];
+  }
+};
+
+const removeSecretFromClustersJSON = (clustersJSON: string, secret: OAuthSecret): string => {
+  let clusters = parseClustersJSON(clustersJSON);
+  clusters = clusters.filter((secretRef) => !isSameResource(secretRef, secret.metadata));
+  return JSON.stringify(clusters);
+};
+
+const addSecretToClustersJSON = (clustersJSON: string, secret: OAuthSecret): string => {
+  const clusters = parseClustersJSON(clustersJSON);
+  if (!clusters.find((secretRef) => isSameResource(secretRef, secret.metadata))) {
+    clusters.push({ name: secret.metadata.name, namespace: secret.metadata.namespace });
+  }
+  return JSON.stringify(clusters);
 };
