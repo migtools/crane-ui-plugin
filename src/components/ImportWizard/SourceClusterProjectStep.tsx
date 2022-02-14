@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { ResolvedQueries, ValidatedTextInput } from '@konveyor/lib-ui';
+import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureProxyMutation } from 'src/api/queries/secrets';
@@ -68,7 +68,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           inputProps={credentialsInputProps}
           formGroupProps={credentialsFormGroupProps}
         />
-        <ValidatedTextInput
+        <ValidatedPasswordInput
           field={form.fields.token}
           isRequired
           fieldId="token"
