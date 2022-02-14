@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextContent, Text, Form } from '@patternfly/react-core';
+import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { ResolvedQueries, ValidatedTextInput } from '@konveyor/lib-ui';
 
@@ -7,6 +7,7 @@ import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
 import { useSourceNamespacesQuery } from 'src/api/queries/sourceNamespaces';
+import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
@@ -32,15 +33,21 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     !configureProxyMutation.isLoading,
   );
   const credentialsValidating = configureProxyMutation.isLoading || sourceNamespacesQuery.isLoading;
-  const credentialsAreValid =
-    !form.fields.apiUrl.isDirty &&
-    !form.fields.token.isDirty &&
-    configureProxyMutation.isSuccess &&
-    sourceNamespacesQuery.isSuccess &&
-    !sourceNamespacesQuery.isLoading &&
-    sourceNamespacesQuery.data?.data.items.length > 0;
+  const credentialsAreValid = areSourceCredentialsValid(
+    form.fields.apiUrl.isDirty || form.fields.token.isDirty,
+    !!form.values.sourceApiSecret,
+    sourceNamespacesQuery,
+  );
+  // Override validation styles based on connection check
+  const credentialsInputProps: Pick<TextInputProps, 'validated'> = {
+    ...(credentialsValidating ? { validated: 'default' } : {}),
+    ...(credentialsAreValid ? { validated: 'success' } : {}),
+  };
+  const credentialsFormGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
+    ...credentialsInputProps,
+    helperText: credentialsValidating ? 'Validating...' : null,
+  };
 
-  // TODO can we move the extra validation props relating to connection test into yup validation?
   // TODO validate project field using loaded namespaces
 
   return (
@@ -54,38 +61,16 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           isRequired
           fieldId="api-url"
           onBlur={configureProxy}
-          formGroupProps={{
-            helperText: credentialsValidating ? 'Validating...' : null,
-            ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(!credentialsValidating && sourceNamespacesQuery.isError
-              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
-              : {}),
-          }}
-          inputProps={{
-            ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(!credentialsValidating && sourceNamespacesQuery.isError
-              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
-              : {}),
-          }}
+          inputProps={credentialsInputProps}
+          formGroupProps={credentialsFormGroupProps}
         />
         <ValidatedTextInput
           field={form.fields.token}
           isRequired
           fieldId="token"
           onBlur={configureProxy}
-          formGroupProps={{
-            helperText: credentialsValidating ? 'Validating...' : null,
-            ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(!credentialsValidating && sourceNamespacesQuery.isError
-              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
-              : {}),
-          }}
-          inputProps={{
-            ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(!credentialsValidating && sourceNamespacesQuery.isError
-              ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
-              : {}),
-          }}
+          inputProps={credentialsInputProps}
+          formGroupProps={credentialsFormGroupProps}
         />
         <ValidatedTextInput field={form.fields.namespace} isRequired fieldId="project-name" />
         <ResolvedQueries

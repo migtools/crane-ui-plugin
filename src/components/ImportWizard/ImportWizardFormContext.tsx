@@ -6,11 +6,38 @@ import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
 import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
+import { useSourceNamespacesQuery } from 'src/api/queries/sourceNamespaces';
+import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
-
   const sourceApiSecretField = useFormField<OAuthSecret | null>(null, yup.mixed());
+
+  const credentialsFieldSchema = yup
+    .string()
+    .required()
+    .test('is-not-validating', (_value, context) => {
+      if (sourceNamespacesQuery.isLoading) {
+        return context.createError();
+      }
+      return true;
+    })
+    .test('loads-namespaces', (_value, context) => {
+      if (sourceApiSecretField.value && !credentialsAreValid) {
+        return context.createError({ message: 'Cannot connect using these credentials' });
+      }
+      return true;
+    });
+
+  const apiUrlField = useFormField<string>('', credentialsFieldSchema.label('Cluster API URL'));
+  const tokenField = useFormField<string>('', credentialsFieldSchema.label('OAuth token'));
+
+  const sourceNamespacesQuery = useSourceNamespacesQuery(sourceApiSecretField.value);
+  const credentialsAreValid = areSourceCredentialsValid(
+    apiUrlField.isDirty || tokenField.isDirty,
+    !!sourceApiSecretField.value,
+    sourceNamespacesQuery,
+  );
 
   // TODO load this from the host cluster via the SDK -- probably prefill async
   const storageClasses = MOCK_STORAGE_CLASSES; // TODO do we need to pass this in? call the SDK hook here?
@@ -45,12 +72,17 @@ export const useImportWizardFormState = () => {
   };
 
   return {
-    sourceClusterProject: useFormState({
-      apiUrl: useFormField('', yup.string().label('Cluster API URL').required()),
-      token: useFormField('', yup.string().label('OAuth token').required()),
-      namespace: useFormField('', dnsLabelNameSchema.label('Project name').required()), // TODO check if it exists (use list or single lookup?)
-      sourceApiSecret: sourceApiSecretField,
-    }),
+    sourceClusterProject: useFormState(
+      {
+        apiUrl: apiUrlField,
+        token: tokenField,
+        namespace: useFormField('', dnsLabelNameSchema.label('Project name').required()), // TODO check if it exists (use list or single lookup?)
+        sourceApiSecret: sourceApiSecretField,
+      },
+      {
+        revalidateOnChange: [credentialsAreValid],
+      },
+    ),
     pvcSelect: useFormState({
       selectedPVCs: useFormField<PersistentVolumeClaim[]>([], yup.array(), {
         onChange: onSelectedPVCsChange,
