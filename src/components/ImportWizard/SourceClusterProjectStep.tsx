@@ -38,7 +38,10 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     !!form.values.sourceApiSecret,
     sourceNamespacesQuery,
   );
-  // Override validation styles based on connection check
+
+  // Override validation styles based on connection check.
+  // Can't use greenWhenValid prop of ValidatedTextInput because fields can be valid before connection test passes.
+  // This way we don't show the connection failed message when you just haven't finished entering credentials.
   const credentialsInputProps: Pick<TextInputProps, 'validated'> = {
     ...(credentialsValidating ? { validated: 'default' } : {}),
     ...(credentialsAreValid ? { validated: 'success' } : {}),
@@ -72,7 +75,12 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           inputProps={credentialsInputProps}
           formGroupProps={credentialsFormGroupProps}
         />
-        <ValidatedTextInput field={form.fields.namespace} isRequired fieldId="project-name" />
+        <ValidatedTextInput
+          field={form.fields.namespace}
+          isRequired
+          fieldId="project-name"
+          greenWhenValid
+        />
         <ResolvedQueries
           spinnerMode="none"
           resultsWithErrorTitles={[

@@ -76,7 +76,28 @@ export const useImportWizardFormState = () => {
       {
         apiUrl: apiUrlField,
         token: tokenField,
-        namespace: useFormField('', dnsLabelNameSchema.label('Project name').required()), // TODO check if it exists (use list or single lookup?)
+        namespace: useFormField(
+          '',
+          dnsLabelNameSchema
+            .label('Project name')
+            .required()
+            .test('exists', (value, context) => {
+              if (value && !credentialsAreValid) {
+                return context.createError({
+                  message: 'Cannot validate project name without connecting to the cluster',
+                });
+              }
+              const namespaceExists = sourceNamespacesQuery.data?.data.items.find(
+                (ns) => ns.metadata.name === value,
+              );
+              if (value && !namespaceExists) {
+                return context.createError({
+                  message: 'This project does not exist in the source cluster',
+                });
+              }
+              return true;
+            }),
+        ),
         sourceApiSecret: sourceApiSecretField,
       },
       {
