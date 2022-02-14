@@ -16,6 +16,7 @@ import { useSortState } from 'src/common/hooks/useSortState';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
+import { TableEmptyState } from 'src/common/components/TableEmptyState';
 
 export const PVCSelectStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
@@ -41,7 +42,7 @@ export const PVCSelectStep: React.FunctionComponent = () => {
     capacity: 'Capacity',
   };
 
-  // TODO handle empty state and what happens when you proceed with no PVCs selected (see notes)
+  // TODO warn with a confirm modal when clicking Next with no PVCs selected
 
   return (
     <ResolvedQuery result={sourcePVCsQuery} errorTitle="Cannot load PVCs from source cluster">
@@ -62,12 +63,14 @@ export const PVCSelectStep: React.FunctionComponent = () => {
         <TableComposable borders={false} variant="compact">
           <Thead>
             <Tr>
-              <Th
-                select={{
-                  onSelect: (_event, isSelecting) => selectAll(isSelecting),
-                  isSelected: areAllSelected,
-                }}
-              />
+              {sortedItems.length > 0 ? (
+                <Th
+                  select={{
+                    onSelect: (_event, isSelecting) => selectAll(isSelecting),
+                    isSelected: areAllSelected,
+                  }}
+                />
+              ) : null}
               <Th sort={{ sortBy, onSort, columnIndex: 0 }}>{columnNames.pvcName}</Th>
               <Th>{columnNames.storageClass}</Th>
               <Th>{columnNames.capacity}</Th>
@@ -75,38 +78,53 @@ export const PVCSelectStep: React.FunctionComponent = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {sortedItems.map((pvc, rowIndex) => (
-              <Tr key={pvc.metadata.name}>
-                <Td
-                  select={{
-                    rowIndex,
-                    onSelect: (_event, isSelecting) => toggleItemSelected(pvc, isSelecting),
-                    isSelected: isItemSelected(pvc),
-                  }}
-                />
-                <Td dataLabel={columnNames.pvcName}>{pvc.metadata.name}</Td>
-                <Td dataLabel={columnNames.storageClass}>{pvc.spec.storageClassName}</Td>
-                <Td dataLabel={columnNames.capacity}>{getCapacity(pvc)}</Td>
-                <Td>
-                  <Popover
-                    className="json-popover"
-                    position="bottom"
-                    bodyContent={
-                      <div onClick={(event) => event.stopPropagation()}>
-                        <ReactJson src={pvc} enableClipboard={false} />
-                      </div>
+            {sortedItems.length === 0 ? (
+              <Tr>
+                <Td colSpan={4}>
+                  <TableEmptyState
+                    titleText="No results found"
+                    bodyText={
+                      pvcs.length === 0
+                        ? 'No PVCs were found in the selected project on the source cluster. If you proceed, only workloads will be migrated.'
+                        : 'Adjust your filters and try again.'
                     }
-                    aria-label={`View JSON for PVC ${pvc.metadata.name}`}
-                    closeBtnAriaLabel="Close JSON view"
-                    maxWidth="200rem"
-                  >
-                    <Button variant="link" className={text.textNowrap}>
-                      View JSON
-                    </Button>
-                  </Popover>
+                  />
                 </Td>
               </Tr>
-            ))}
+            ) : (
+              sortedItems.map((pvc, rowIndex) => (
+                <Tr key={pvc.metadata.name}>
+                  <Td
+                    select={{
+                      rowIndex,
+                      onSelect: (_event, isSelecting) => toggleItemSelected(pvc, isSelecting),
+                      isSelected: isItemSelected(pvc),
+                    }}
+                  />
+                  <Td dataLabel={columnNames.pvcName}>{pvc.metadata.name}</Td>
+                  <Td dataLabel={columnNames.storageClass}>{pvc.spec.storageClassName}</Td>
+                  <Td dataLabel={columnNames.capacity}>{getCapacity(pvc)}</Td>
+                  <Td>
+                    <Popover
+                      className="json-popover"
+                      position="bottom"
+                      bodyContent={
+                        <div onClick={(event) => event.stopPropagation()}>
+                          <ReactJson src={pvc} enableClipboard={false} />
+                        </div>
+                      }
+                      aria-label={`View JSON for PVC ${pvc.metadata.name}`}
+                      closeBtnAriaLabel="Close JSON view"
+                      maxWidth="200rem"
+                    >
+                      <Button variant="link" className={text.textNowrap}>
+                        View JSON
+                      </Button>
+                    </Popover>
+                  </Td>
+                </Tr>
+              ))
+            )}
           </Tbody>
         </TableComposable>
       </Form>

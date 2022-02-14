@@ -5,7 +5,12 @@ import { OAuthSecret } from 'src/api/types/Secret';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
-import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
+import {
+  capacitySchema,
+  dnsLabelNameSchema,
+  getSourceNamespaceSchema,
+  yamlSchema,
+} from 'src/common/schema';
 import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 import { secretMatchesCredentials } from 'src/api/queries/secrets';
@@ -84,25 +89,9 @@ export const useImportWizardFormState = () => {
         token: tokenField,
         namespace: useFormField(
           '',
-          dnsLabelNameSchema
-            .label('Project name')
-            .required()
-            .test('exists', (value, context) => {
-              if (value && !credentialsAreValid) {
-                return context.createError({
-                  message: 'Cannot validate project name without connecting to the cluster',
-                });
-              }
-              const namespaceExists = sourceNamespacesQuery.data?.data.items.find(
-                (ns) => ns.metadata.name === value,
-              );
-              if (value && !namespaceExists) {
-                return context.createError({
-                  message: 'This project does not exist in the source cluster',
-                });
-              }
-              return true;
-            }),
+          getSourceNamespaceSchema(sourceNamespacesQuery, credentialsAreValid).label(
+            'Project name',
+          ),
         ),
         sourceApiSecret: sourceApiSecretField,
       },
