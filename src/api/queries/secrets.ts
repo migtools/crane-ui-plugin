@@ -37,7 +37,6 @@ export const useConfigureProxyMutation = ({
       // If we already have a secret in state, use that instead of looking for one to replace.
       let existingSecret = existingSecretFromState;
       if (!existingSecret) {
-        console.log('Finding existing secret from list!');
         // See if we have an existing secret for this cluster URL that isn't associated with a pipeline.
         const nsSecrets = await k8sList<Secret>({
           model: secretModel,
@@ -50,8 +49,6 @@ export const useConfigureProxyMutation = ({
             (secret.metadata.ownerReferences || []).length === 0 &&
             secret.data.url === btoa(apiUrl),
         ) as OAuthSecret | undefined;
-      } else {
-        console.log('Reusing secret from state!');
       }
 
       let secretToUse: OAuthSecret | null = null;
@@ -59,20 +56,16 @@ export const useConfigureProxyMutation = ({
 
       // If we have an existing secret that doesn't match our credentials, delete it so we can replace it.
       if (existingSecret) {
-        console.log('We have an existing secret!');
         if (existingSecret.data.url !== btoa(apiUrl) || existingSecret.data.token !== btoa(token)) {
-          console.log('Deleting it!', existingSecret.metadata.name);
           await k8sDelete({ model: secretModel, resource: existingSecret });
           deletedSecret = existingSecret;
         } else {
           // If it already matches, we can just use it as-is.
-          console.log('It matches, reusing it!');
           secretToUse = existingSecret;
         }
       }
 
       if (!secretToUse) {
-        console.log('Creating a brand new secret!');
         secretToUse = await k8sCreate<OAuthSecret>({
           model: secretModel,
           data: getNewSecret('source', namespace, apiUrl, token),
