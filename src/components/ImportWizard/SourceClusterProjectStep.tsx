@@ -31,14 +31,13 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     form.values.sourceApiSecret,
     !configureProxyMutation.isLoading,
   );
-  const credentialsValidating =
-    configureProxyMutation.isLoading || sourceNamespacesQuery.isFetching;
+  const credentialsValidating = configureProxyMutation.isLoading || sourceNamespacesQuery.isLoading;
   const credentialsAreValid =
     !form.fields.apiUrl.isDirty &&
     !form.fields.token.isDirty &&
     configureProxyMutation.isSuccess &&
     sourceNamespacesQuery.isSuccess &&
-    !sourceNamespacesQuery.isFetching &&
+    !sourceNamespacesQuery.isLoading &&
     sourceNamespacesQuery.data?.data.items.length > 0;
 
   // TODO can we move the extra validation props relating to connection test into yup validation?

@@ -4,7 +4,7 @@ import { OAuthSecret } from '../types/Secret';
 
 export const useSourceNamespacesQuery = (sourceApiSecret?: OAuthSecret, isEnabled = true) => {
   const client = useProxyK8sClient(sourceApiSecret);
-  return useQuery('source-namespaces', {
+  return useQuery(`namespaces-${sourceApiSecret?.metadata.name || ''}`, {
     queryFn: () => client.list(namespaceResource),
     enabled: !!sourceApiSecret && isEnabled,
   });
