@@ -16,11 +16,6 @@ import { OAuthSecret, Secret } from '../types/Secret';
 const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
 const configMapGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'ConfigMap' };
 
-interface ConfigureProxyMutationParams {
-  apiUrl: string;
-  token: string;
-}
-
 const getNewSecret = (
   sourceOrTarget: 'source' | 'target',
   namespace: string,
@@ -66,35 +61,50 @@ const addSecretToClustersJSON = (clustersJSON: string, secret: OAuthSecret): str
 };
 
 interface UseConfigureProxyMutationArgs {
+  existingSecretFromState: OAuthSecret | null;
   onSuccess: (newSecret: OAuthSecret) => void;
 }
-export const useConfigureProxyMutation = ({ onSuccess }: UseConfigureProxyMutationArgs) => {
+interface ConfigureProxyMutationParams {
+  apiUrl: string;
+  token: string;
+}
+
+export const useConfigureProxyMutation = ({
+  existingSecretFromState,
+  onSuccess,
+}: UseConfigureProxyMutationArgs) => {
   const [secretModel] = useK8sModel(secretGVK);
   const [configMapModel] = useK8sModel(configMapGVK);
   const namespace = useNamespaceContext();
   return useMutation<OAuthSecret, Error, ConfigureProxyMutationParams>(
     async ({ apiUrl, token }) => {
-      // See if we have an existing secret for this cluster URL that isn't associated with a pipeline
-      const nsSecrets = await k8sList<Secret>({
-        model: secretModel,
-        queryParams: { ns: namespace },
-      });
-      const existingSecret = nsSecrets.find(
-        (secret) =>
-          secret.metadata.annotations?.['konveyor.io/crane-ui-plugin'] === 'source-cluster-oauth' &&
-          (secret.metadata.ownerReferences || []).length === 0 &&
-          secret.data.url === btoa(apiUrl),
-      ) as OAuthSecret | undefined;
+      // If we already have a secret in state, use that instead of looking for one to replace.
+      let existingSecret = existingSecretFromState;
+      if (!existingSecret) {
+        // See if we have an existing secret for this cluster URL that isn't associated with a pipeline.
+        const nsSecrets = await k8sList<Secret>({
+          model: secretModel,
+          queryParams: { ns: namespace },
+        });
+        existingSecret = nsSecrets.find(
+          (secret) =>
+            secret.metadata.annotations?.['konveyor.io/crane-ui-plugin'] ===
+              'source-cluster-oauth' &&
+            (secret.metadata.ownerReferences || []).length === 0 &&
+            secret.data.url === btoa(apiUrl),
+        ) as OAuthSecret | undefined;
+      }
 
       let secretToUse: OAuthSecret | null = null;
       let deletedSecret: OAuthSecret | null = null;
 
-      // If it exists and doesn't match our token, delete it so we can recreate it
+      // If we have an existing secret that doesn't match our credentials, delete it so we can replace it.
       if (existingSecret) {
-        if (existingSecret.data.token !== btoa(token)) {
+        if (existingSecret.data.url !== btoa(apiUrl) || existingSecret.data.token !== btoa(token)) {
           await k8sDelete({ model: secretModel, resource: existingSecret });
           deletedSecret = existingSecret;
         } else {
+          // If it already matches, we can just use it as-is.
           secretToUse = existingSecret;
         }
       }
@@ -106,7 +116,7 @@ export const useConfigureProxyMutation = ({ onSuccess }: UseConfigureProxyMutati
         });
       }
 
-      // Patch the proxy ConfigMap to remove any deleted secret and add the new secret
+      // Patch the proxy ConfigMap to add the new secret and remove the deleted secret if applicable
       const proxyConfigMap = await k8sGet<ProxyConfigMap>({
         model: configMapModel,
         ns: 'openshift-migration',
@@ -116,7 +126,6 @@ export const useConfigureProxyMutation = ({ onSuccess }: UseConfigureProxyMutati
       if (deletedSecret) {
         newClustersJSON = removeSecretFromClustersJSON(newClustersJSON, deletedSecret);
       }
-
       await k8sPatch<ProxyConfigMap>({
         model: configMapModel,
         resource: proxyConfigMap,

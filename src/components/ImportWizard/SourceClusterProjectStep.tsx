@@ -12,6 +12,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
 
   const configureProxyMutation = useConfigureProxyMutation({
+    existingSecretFromState: form.values.sourceApiSecret,
     onSuccess: (newSecret: OAuthSecret) => {
       form.fields.sourceApiSecret.setValue(newSecret);
       form.fields.apiUrl.markSaved();
@@ -20,13 +21,8 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   });
 
   const configureProxy = () => {
-    const { apiUrl, token, sourceApiSecret } = form.fields;
-    if (
-      (apiUrl.isDirty || token.isDirty) &&
-      apiUrl.value &&
-      token.value &&
-      !sourceApiSecret.value
-    ) {
+    const { apiUrl, token } = form.fields;
+    if ((apiUrl.isDirty || token.isDirty) && apiUrl.value && token.value) {
       configureProxyMutation.mutate({ apiUrl: apiUrl.value, token: token.value });
     }
   };
