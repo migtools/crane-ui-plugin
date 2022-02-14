@@ -8,5 +8,5 @@ export interface StorageClass extends K8sResourceCommon {
   parameters?: {
     type: string;
   };
-  reclaimPolicy?: 'Retain' | 'Delete' | string; // TODO can we narrow this?
+  reclaimPolicy?: 'Retain' | 'Delete';
 }

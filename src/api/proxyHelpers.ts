@@ -42,7 +42,7 @@ export interface IProxyK8sStatus extends K8sResourceCommon {
 
 export interface OAuthUser {
   access_token: string;
-  expiry_time?: number; // TODO is expiry_time optional?
+  expiry_time?: number;
 }
 
 export const useProxyK8sClient = (clusterSecret?: OAuthSecret) => {

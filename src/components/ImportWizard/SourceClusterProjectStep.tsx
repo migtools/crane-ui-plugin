@@ -52,8 +52,6 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     helperText: credentialsValidating ? 'Validating...' : null,
   };
 
-  // TODO validate project field using loaded namespaces
-
   return (
     <>
       <TextContent className={spacing.mbMd}>
