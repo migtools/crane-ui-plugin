@@ -27,7 +27,10 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     }
   };
 
-  const sourceNamespacesQuery = useSourceNamespacesQuery(form.values.sourceApiSecret);
+  const sourceNamespacesQuery = useSourceNamespacesQuery(
+    form.values.sourceApiSecret,
+    !configureProxyMutation.isLoading,
+  );
   const credentialsValidating =
     configureProxyMutation.isLoading || sourceNamespacesQuery.isFetching;
   const credentialsAreValid =
@@ -55,13 +58,13 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           formGroupProps={{
             helperText: credentialsValidating ? 'Validating...' : null,
             ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(sourceNamespacesQuery.isError
+            ...(!credentialsValidating && sourceNamespacesQuery.isError
               ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
               : {}),
           }}
           inputProps={{
             ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(sourceNamespacesQuery.isError
+            ...(!credentialsValidating && sourceNamespacesQuery.isError
               ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
               : {}),
           }}
@@ -74,13 +77,13 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           formGroupProps={{
             helperText: credentialsValidating ? 'Validating...' : null,
             ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(sourceNamespacesQuery.isError
+            ...(!credentialsValidating && sourceNamespacesQuery.isError
               ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
               : {}),
           }}
           inputProps={{
             ...(credentialsAreValid ? { validated: 'success' } : {}),
-            ...(sourceNamespacesQuery.isError
+            ...(!credentialsValidating && sourceNamespacesQuery.isError
               ? { validated: 'error', helperTextInvalid: 'Cannot connect using these credentials' }
               : {}),
           }}

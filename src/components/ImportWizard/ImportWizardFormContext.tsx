@@ -46,12 +46,8 @@ export const useImportWizardFormState = () => {
 
   return {
     sourceClusterProject: useFormState({
-      apiUrl: useFormField('', yup.string().label('Cluster API URL').required(), {
-        onChange: () => sourceApiSecretField.setValue(null),
-      }),
-      token: useFormField('', yup.string().label('OAuth token').required(), {
-        onChange: () => sourceApiSecretField.setValue(null),
-      }),
+      apiUrl: useFormField('', yup.string().label('Cluster API URL').required()),
+      token: useFormField('', yup.string().label('OAuth token').required()),
       namespace: useFormField('', dnsLabelNameSchema.label('Project name').required()), // TODO check if it exists (use list or single lookup?)
       sourceApiSecret: sourceApiSecretField,
     }),
