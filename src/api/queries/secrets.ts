@@ -5,6 +5,7 @@ import {
   k8sCreate,
   k8sGet,
   k8sPatch,
+  k8sDelete,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useMutation } from 'react-query';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
@@ -19,12 +20,6 @@ interface ConfigureProxyMutationParams {
   apiUrl: string;
   token: string;
 }
-
-// TODO do we have a derived secret name that depends on the API URL hash, so they are reusable? or do we use generateName and keep it in state?
-// We could:
-// - use md5 or similar to derive a name for the secret from the URL, so they are 1-to-1
-// - list all secrets in the namespace and see if one matches the entire URL already, if not create one with generateName
-// - just create a fresh one with generateName every session and let there be garbage
 
 const getNewSecret = (
   sourceOrTarget: 'source' | 'target',
@@ -56,13 +51,11 @@ const parseClustersJSON = (clustersJSON: string): ProxyConfigMapCluster[] => {
   }
 };
 
-/*
 const removeSecretFromClustersJSON = (clustersJSON: string, secret: OAuthSecret): string => {
   let clusters = parseClustersJSON(clustersJSON);
   clusters = clusters.filter((secretRef) => !isSameResource(secretRef, secret.metadata));
   return JSON.stringify(clusters);
 };
-*/
 
 const addSecretToClustersJSON = (clustersJSON: string, secret: OAuthSecret): string => {
   const clusters = parseClustersJSON(clustersJSON);
@@ -81,47 +74,56 @@ export const useConfigureProxyMutation = ({ onSuccess }: UseConfigureProxyMutati
   const namespace = useNamespaceContext();
   return useMutation<OAuthSecret, Error, ConfigureProxyMutationParams>(
     async ({ apiUrl, token }) => {
-      // Reuse an existing secret if one exists for this cluster URL
+      // See if we have an existing secret for this cluster URL that isn't associated with a pipeline
       const nsSecrets = await k8sList<Secret>({
         model: secretModel,
         queryParams: { ns: namespace },
       });
-      let secretForUrl = nsSecrets.find(
+      const existingSecret = nsSecrets.find(
         (secret) =>
           secret.metadata.annotations?.['konveyor.io/crane-ui-plugin'] === 'source-cluster-oauth' &&
+          (secret.metadata.ownerReferences || []).length === 0 &&
           secret.data.url === btoa(apiUrl),
       ) as OAuthSecret | undefined;
 
-      // If it exists, update it with the new token, else create one
-      secretForUrl = secretForUrl
-        ? await k8sPatch<OAuthSecret>({
-            model: secretModel,
-            resource: secretForUrl,
-            data: [{ op: 'replace', path: '/data/token', value: btoa(token) }],
-          })
-        : await k8sCreate<OAuthSecret>({
-            model: secretModel,
-            data: getNewSecret('source', namespace, apiUrl, token),
-          });
+      let secretToUse: OAuthSecret | null = null;
+      let deletedSecret: OAuthSecret | null = null;
 
-      // Patch the proxy ConfigMap with a reference to the new secret if necessary
+      // If it exists and doesn't match our token, delete it so we can recreate it
+      if (existingSecret) {
+        if (existingSecret.data.token !== btoa(token)) {
+          await k8sDelete({ model: secretModel, resource: existingSecret });
+          deletedSecret = existingSecret;
+        } else {
+          secretToUse = existingSecret;
+        }
+      }
+
+      if (!secretToUse) {
+        secretToUse = await k8sCreate<OAuthSecret>({
+          model: secretModel,
+          data: getNewSecret('source', namespace, apiUrl, token),
+        });
+      }
+
+      // Patch the proxy ConfigMap to remove any deleted secret and add the new secret
       const proxyConfigMap = await k8sGet<ProxyConfigMap>({
         model: configMapModel,
         ns: 'openshift-migration',
         name: 'crane-proxy',
       });
-      const newClustersJSON = addSecretToClustersJSON(proxyConfigMap.data.clusters, secretForUrl);
-      if (newClustersJSON !== proxyConfigMap.data.clusters) {
-        await k8sPatch<ProxyConfigMap>({
-          model: configMapModel,
-          resource: proxyConfigMap,
-          data: [{ op: 'replace', path: '/data/clusters', value: newClustersJSON }],
-        });
+      let newClustersJSON = addSecretToClustersJSON(proxyConfigMap.data.clusters, secretToUse);
+      if (deletedSecret) {
+        newClustersJSON = removeSecretFromClustersJSON(newClustersJSON, deletedSecret);
       }
 
-      // TODO do we have a problem here where we need to worry about the proxy not picking up the updated secret?
+      await k8sPatch<ProxyConfigMap>({
+        model: configMapModel,
+        resource: proxyConfigMap,
+        data: [{ op: 'replace', path: '/data/clusters', value: newClustersJSON }],
+      });
 
-      return secretForUrl;
+      return secretToUse;
     },
     {
       onSuccess,

@@ -43,6 +43,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     sourceNamespacesQuery.data?.data.items.length > 0;
 
   // TODO can we move the extra validation props relating to connection test into yup validation?
+  // TODO validate project field using loaded namespaces
 
   return (
     <>
