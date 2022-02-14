@@ -29,6 +29,7 @@ const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
   return useQuery([kindPlural, sourceApiSecret?.metadata.name, namespace], {
     queryFn: () => client.list<T>(resource),
     enabled: !!sourceApiSecret,
+    refetchInterval: 15_000,
   });
 };
 
