@@ -56,7 +56,7 @@ export const useConfigureProxyMutation = ({
 
       // If we have an existing secret that doesn't match our credentials, delete it so we can replace it.
       if (existingSecret) {
-        if (existingSecret.data.url !== btoa(apiUrl) || existingSecret.data.token !== btoa(token)) {
+        if (!secretMatchesCredentials(existingSecret, apiUrl, token)) {
           await k8sDelete({ model: secretModel, resource: existingSecret });
           deletedSecret = existingSecret;
         } else {
@@ -139,3 +139,6 @@ const addSecretToClustersJSON = (clustersJSON: string, secret: OAuthSecret): str
   }
   return JSON.stringify(clusters);
 };
+
+export const secretMatchesCredentials = (secret: OAuthSecret, apiUrl: string, token: string) =>
+  secret.data.url === btoa(apiUrl) && secret.data.token === btoa(token);

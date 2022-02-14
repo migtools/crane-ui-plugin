@@ -8,6 +8,7 @@ import { getCapacity } from 'src/utils/helpers';
 import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
 import { useSourceNamespacesQuery } from 'src/api/queries/sourceNamespaces';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
+import { secretMatchesCredentials } from 'src/api/queries/secrets';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
@@ -23,7 +24,11 @@ export const useImportWizardFormState = () => {
       return true;
     })
     .test('loads-namespaces', (_value, context) => {
-      if (sourceApiSecretField.value && !credentialsAreValid) {
+      if (
+        sourceApiSecretField.value &&
+        secretMatchesCredentials(sourceApiSecretField.value, apiUrlField.value, tokenField.value) &&
+        !credentialsAreValid
+      ) {
         return context.createError({ message: 'Cannot connect using these credentials' });
       }
       return true;
@@ -34,8 +39,9 @@ export const useImportWizardFormState = () => {
 
   const sourceNamespacesQuery = useSourceNamespacesQuery(sourceApiSecretField.value);
   const credentialsAreValid = areSourceCredentialsValid(
-    apiUrlField.isDirty || tokenField.isDirty,
-    !!sourceApiSecretField.value,
+    apiUrlField,
+    tokenField,
+    sourceApiSecretField,
     sourceNamespacesQuery,
   );
 

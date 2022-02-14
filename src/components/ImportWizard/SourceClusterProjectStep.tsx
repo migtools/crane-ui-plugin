@@ -34,8 +34,9 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   );
   const credentialsValidating = configureProxyMutation.isLoading || sourceNamespacesQuery.isLoading;
   const credentialsAreValid = areSourceCredentialsValid(
-    form.fields.apiUrl.isDirty || form.fields.token.isDirty,
-    !!form.values.sourceApiSecret,
+    form.fields.apiUrl,
+    form.fields.token,
+    form.fields.sourceApiSecret,
     sourceNamespacesQuery,
   );
 
