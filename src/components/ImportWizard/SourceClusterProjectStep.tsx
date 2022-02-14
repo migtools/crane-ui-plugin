@@ -6,7 +6,7 @@ import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@ko
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
-import { useSourceNamespacesQuery } from 'src/api/queries/sourceNamespaces';
+import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {

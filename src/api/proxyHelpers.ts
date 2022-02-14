@@ -7,7 +7,7 @@ import {
   KubeResource,
 } from '@konveyor/lib-ui';
 import { OAuthSecret } from './types/Secret';
-import { useSourceNamespacesQuery } from './queries/sourceNamespaces';
+import { useSourceNamespacesQuery } from './queries/sourceResources';
 import { secretMatchesCredentials } from './queries/secrets';
 
 export interface IProxyK8sResponse<T = unknown> {
@@ -78,8 +78,6 @@ export const useProxyK8sClient = (clusterSecret?: OAuthSecret) => {
   };
 };
 
-export const namespaceResource = new CoreClusterResource(CoreClusterResourceKind.Namespace); // TODO this should take arbitrary strings for kind
-
 export const areSourceCredentialsValid = (
   apiUrlField: IFormField<string>,
   tokenField: IFormField<string>,
@@ -92,3 +90,5 @@ export const areSourceCredentialsValid = (
   secretMatchesCredentials(sourceApiSecretField.value, apiUrlField.value, tokenField.value) &&
   sourceNamespacesQuery.isSuccess &&
   (sourceNamespacesQuery.data?.data.items || []).length > 0;
+
+export const namespaceResource = new CoreClusterResource(CoreClusterResourceKind.Namespace); // TODO this should take arbitrary strings for kind

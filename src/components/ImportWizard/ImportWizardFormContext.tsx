@@ -6,7 +6,7 @@ import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
 import { capacitySchema, dnsLabelNameSchema, yamlSchema } from 'src/common/schema';
-import { useSourceNamespacesQuery } from 'src/api/queries/sourceNamespaces';
+import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 import { secretMatchesCredentials } from 'src/api/queries/secrets';
 
