@@ -9,7 +9,7 @@ import {
 } from '@openshift-console/dynamic-plugin-sdk';
 
 import { useSortState } from 'src/common/hooks/useSortState';
-import { PersistentVolumeClaim } from 'src/types/PersistentVolume';
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { PVCEditStepTableRow } from './PVCEditStepTableRow';
 

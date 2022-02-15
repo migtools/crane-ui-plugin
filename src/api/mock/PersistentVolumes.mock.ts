@@ -1,4 +1,4 @@
-import { PersistentVolume, PersistentVolumeClaim } from 'src/types/PersistentVolume';
+import { PersistentVolume, PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
 export let MOCK_PERSISTENT_VOLUMES: PersistentVolume[] = [];
 export let MOCK_PERSISTENT_VOLUME_CLAIMS: PersistentVolumeClaim[] = [];

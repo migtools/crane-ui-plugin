@@ -22,7 +22,6 @@ type ReviewStepFieldKey = keyof ImportWizardFormState['review']['fields'];
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
 
-  // TODO dropdown for switching between Pipeline and PipelineRun
   // TODO warn somehow if the user is going to override their manual edits here when they go to another step (use isTouched)? not sure how to do that if they use canJumpTo
 
   const [selectedEditorKey, setSelectedEditorKey] =

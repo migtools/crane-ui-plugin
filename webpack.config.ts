@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-import { Configuration as WebpackConfiguration } from 'webpack';
+import { Configuration as WebpackConfiguration, EnvironmentPlugin } from 'webpack';
 import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 import * as path from 'path';
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
@@ -69,11 +69,17 @@ const config: Configuration = {
       writeToDisk: true,
     },
   },
-  plugins: [new ConsoleRemotePlugin()],
+  plugins: [
+    new ConsoleRemotePlugin(),
+    new EnvironmentPlugin({
+      NODE_ENV: 'development',
+      DATA_SOURCE: 'api',
+    }),
+  ],
   devtool: 'source-map',
   optimization: {
     chunkIds: 'named',
-    minimize: false,
+    minimize: false, // TODO look into why this is false in the template. enabling it would remove dead code (mock data in prod)
   },
 };
 

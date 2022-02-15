@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import * as yaml from 'js-yaml';
+import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 
 export const dnsLabelNameSchema = yup
   .string()
@@ -8,6 +9,27 @@ export const dnsLabelNameSchema = yup
     message: ({ label }) =>
       `${label} can only contain lowercase alphanumeric characters and dashes (-), and must start and end with an alphanumeric character`,
     excludeEmptyString: true,
+  });
+
+export const getSourceNamespaceSchema = (
+  sourceNamespacesQuery: ReturnType<typeof useSourceNamespacesQuery>,
+  credentialsAreValid: boolean,
+) =>
+  dnsLabelNameSchema.required().test('exists', (value, context) => {
+    if (value && !credentialsAreValid) {
+      return context.createError({
+        message: 'Cannot validate project name without connecting to the cluster',
+      });
+    }
+    const namespaceExists = sourceNamespacesQuery.data?.data.items.find(
+      (ns) => ns.metadata.name === value,
+    );
+    if (value && !namespaceExists) {
+      return context.createError({
+        message: 'This project does not exist in the source cluster',
+      });
+    }
+    return true;
   });
 
 export const capacitySchema = yup.string().matches(/^(\d+)[KMGTP]i?$/, {

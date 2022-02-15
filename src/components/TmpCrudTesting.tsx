@@ -6,26 +6,9 @@ import {
   useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { useMutation } from 'react-query';
-import { MOCK_NEW_PIPELINE } from 'src/mock/pipelines.mock';
+import { MOCK_NEW_PIPELINE } from 'src/api/mock/Pipelines.mock';
 import { Button, Flex, FlexItem, Modal, TextInput } from '@patternfly/react-core';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-
-// TODO -- move these helpers elsewhere? do we need them at all? Taken from https://github.com/spadgett/console-customization-plugin/blob/main/src/k8s/resources.ts
-/*
-// TODO: Use utility when available in the SDK.
-export const referenceFor = (group: string, version: string, kind: string) =>
-  `${group}~${version}~${kind}`;
-
-const groupVersionKindForObj = (obj: K8sResourceCommon) => {
-  const [group, version] = obj.apiVersion.split('/');
-  return { group, version, kind: obj.kind };
-};
-
-export const referenceForObj = (obj: K8sResourceCommon) => {
-  const { group, version, kind } = groupVersionKindForObj(obj);
-  return referenceFor(group, version, kind);
-};
-*/
 
 const pipelineResource: K8sGroupVersionKind = {
   group: 'tekton.dev',
@@ -55,14 +38,17 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
     namespaced: true,
     namespace,
   });
+
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const createPipelineMutation = useCreatePipelineMutation();
   const [newPipelineName, setNewPipelineName] = React.useState('');
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
   return (
     <>
       <Button
         onClick={() => setIsModalOpen(true)}
-        style={{ position: 'absolute', top: 100, right: 15 }}
+        style={{ position: 'absolute', bottom: 15, right: 15 }}
+        variant="secondary"
       >
         CRUD debugging (ignore me)
       </Button>
@@ -71,7 +57,6 @@ export const TmpCrudTesting: React.FunctionComponent = () => {
         title="CRUD debugging (ignore me)"
         onClose={() => setIsModalOpen(false)}
       >
-        Testing creation of a pipeline:
         <Flex>
           <FlexItem>
             <TextInput value={newPipelineName} onChange={setNewPipelineName} />

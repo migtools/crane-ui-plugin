@@ -1,4 +1,4 @@
-import { StorageClass } from 'src/types/StorageClass';
+import { StorageClass } from 'src/api/types/StorageClass';
 
 export let MOCK_STORAGE_CLASSES: StorageClass[] = [];
 

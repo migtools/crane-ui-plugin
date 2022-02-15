@@ -75,9 +75,16 @@ kind: ConsolePlugin
 metadata:
   name: crane-ui-plugin
 spec:
-  displayName: 'Crane UI Plugin'
+  displayName: 'Konveyor Crane UI Plugin'
   service:
     name: crane-ui-plugin
     namespace: openshift-migration
     port: 9001
     basePath: '/'
+  proxy:
+    - type: Service
+      alias: remote-cluster
+      service:
+        name: proxy
+        namespace: openshift-migration
+        port: 8080
