@@ -42,8 +42,20 @@ export const ImportWizard: React.FunctionComponent = () => {
     [StepId.PipelineSettings]: forms.pipelineSettings,
     [StepId.Review]: null,
   };
+  const hiddenStepIds = forms.pvcSelect.values.selectedPVCs.length === 0 ? [StepId.PVCEdit] : [];
+  const nextVisibleStep = (currentStepId: StepId) => {
+    let newStepId = currentStepId + 1;
+    while (hiddenStepIds.includes(newStepId)) newStepId++;
+    return newStepId;
+  };
+  const prevVisibleStep = (currentStepId: StepId) => {
+    let newStepId = currentStepId - 1;
+    while (hiddenStepIds.includes(newStepId)) newStepId--;
+    return newStepId;
+  };
+
   const firstInvalidFormStepId = Object.values(StepId).find(
-    (id: StepId) => formsByStepId[id] && !formsByStepId[id].isValid,
+    (id: StepId) => formsByStepId[id] && !hiddenStepIds.includes(id) && !formsByStepId[id].isValid,
   ) as StepId | undefined;
   const stepIdReached =
     firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review;
@@ -110,12 +122,16 @@ export const ImportWizard: React.FunctionComponent = () => {
                 component: <PVCSelectStep />,
                 canJumpTo: canMoveToStep(StepId.PVCSelect),
               },
-              {
-                id: StepId.PVCEdit,
-                name: 'Edit',
-                component: <PVCEditStep />,
-                canJumpTo: canMoveToStep(StepId.PVCEdit),
-              },
+              ...(!hiddenStepIds.includes(StepId.PVCEdit)
+                ? [
+                    {
+                      id: StepId.PVCEdit,
+                      name: 'Edit',
+                      component: <PVCEditStep />,
+                      canJumpTo: canMoveToStep(StepId.PVCEdit),
+                    },
+                  ]
+                : []),
             ],
           },
           {
@@ -142,8 +158,8 @@ export const ImportWizard: React.FunctionComponent = () => {
             <WizardContextConsumer>
               {({ activeStep, onNext, onBack, onClose }) => {
                 const onFinalStep = activeStep.id === StepId.Review;
-                const isNextDisabled = !canMoveToStep((activeStep.id as StepId) + 1);
-                const isBackDisabled = !canMoveToStep((activeStep.id as StepId) - 1);
+                const isNextDisabled = !canMoveToStep(nextVisibleStep(activeStep.id as StepId));
+                const isBackDisabled = !canMoveToStep(prevVisibleStep(activeStep.id as StepId));
                 return (
                   <>
                     <Tooltip
