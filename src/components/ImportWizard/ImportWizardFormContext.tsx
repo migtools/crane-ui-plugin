@@ -39,8 +39,8 @@ export const useImportWizardFormState = () => {
       return true;
     });
 
-  const apiUrlField = useFormField<string>('', credentialsFieldSchema.label('Cluster API URL'));
-  const tokenField = useFormField<string>('', credentialsFieldSchema.label('OAuth token'));
+  const apiUrlField = useFormField('', credentialsFieldSchema.label('Cluster API URL'));
+  const tokenField = useFormField('', credentialsFieldSchema.label('OAuth token'));
 
   const sourceNamespacesQuery = useSourceNamespacesQuery(sourceApiSecretField.value);
   const credentialsAreValid = areSourceCredentialsValid(
@@ -87,13 +87,14 @@ export const useImportWizardFormState = () => {
       {
         apiUrl: apiUrlField,
         token: tokenField,
-        namespace: useFormField(
+        sourceNamespace: useFormField(
           '',
           getSourceNamespaceSchema(sourceNamespacesQuery, credentialsAreValid).label(
             'Project name',
           ),
         ),
         sourceApiSecret: sourceApiSecretField,
+        destinationApiUrl: useFormField('', yup.string().required()),
       },
       {
         revalidateOnChange: [credentialsAreValid],
@@ -109,7 +110,7 @@ export const useImportWizardFormState = () => {
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: useFormField('', dnsLabelNameSchema.label('Pipeline name').required()), // TODO check if it exists (use list or single lookup?)
+      pipelineName: useFormField('', dnsLabelNameSchema.label('Pipeline name').required()), // TODO check if it exists (use list or single lookup?) -- also make sure it is short enough for a generateName on the pipelineRun
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({

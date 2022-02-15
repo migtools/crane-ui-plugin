@@ -18,6 +18,7 @@ export type PipelineTaskWorkspace = {
   name: string;
   workspace: string;
   optional?: boolean;
+  subPath?: string; // NOTE: This was added since copying from Console.
 };
 
 export type PipelineTaskResource = {

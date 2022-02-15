@@ -75,7 +75,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           formGroupProps={credentialsFormGroupProps}
         />
         <ValidatedTextInput
-          field={form.fields.namespace}
+          field={form.fields.sourceNamespace}
           isRequired
           fieldId="project-name"
           greenWhenValid

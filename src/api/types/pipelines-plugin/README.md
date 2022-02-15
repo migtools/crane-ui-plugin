@@ -6,7 +6,10 @@ This directory has been lifted entirely from the Pipelines plugin source in the 
 
 It was copied on Feb 15, 2022 from version `3348a3b`. The last changes in that directory at that time were from Dec 23, 2021.
 
-The only changes here since copying these were in commit `071d562`, to change internal imports to use the `@openshift-console/dynamic-plugin-sdk` package and to disable/satisfy certain eslint rules.
+The only changes here since copying these were:
+
+- Commit `071d562` changed internal imports to use the `@openshift-console/dynamic-plugin-sdk` package and disabled/satisfied certain eslint rules.
+- Shortly after, some missing fields were added that are specifically called out in comments.
 
 ## We should remove these some day.
 
