@@ -1,3 +1,5 @@
+// NOTE: This code was copied from the OpenShift console source. See ./README.md for details.
+
 export type TektonHubItem = {
   id: number;
   name: string;

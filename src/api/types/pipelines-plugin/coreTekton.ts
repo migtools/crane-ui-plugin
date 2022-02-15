@@ -1,3 +1,6 @@
+// NOTE: This code was copied from the OpenShift console source. See ./README.md for details.
+/* eslint-disable @typescript-eslint/ban-types */
+
 export type ResourceTarget = 'inputs' | 'outputs';
 
 export type TektonParam = {
@@ -8,7 +11,7 @@ export type TektonParam = {
 };
 
 export type TektonTaskSteps = {
-  // TODO: Figure out required fields
+  // TODO: Figure out required fields (NOTE: this TODO is from original console code, see ./README.md)
   name: string;
   args?: string[];
   command?: string[];
@@ -24,6 +27,7 @@ export type TaskResult = {
 };
 
 export type TektonTaskSpec = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   metadata?: {};
   description?: string;
   steps: TektonTaskSteps[];
@@ -42,7 +46,7 @@ export type TektonResourceGroup<ResourceType> = {
 export type TektonResource = {
   name: string;
   optional?: boolean;
-  type: string; // TODO: limit to known strings
+  type: string; // TODO: limit to known strings (NOTE: this TODO is from original console code, see ./README.md)
 };
 
 export type TektonWorkspace = {

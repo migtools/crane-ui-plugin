@@ -1,4 +1,6 @@
-import { K8sResourceCommon } from '@console/internal/module/k8s';
+// NOTE: This code was copied from the OpenShift console source. See ./README.md for details.
+
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import {
   TektonParam,
   TektonResource,
@@ -26,7 +28,7 @@ export type PipelineTaskResource = {
 
 export type PipelineTaskParam = {
   name: string;
-  value: any;
+  value: unknown;
 };
 
 export type WhenExpression = {

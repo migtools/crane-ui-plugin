@@ -1,6 +1,12 @@
-import { K8sResourceCommon, PersistentVolumeClaimKind } from '@console/internal/module/k8s';
+// NOTE: This code was copied from the OpenShift console source. See ./README.md for details.
+/* eslint-disable @typescript-eslint/ban-types */
+
+import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { TektonResource, TektonResultsRun, TektonTaskSpec } from './coreTekton';
 import { PipelineTaskParam, PipelineTaskRef } from './pipeline';
+
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
+
 import {
   Condition,
   PLRTaskRunStep,
@@ -11,7 +17,7 @@ import {
 
 export type TaskRunWorkspace = {
   name: string;
-  volumeClaimTemplate?: PersistentVolumeClaimKind;
+  volumeClaimTemplate?: PersistentVolumeClaim;
   persistentVolumeClaim?: VolumeTypePVC;
   configMap?: VolumeTypeConfigMaps;
   emptyDir?: {};

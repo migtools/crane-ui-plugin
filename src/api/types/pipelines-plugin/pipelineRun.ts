@@ -1,4 +1,7 @@
-import { K8sResourceCommon, ObjectMetadata } from '@console/internal/module/k8s';
+// NOTE: This code was copied from the OpenShift console source. See ./README.md for details.
+/* eslint-disable @typescript-eslint/ban-types */
+
+import { K8sResourceCommon, ObjectMetadata } from '@openshift-console/dynamic-plugin-sdk';
 import { TektonResultsRun, TektonTaskSpec } from './coreTekton';
 import { PipelineKind, PipelineSpec } from './pipeline';
 
