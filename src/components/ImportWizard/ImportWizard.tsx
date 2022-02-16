@@ -9,7 +9,7 @@ import {
   WizardStepFunctionType,
 } from '@patternfly/react-core';
 import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
-import { IFormState } from '@konveyor/lib-ui';
+import { IFormState, ResolvedQuery } from '@konveyor/lib-ui';
 
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
@@ -161,7 +161,12 @@ export const ImportWizard: React.FunctionComponent = () => {
             id: StepId.Review,
             name: 'Review',
             component: (
-              <ReviewStep configureDestinationSecretMutation={configureDestinationSecretMutation} />
+              <ResolvedQuery
+                result={configureDestinationSecretMutation}
+                errorTitle="Cannot configure destination cluster secret"
+              >
+                <ReviewStep />
+              </ResolvedQuery>
             ),
             canJumpTo: canMoveToStep(StepId.Review),
           },
