@@ -9,7 +9,7 @@ import {
   WizardStepFunctionType,
 } from '@patternfly/react-core';
 import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
-import { IFormState, ResolvedQuery } from '@konveyor/lib-ui';
+import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
 
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
@@ -24,6 +24,8 @@ import './ImportWizard.css';
 import { TmpCrudTesting } from '../TmpCrudTesting';
 import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
 import { formsToTektonResources } from 'src/api/pipelineHelpers';
+import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
+import { PipelineKind, PipelineRunKind } from 'src/api/types/pipelines-plugin';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -61,7 +63,7 @@ export const ImportWizard: React.FunctionComponent = () => {
     (id: StepId) => formsByStepId[id] && !hiddenStepIds.includes(id) && !formsByStepId[id].isValid,
   ) as StepId | undefined;
   const stepIdReached =
-    firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review;
+    firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review + 1;
 
   const somePVRowIsEditMode = Object.values(forms.pvcEdit.values.isEditModeByPVC).some(
     (isEditMode) => isEditMode,
@@ -86,13 +88,11 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const namespace = useNamespaceContext();
 
-  const [destinationApiSecret, setDestinationApiSecret] = forms.meta.destinationApiSecret;
-
   const configureDestinationSecretMutation = useConfigureDestinationSecretMutation({
-    existingSecretFromState: destinationApiSecret,
+    existingSecretFromState: forms.review.values.destinationApiSecret,
     onSuccess: (newSecret) => {
-      setDestinationApiSecret(newSecret);
-      const tektonResources = formsToTektonResources(forms, newSecret);
+      forms.review.fields.destinationApiSecret.setValue(newSecret);
+      const tektonResources = formsToTektonResources(forms, newSecret, namespace);
       forms.review.fields.pipelineYaml.prefill(yaml.dump(tektonResources.pipeline));
       forms.review.fields.pipelineRunYaml.prefill(yaml.dump(tektonResources.pipelineRun));
     },
@@ -104,8 +104,24 @@ export const ImportWizard: React.FunctionComponent = () => {
       configureDestinationSecretMutation.mutate({
         token: forms.sourceClusterProject.values.destinationToken,
       });
-      // TODO implement the submit button... create tekton resources AND patch both secrets with ownerreferences, redirect away
     }
+  };
+
+  const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
+    // On success, navigate to the Tekton UI!
+    document.location = `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata.name}`;
+  });
+
+  const onSubmitWizard = () => {
+    const pipeline = yaml.load(forms.review.values.pipelineYaml) as PipelineKind;
+    const pipelineRun = yaml.load(forms.review.values.pipelineRunYaml) as PipelineRunKind;
+    createTektonResourcesMutation.mutate({
+      resources: { pipeline, pipelineRun },
+      secrets: [
+        forms.sourceClusterProject.values.sourceApiSecret,
+        forms.review.values.destinationApiSecret,
+      ],
+    });
   };
 
   return (
@@ -161,18 +177,27 @@ export const ImportWizard: React.FunctionComponent = () => {
             id: StepId.Review,
             name: 'Review',
             component: (
-              <ResolvedQuery
-                result={configureDestinationSecretMutation}
-                errorTitle="Cannot configure destination cluster secret"
+              <ResolvedQueries
+                resultsWithErrorTitles={[
+                  {
+                    result: configureDestinationSecretMutation,
+                    errorTitle: 'Cannot configure destination cluster secret',
+                  },
+                  {
+                    result: createTektonResourcesMutation,
+                    errorTitle: 'Cannot create Pipeline and PipelineRun',
+                  },
+                ]}
+                forceLoadingState={createTektonResourcesMutation.isSuccess}
               >
                 <ReviewStep />
-              </ResolvedQuery>
+              </ResolvedQueries>
             ),
             canJumpTo: canMoveToStep(StepId.Review),
           },
         ]}
         onSubmit={(event) => event.preventDefault()}
-        onSave={() => console.log('SAVE WIZARD!')}
+        onSave={onSubmitWizard}
         onClose={() => (document.location = `/add/ns/${namespace}`)}
         onNext={onMoveToStep}
         onBack={onMoveToStep}

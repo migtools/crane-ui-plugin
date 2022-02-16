@@ -85,11 +85,6 @@ export const useImportWizardFormState = () => {
   };
 
   return {
-    meta: {
-      // Form-related state that isn't attached to particular fields and doesn't need validation goes here
-      destinationApiSecret: React.useState<OAuthSecret | null>(null),
-      // TODO move sourceApiSecret and isEditModeByPVC here?
-    },
     sourceClusterProject: useFormState(
       {
         apiUrl: apiUrlField,
@@ -124,6 +119,7 @@ export const useImportWizardFormState = () => {
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
+      destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
       pipelineYaml: useFormField('', yamlSchema.label('Pipeline').required()),
       pipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun').required()),
     }),

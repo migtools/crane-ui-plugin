@@ -2,10 +2,16 @@ import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardF
 import { PipelineKind, PipelineRunKind } from './types/pipelines-plugin';
 import { OAuthSecret } from './types/Secret';
 
+export interface WizardTektonResources {
+  pipeline: PipelineKind;
+  pipelineRun: PipelineRunKind;
+}
+
 export const formsToTektonResources = (
   forms: ImportWizardFormState,
-  destinationApiSecret: OAuthSecret, // TODO when do we create this? how do we keep it updated if the user changes the URL in the first step?
-): { pipeline: PipelineKind; pipelineRun: PipelineRunKind } => {
+  destinationApiSecret: OAuthSecret,
+  namespace: string,
+): WizardTektonResources => {
   const { sourceNamespace, sourceApiSecret } = forms.sourceClusterProject.values;
   // const { selectedPVCs } = forms.pvcSelect.values;
   // const { editValuesByPVC } = forms.pvcEdit.values;
@@ -19,6 +25,7 @@ export const formsToTektonResources = (
     kind: 'Pipeline',
     metadata: {
       name: pipelineName, // <--
+      namespace, // <--
     },
     spec: {
       params: [
@@ -232,6 +239,7 @@ export const formsToTektonResources = (
     kind: 'PipelineRun',
     metadata: {
       generateName: `${pipelineName}-`, // <--
+      namespace, // <--
     },
     spec: {
       ...(!startImmediately ? { status: 'PipelineRunPending' } : {}), // <--

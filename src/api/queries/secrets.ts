@@ -14,8 +14,8 @@ import { isSameResource } from 'src/utils/helpers';
 import { ProxyConfigMap, ProxyConfigMapCluster } from '../types/ConfigMap';
 import { OAuthSecret, Secret } from '../types/Secret';
 
-const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
-const configMapGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'ConfigMap' };
+export const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
+export const configMapGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'ConfigMap' };
 
 interface UseConfigureSecretMutationArgs {
   existingSecretFromState: OAuthSecret | null;
