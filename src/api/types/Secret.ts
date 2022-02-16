@@ -20,7 +20,7 @@ export interface Secret extends K8sResourceCommon {
 export interface OAuthSecret extends Secret {
   metadata: ObjectMetadata & {
     annotations: ObjectMetadata['annotations'] & {
-      'konveyor.io/crane-ui-plugin'?: 'source-cluster-oauth' | 'target-cluster-oauth';
+      'konveyor.io/crane-ui-plugin'?: 'source-cluster-oauth' | 'destination-cluster-oauth';
     };
   };
   data: {

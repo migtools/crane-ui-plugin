@@ -8,12 +8,14 @@ import { getCapacity } from 'src/utils/helpers';
 import {
   capacitySchema,
   dnsLabelNameSchema,
+  getPipelineNameSchema,
   getSourceNamespaceSchema,
   yamlSchema,
 } from 'src/common/schema';
 import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 import { secretMatchesCredentials } from 'src/api/queries/secrets';
+import { useWatchPipelines } from 'src/api/queries/pipelines';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
@@ -39,8 +41,8 @@ export const useImportWizardFormState = () => {
       return true;
     });
 
-  const apiUrlField = useFormField<string>('', credentialsFieldSchema.label('Cluster API URL'));
-  const tokenField = useFormField<string>('', credentialsFieldSchema.label('OAuth token'));
+  const apiUrlField = useFormField('', credentialsFieldSchema.label('Cluster API URL'));
+  const tokenField = useFormField('', credentialsFieldSchema.label('OAuth token'));
 
   const sourceNamespacesQuery = useSourceNamespacesQuery(sourceApiSecretField.value);
   const credentialsAreValid = areSourceCredentialsValid(
@@ -52,7 +54,7 @@ export const useImportWizardFormState = () => {
 
   // TODO load this from the host cluster via the SDK -- probably prefill async
   const storageClasses = MOCK_STORAGE_CLASSES; // TODO do we need to pass this in? call the SDK hook here?
-  const defaultStorageClass = storageClasses[0]; // TODO how to determine this?
+  const defaultStorageClass = storageClasses[0]; // TODO find real default value, use "storageclass.kubernetes.io/is-default-class" annotation?
 
   const isEditModeByPVCField = useFormField<PVIsEditModeByPVCName>(
     {},
@@ -87,13 +89,17 @@ export const useImportWizardFormState = () => {
       {
         apiUrl: apiUrlField,
         token: tokenField,
-        namespace: useFormField(
+        sourceNamespace: useFormField(
           '',
           getSourceNamespaceSchema(sourceNamespacesQuery, credentialsAreValid).label(
             'Project name',
           ),
         ),
         sourceApiSecret: sourceApiSecretField,
+        destinationToken: useFormField(
+          '',
+          yup.string().label('Destination cluster OAuth token').required(),
+        ),
       },
       {
         revalidateOnChange: [credentialsAreValid],
@@ -109,10 +115,11 @@ export const useImportWizardFormState = () => {
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: useFormField('', dnsLabelNameSchema.label('Pipeline name').required()), // TODO check if it exists (use list or single lookup?)
+      pipelineName: useFormField('', getPipelineNameSchema(useWatchPipelines())),
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
+      destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
       pipelineYaml: useFormField('', yamlSchema.label('Pipeline').required()),
       pipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun').required()),
     }),
@@ -139,7 +146,7 @@ export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => 
       targetPvcName,
       dnsLabelNameSchema.label('Target PVC name').required(),
     ), // TODO check if it exists
-    storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()), // TODO find real default value
+    storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()),
     capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),
   });

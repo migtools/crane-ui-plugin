@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
+import {
+  TextContent,
+  Text,
+  Form,
+  TextInputProps,
+  FormGroupProps,
+  Popover,
+  Button,
+} from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
@@ -8,6 +16,7 @@ import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
 import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
@@ -75,10 +84,43 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           formGroupProps={credentialsFormGroupProps}
         />
         <ValidatedTextInput
-          field={form.fields.namespace}
+          field={form.fields.sourceNamespace}
           isRequired
           fieldId="project-name"
           greenWhenValid
+        />
+        <ValidatedPasswordInput
+          field={form.fields.destinationToken}
+          isRequired
+          fieldId="destination-token"
+          formGroupProps={{
+            labelIcon: (
+              <Popover
+                bodyContent={
+                  <>
+                    This field is not final and is necessary for the alpha version only (hopefully).
+                    <br />
+                    It is the OAuth token for the destination cluster (this cluster). You can find
+                    it by clicking your username in the top right corner of the screen and choosing
+                    &quot;Copy login command&quot;, then &quot;Display token&quot;.
+                  </>
+                }
+                maxWidth="30vw"
+              >
+                <Button
+                  variant="plain"
+                  aria-label={`More info for ${
+                    form.fields.destinationToken.schema.describe().label
+                  } field`}
+                  onClick={(e) => e.preventDefault()}
+                  aria-describedby="destination-token-info"
+                  className="pf-c-form__group-label-help"
+                >
+                  <HelpIcon noVerticalAlign />
+                </Button>
+              </Popover>
+            ),
+          }}
         />
         <ResolvedQueries
           spinnerMode="none"

@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import * as yaml from 'js-yaml';
 import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
+import { useWatchPipelines } from 'src/api/queries/pipelines';
 
 export const dnsLabelNameSchema = yup
   .string()
@@ -57,3 +58,16 @@ export const yamlSchema = yup.string().test({
     return true;
   },
 });
+
+export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatchPipelines>) =>
+  dnsLabelNameSchema
+    .label('Pipeline name')
+    .required()
+    .max(57) // So it can be used as the generateName for a PipelineRun, which will add 6 characters
+    .test(
+      'unique-name',
+      'A pipeline with this name already exists',
+      (value) =>
+        !pipelinesWatch.loaded ||
+        !pipelinesWatch.data?.find((pipeline) => pipeline.metadata.name === value),
+    );

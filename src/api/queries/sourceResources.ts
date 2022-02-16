@@ -17,16 +17,16 @@ export const useSourceNamespacesQuery = (sourceApiSecret?: OAuthSecret, isEnable
 
 interface UseSourceNamespacedQueryArgs {
   sourceApiSecret?: OAuthSecret;
-  namespace: string;
+  sourceNamespace: string;
 }
 
 const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
-  { sourceApiSecret, namespace }: UseSourceNamespacedQueryArgs,
+  { sourceApiSecret, sourceNamespace }: UseSourceNamespacedQueryArgs,
   kindPlural: string,
 ) => {
   const client = useProxyK8sClient(sourceApiSecret);
-  const resource = new CoreNamespacedResource(kindPlural, namespace);
-  return useQuery([kindPlural, sourceApiSecret?.metadata.name, namespace], {
+  const resource = new CoreNamespacedResource(kindPlural, sourceNamespace);
+  return useQuery([kindPlural, sourceApiSecret?.metadata.name, sourceNamespace], {
     queryFn: () => client.list<T>(resource),
     enabled: !!sourceApiSecret,
     refetchInterval: 15_000,

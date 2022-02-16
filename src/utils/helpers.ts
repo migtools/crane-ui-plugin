@@ -1,4 +1,4 @@
-import { ObjectReference } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceCommon, ObjectReference } from '@openshift-console/dynamic-plugin-sdk';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
 export const isSameResource = (
@@ -17,3 +17,11 @@ export const isSameResource = (
 
 export const getCapacity = (pvc: PersistentVolumeClaim) =>
   pvc.status?.capacity?.storage || pvc.spec.resources.requests.storage;
+
+export const getObjectRef = (resource: K8sResourceCommon): ObjectReference => ({
+  apiVersion: resource.apiVersion,
+  kind: resource.kind,
+  name: resource.metadata.name,
+  namespace: resource.metadata.namespace,
+  uid: resource.metadata.uid,
+});

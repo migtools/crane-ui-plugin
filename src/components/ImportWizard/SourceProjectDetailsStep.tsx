@@ -28,7 +28,7 @@ export const SourceProjectDetailsStep: React.FunctionComponent = () => {
     >
       <TextContent className={spacing.mbXl}>
         <Text component="h2">Project details</Text>
-        <Text component="h3">{forms.sourceClusterProject.values.namespace}</Text>
+        <Text component="h3">{forms.sourceClusterProject.values.sourceNamespace}</Text>
       </TextContent>
       <TableComposable
         aria-label="Project details table"
@@ -47,14 +47,6 @@ export const SourceProjectDetailsStep: React.FunctionComponent = () => {
           <Tr>
             <Th className={spacing.pr_2xl}>Services</Th>
             <Td id="details-services">{sourceServicesQuery.data?.data.items.length}</Td>
-          </Tr>
-          <Tr>
-            <Th className={spacing.pr_2xl}>Images</Th>
-            <Td id="details-images">TODO</Td>
-          </Tr>
-          <Tr>
-            <Th className={spacing.pr_2xl}>Total image size</Th>
-            <Td id="details-imagesize">TODO</Td>
           </Tr>
         </Tbody>
       </TableComposable>
