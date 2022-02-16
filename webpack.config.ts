@@ -5,8 +5,6 @@ import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-serv
 import * as path from 'path';
 import { ConsoleRemotePlugin } from '@openshift-console/dynamic-plugin-sdk-webpack';
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 interface Configuration extends WebpackConfiguration {
   devServer?: WebpackDevServerConfiguration;
@@ -76,9 +74,6 @@ const config: Configuration = {
     new EnvironmentPlugin({
       NODE_ENV: 'development',
       DATA_SOURCE: 'api',
-    }),
-    new MonacoWebpackPlugin({
-      languages: ['yaml'],
     }),
   ],
   devtool: 'source-map',
