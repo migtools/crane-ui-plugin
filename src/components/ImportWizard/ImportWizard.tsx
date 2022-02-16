@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as yaml from 'js-yaml';
 import {
   Wizard,
   WizardFooter,
@@ -21,6 +22,8 @@ import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizar
 
 import './ImportWizard.css';
 import { TmpCrudTesting } from '../TmpCrudTesting';
+import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
+import { formsToTektonResources } from 'src/api/pipelineHelpers';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -83,11 +86,25 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const namespace = useNamespaceContext();
 
-  const onMoveToStep: WizardStepFunctionType = (newStep, prevStep) => {
+  const [destinationApiSecret, setDestinationApiSecret] = forms.meta.destinationApiSecret;
+
+  const configureDestinationSecretMutation = useConfigureDestinationSecretMutation({
+    existingSecretFromState: destinationApiSecret,
+    onSuccess: (newSecret) => {
+      setDestinationApiSecret(newSecret);
+      const tektonResources = formsToTektonResources(forms, newSecret);
+      forms.review.fields.pipelineYaml.prefill(yaml.dump(tektonResources.pipeline));
+      forms.review.fields.pipelineRunYaml.prefill(yaml.dump(tektonResources.pipelineRun));
+    },
+  });
+
+  const onMoveToStep: WizardStepFunctionType = async (newStep, prevStep) => {
     if (newStep.id === StepId.Review) {
-      // TODO generate YAML from forms
-      forms.review.fields.pipelineYaml.prefill('---\nTODO: generate Pipeline yaml here');
-      forms.review.fields.pipelineRunYaml.prefill('---\nTODO: generate PipelineRun yaml here');
+      // Triggers prefilling of Tekton resource YAML in review step form fields
+      configureDestinationSecretMutation.mutate({
+        token: forms.sourceClusterProject.values.destinationToken,
+      });
+      // TODO implement the submit button... create tekton resources AND patch both secrets with ownerreferences, redirect away
     }
   };
 
@@ -143,7 +160,9 @@ export const ImportWizard: React.FunctionComponent = () => {
           {
             id: StepId.Review,
             name: 'Review',
-            component: <ReviewStep />,
+            component: (
+              <ReviewStep configureDestinationSecretMutation={configureDestinationSecretMutation} />
+            ),
             canJumpTo: canMoveToStep(StepId.Review),
           },
         ]}
