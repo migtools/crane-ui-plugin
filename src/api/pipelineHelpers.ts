@@ -83,7 +83,7 @@ export const formsToTektonResources = (
           params: [
             {
               name: 'cluster-secret',
-              value: '$(params.source-cluster-secret)',
+              value: '$(params.destination-cluster-secret)',
             },
             {
               name: 'context-name',
@@ -228,6 +228,10 @@ export const formsToTektonResources = (
               name: 'kustomize',
               workspace: 'shared-data',
             },
+            {
+              name: 'kubeconfig',
+              workspace: 'kubeconfig',
+            },
           ],
         },
       ],
@@ -277,7 +281,16 @@ export const formsToTektonResources = (
         },
         {
           name: 'kubeconfig',
-          emptyDir: {},
+          volumeClaimTemplate: {
+            spec: {
+              accessModes: ['ReadWriteOnce'],
+              resources: {
+                requests: {
+                  storage: '10Mi',
+                },
+              },
+            },
+          },
         },
       ],
       pipelineRef: {
