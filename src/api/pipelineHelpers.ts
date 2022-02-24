@@ -41,10 +41,6 @@ export const formsToTektonResources = (
           name: 'destination-cluster-secret',
           type: 'string',
         },
-        {
-          name: 'optional-flags',
-          type: 'string',
-        },
       ],
       workspaces: [
         {
@@ -133,12 +129,7 @@ export const formsToTektonResources = (
         {
           name: 'transform',
           runAfter: ['export'],
-          params: [
-            {
-              name: 'optional-flags',
-              value: '$(params.optional-flags)',
-            },
-          ],
+          params: [],
           taskRef: {
             name: 'crane-transform',
             kind: 'ClusterTask',
@@ -259,10 +250,6 @@ export const formsToTektonResources = (
         {
           name: 'source-namespace',
           value: sourceNamespace, // <--
-        },
-        {
-          name: 'optional-flags',
-          value: '',
         },
       ],
       workspaces: [
