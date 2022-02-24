@@ -7,14 +7,3 @@ export interface ConfigMap extends K8sResourceCommon {
   kind: 'ConfigMap';
   data: Record<string, string>;
 }
-
-export interface ProxyConfigMap extends ConfigMap {
-  data: {
-    clusters: string; // JSON like { namespace: string; name: string; }[]
-  };
-}
-
-export interface ProxyConfigMapCluster {
-  namespace: string;
-  name: string;
-}
