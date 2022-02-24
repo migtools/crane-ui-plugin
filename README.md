@@ -45,21 +45,11 @@ You'll need:
 2. In a separate shell, from your clone of the [openshift/console](https://github.com/openshift/console) repository:
 
    - `oc login` to your cluster
-   - Identify the route exposed by the crane-reverse-proxy service on your cluster:
-
-     ```sh
-     oc get route -n openshift-migration proxy
-     ```
-
-     It will look something like: `proxy-openshift-migration.cluster.example.com`
-
+   - `oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/dev-route.yml` to create the dev route
    - Start the console bridge with the following options:
-
      ```sh
-     source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy='{"services":[{"consoleAPIPath":"/api/proxy/plugin/crane-ui-plugin/remote-cluster/","endpoint":"https://proxy-openshift-migration.cluster.example.com","authorize":false}]}'
+     source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy="{\"services\":[{\"consoleAPIPath\":\"/api/proxy/plugin/crane-ui-plugin/remote-cluster/\",\"endpoint\":\"https://$(oc get route -n openshift-migration proxy -o go-template='{{ .spec.host }}')\",\"authorize\":false}]}"
      ```
-
-     Note: replace `https://proxy-openshift-migration.cluster.example.com` with your proxy route URL from above (be sure to add the `https://`).
 
 3. Open the Console in your browser at http://localhost:9000/
 
