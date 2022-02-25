@@ -76,6 +76,7 @@ export const formsToTektonResources = (
         },
         {
           name: 'generate-destination-kubeconfig',
+          runAfter: ['generate-source-kubeconfig'],
           params: [
             {
               name: 'cluster-secret',
@@ -99,7 +100,7 @@ export const formsToTektonResources = (
         },
         {
           name: 'export',
-          runAfter: ['generate-source-kubeconfig', 'generate-destination-kubeconfig'],
+          runAfter: ['generate-destination-kubeconfig'],
           params: [
             {
               name: 'context',
