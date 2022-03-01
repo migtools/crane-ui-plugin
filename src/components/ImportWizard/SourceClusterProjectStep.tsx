@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import formStyles from '@patternfly/react-styles/css/components/form/form';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -72,23 +73,23 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const apiUrlFieldProps = getAsyncValidationFieldProps(
     credentialsValidating,
     credentialsAreValid,
-    <>
+    <div className={formStyles.formHelperText}>
       API URL of the source cluster, e.g. <code>https://api.example.cluster:6443</code>
-    </>,
+    </div>,
   );
 
   const sourceTokenFieldProps = getAsyncValidationFieldProps(
     credentialsValidating,
     credentialsAreValid,
-    <>
+    <div className={formStyles.formHelperText}>
       OAuth token of the source cluster. Can be found via <code>oc whoami -t</code>
-    </>,
+    </div>,
   );
 
   const sourceNamespaceFieldProps = getAsyncValidationFieldProps(
     validateSourceNamespaceQuery.isLoading,
     validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
-    <>Name of the project to be migrated</>,
+    <div className={formStyles.formHelperText}>Name of the project to be migrated</div>,
   );
 
   return (
@@ -125,10 +126,10 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           fieldId="destination-token"
           formGroupProps={{
             helperText: (
-              <>
+              <div className={formStyles.formHelperText}>
                 OAuth token of the host cluster (this cluster). Can be found via{' '}
                 <code>oc whoami -t</code>
-              </>
+              </div>
             ),
           }}
         />
