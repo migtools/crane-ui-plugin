@@ -21,7 +21,6 @@ import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
 
 import './ImportWizard.css';
-import { TmpCrudTesting } from '../TmpCrudTesting';
 import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
 import { formsToTektonResources } from 'src/api/pipelineHelpers';
 import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
@@ -237,7 +236,6 @@ export const ImportWizard: React.FunctionComponent = () => {
                         Cancel
                       </Button>
                     </div>
-                    <TmpCrudTesting />
                   </>
                 );
               }}
