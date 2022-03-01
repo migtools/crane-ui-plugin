@@ -21,7 +21,6 @@ import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
 
 import './ImportWizard.css';
-import { TmpCrudTesting } from '../TmpCrudTesting';
 import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
 import { formsToTektonResources } from 'src/api/pipelineHelpers';
 import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
@@ -73,7 +72,7 @@ export const ImportWizard: React.FunctionComponent = () => {
     ? 'Confirm or cancel row edits before proceeding'
     : null;
   const canMoveToStep = (stepId: StepId) =>
-    (!allNavDisabled && stepId >= 0 && stepIdReached >= stepId) || true; // TODO remove the || true case, this temporarily circumvents the admin-only credentials validation (see https://github.com/konveyor/crane-ui-plugin/issues/30)
+    !allNavDisabled && stepId >= 0 && stepIdReached >= stepId;
 
   /*
   const allMutationResults = []; // TODO do we need this?
@@ -237,7 +236,6 @@ export const ImportWizard: React.FunctionComponent = () => {
                         Cancel
                       </Button>
                     </div>
-                    <TmpCrudTesting />
                   </>
                 );
               }}

@@ -1,22 +1,17 @@
 import * as React from 'react';
-import {
-  TextContent,
-  Text,
-  Form,
-  TextInputProps,
-  FormGroupProps,
-  Popover,
-  Button,
-} from '@patternfly/react-core';
+import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import formStyles from '@patternfly/react-styles/css/components/Form/form';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
-import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
+import {
+  useSourceApiRootQuery,
+  useValidateSourceNamespaceQuery,
+} from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
-import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
@@ -37,29 +32,65 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     }
   };
 
-  const sourceNamespacesQuery = useSourceNamespacesQuery(
+  const sourceApiRootQuery = useSourceApiRootQuery(
     form.values.sourceApiSecret,
     !configureProxyMutation.isLoading,
   );
-  const credentialsValidating = configureProxyMutation.isLoading || sourceNamespacesQuery.isLoading;
+
+  const credentialsValidating = configureProxyMutation.isLoading || sourceApiRootQuery.isLoading;
   const credentialsAreValid = areSourceCredentialsValid(
     form.fields.apiUrl,
     form.fields.token,
     form.fields.sourceApiSecret,
-    sourceNamespacesQuery,
+    sourceApiRootQuery,
+  );
+
+  const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
+    form.values.sourceApiSecret,
+    form.values.sourceNamespace,
+    form.fields.sourceNamespace.isTouched,
   );
 
   // Override validation styles based on connection check.
   // Can't use greenWhenValid prop of ValidatedTextInput because fields can be valid before connection test passes.
   // This way we don't show the connection failed message when you just haven't finished entering credentials.
-  const credentialsInputProps: Pick<TextInputProps, 'validated'> = {
-    ...(credentialsValidating ? { validated: 'default' } : {}),
-    ...(credentialsAreValid ? { validated: 'success' } : {}),
+  const getAsyncValidationFieldProps = (
+    validating: boolean,
+    valid: boolean,
+    helperText: React.ReactNode = null,
+  ) => {
+    const inputProps: Pick<TextInputProps, 'validated'> = {
+      ...(validating ? { validated: 'default' } : {}),
+      ...(valid ? { validated: 'success' } : {}),
+    };
+    const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
+      ...inputProps,
+      helperText: validating ? 'Validating...' : helperText,
+    };
+    return { inputProps, formGroupProps };
   };
-  const credentialsFormGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
-    ...credentialsInputProps,
-    helperText: credentialsValidating ? 'Validating...' : null,
-  };
+
+  const apiUrlFieldProps = getAsyncValidationFieldProps(
+    credentialsValidating,
+    credentialsAreValid,
+    <div className={formStyles.formHelperText}>
+      API URL of the source cluster, e.g. <code>https://api.example.cluster:6443</code>
+    </div>,
+  );
+
+  const sourceTokenFieldProps = getAsyncValidationFieldProps(
+    credentialsValidating,
+    credentialsAreValid,
+    <div className={formStyles.formHelperText}>
+      OAuth token of the source cluster. Can be found via <code>oc whoami -t</code>
+    </div>,
+  );
+
+  const sourceNamespaceFieldProps = getAsyncValidationFieldProps(
+    validateSourceNamespaceQuery.isLoading,
+    validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
+    <div className={formStyles.formHelperText}>Name of the project to be migrated</div>,
+  );
 
   return (
     <>
@@ -72,53 +103,33 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           isRequired
           fieldId="api-url"
           onBlur={configureProxy}
-          inputProps={credentialsInputProps}
-          formGroupProps={credentialsFormGroupProps}
+          {...apiUrlFieldProps}
         />
         <ValidatedPasswordInput
           field={form.fields.token}
           isRequired
           fieldId="token"
           onBlur={configureProxy}
-          inputProps={credentialsInputProps}
-          formGroupProps={credentialsFormGroupProps}
+          {...sourceTokenFieldProps}
         />
         <ValidatedTextInput
           field={form.fields.sourceNamespace}
           isRequired
           fieldId="project-name"
-          greenWhenValid
+          onChange={() => form.fields.sourceNamespace.setIsTouched(false)} // So we can use isTouched to enable/disable the validation query
+          // isTouched is already automatically set to true on blur
+          {...sourceNamespaceFieldProps}
         />
         <ValidatedPasswordInput
           field={form.fields.destinationToken}
           isRequired
           fieldId="destination-token"
           formGroupProps={{
-            labelIcon: (
-              <Popover
-                bodyContent={
-                  <>
-                    This field is not final and is necessary for the alpha version only (hopefully).
-                    <br />
-                    It is the OAuth token for the destination cluster (this cluster). You can find
-                    it by clicking your username in the top right corner of the screen and choosing
-                    &quot;Copy login command&quot;, then &quot;Display token&quot;.
-                  </>
-                }
-                maxWidth="30vw"
-              >
-                <Button
-                  variant="plain"
-                  aria-label={`More info for ${
-                    form.fields.destinationToken.schema.describe().label
-                  } field`}
-                  onClick={(e) => e.preventDefault()}
-                  aria-describedby="destination-token-info"
-                  className="pf-c-form__group-label-help"
-                >
-                  <HelpIcon noVerticalAlign />
-                </Button>
-              </Popover>
+            helperText: (
+              <div className={formStyles.formHelperText}>
+                OAuth token of the host cluster (this cluster). Can be found via{' '}
+                <code>oc whoami -t</code>
+              </div>
             ),
           }}
         />
@@ -126,7 +137,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           spinnerMode="none"
           resultsWithErrorTitles={[
             { result: configureProxyMutation, errorTitle: 'Cannot configure crane-proxy' },
-            { result: sourceNamespacesQuery, errorTitle: 'Cannot load source cluster namespaces' },
+            { result: sourceApiRootQuery, errorTitle: 'Cannot load cluster API versions' },
           ]}
         />
       </Form>

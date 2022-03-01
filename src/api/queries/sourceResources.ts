@@ -1,17 +1,36 @@
 import { useQuery } from 'react-query';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { CoreNamespacedResource } from '@konveyor/lib-ui';
-import { namespaceResource, useProxyK8sClient } from '../proxyHelpers';
+import { getProxyApiUrl, namespaceResource, useProxyK8sClient } from '../proxyHelpers';
+import { ApiRootQueryResponse } from '../types/APIVersions';
 import { OAuthSecret } from '../types/Secret';
 import { Pod } from '../types/Pod';
 import { PersistentVolumeClaim } from '../types/PersistentVolume';
 import { Service } from '../types/Service';
 
-export const useSourceNamespacesQuery = (sourceApiSecret?: OAuthSecret, isEnabled = true) => {
-  const client = useProxyK8sClient(sourceApiSecret);
-  return useQuery(['namespaces', sourceApiSecret?.metadata.name], {
-    queryFn: () => client.list(namespaceResource),
+export const useSourceApiRootQuery = (sourceApiSecret?: OAuthSecret, isEnabled = true) => {
+  const apiRootUrl = `${getProxyApiUrl(sourceApiSecret)}/api`;
+  return useQuery<ApiRootQueryResponse>(['api-root', sourceApiSecret?.metadata.name], {
+    queryFn: async () =>
+      (
+        await fetch(apiRootUrl, {
+          headers: { Authorization: `Bearer ${atob(sourceApiSecret.data.token)}` },
+        })
+      ).json(),
     enabled: !!sourceApiSecret && isEnabled,
+  });
+};
+
+export const useValidateSourceNamespaceQuery = (
+  sourceApiSecret: OAuthSecret | null,
+  namespace: string,
+  isEnabled = true,
+) => {
+  const client = useProxyK8sClient(sourceApiSecret);
+  return useQuery(['namespace', namespace], {
+    queryFn: () => client.get(namespaceResource, namespace),
+    enabled: !!sourceApiSecret && !!namespace && isEnabled,
+    retry: false,
   });
 };
 

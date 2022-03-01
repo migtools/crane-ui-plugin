@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import * as yaml from 'js-yaml';
-import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { useWatchPipelines } from 'src/api/queries/pipelines';
+import { useValidateSourceNamespaceQuery } from 'src/api/queries/sourceResources';
 
 export const dnsLabelNameSchema = yup
   .string()
@@ -13,7 +13,7 @@ export const dnsLabelNameSchema = yup
   });
 
 export const getSourceNamespaceSchema = (
-  sourceNamespacesQuery: ReturnType<typeof useSourceNamespacesQuery>,
+  validateSourceNamespaceQuery: ReturnType<typeof useValidateSourceNamespaceQuery> | null,
   credentialsAreValid: boolean,
 ) =>
   dnsLabelNameSchema.required().test('exists', (value, context) => {
@@ -22,9 +22,9 @@ export const getSourceNamespaceSchema = (
         message: 'Cannot validate project name without connecting to the cluster',
       });
     }
-    const namespaceExists = sourceNamespacesQuery.data?.data.items.find(
-      (ns) => ns.metadata.name === value,
-    );
+    const namespaceExists =
+      validateSourceNamespaceQuery?.isSuccess &&
+      validateSourceNamespaceQuery?.data?.data.kind === 'Namespace';
     if (value && !namespaceExists) {
       return context.createError({
         message: 'This project does not exist in the source cluster',

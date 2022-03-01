@@ -15,12 +15,13 @@
     "lint:fix": "yarn lint --fix"
   },
   "devDependencies": {
-    "@konveyor/lib-ui": "^8.1.0",
+    "@konveyor/lib-ui": "^8.2.0",
     "@openshift-console/dynamic-plugin-sdk": "0.0.3",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.4",
     "@patternfly/react-code-editor": "^4.33.15",
     "@patternfly/react-core": "^4.181.1",
     "@patternfly/react-icons": "^4.43.15",
+    "@patternfly/react-styles": "^4.48.5",
     "@patternfly/react-table": "^4.61.15",
     "@patternfly/react-tokens": "^4.44.15",
     "@react-hook/size": "^2.1.2",
