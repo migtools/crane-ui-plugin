@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import formStyles from '@patternfly/react-styles/css/components/form/form';
+import formStyles from '@patternfly/react-styles/css/components/Form/form';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
