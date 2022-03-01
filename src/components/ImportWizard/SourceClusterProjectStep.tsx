@@ -1,13 +1,5 @@
 import * as React from 'react';
-import {
-  TextContent,
-  Text,
-  Form,
-  TextInputProps,
-  FormGroupProps,
-  Popover,
-  Button,
-} from '@patternfly/react-core';
+import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
@@ -19,7 +11,6 @@ import {
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
-import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
@@ -53,32 +44,51 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     sourceApiRootQuery,
   );
 
-  // TODO show helperText on all 3 fields all the time, to prevent page jumping around
+  const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
+    form.values.sourceApiSecret,
+    form.values.sourceNamespace,
+    form.fields.sourceNamespace.isTouched,
+  );
 
   // Override validation styles based on connection check.
   // Can't use greenWhenValid prop of ValidatedTextInput because fields can be valid before connection test passes.
   // This way we don't show the connection failed message when you just haven't finished entering credentials.
-  const getAsyncValidationFieldProps = (validating: boolean, valid: boolean) => {
+  const getAsyncValidationFieldProps = (
+    validating: boolean,
+    valid: boolean,
+    helperText: React.ReactNode = null,
+  ) => {
     const inputProps: Pick<TextInputProps, 'validated'> = {
       ...(validating ? { validated: 'default' } : {}),
       ...(valid ? { validated: 'success' } : {}),
     };
     const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
       ...inputProps,
-      helperText: validating ? 'Validating...' : null,
+      helperText: validating ? 'Validating...' : helperText,
     };
     return { inputProps, formGroupProps };
   };
 
-  const credentialsFieldValidationProps = getAsyncValidationFieldProps(
+  const apiUrlFieldProps = getAsyncValidationFieldProps(
     credentialsValidating,
     credentialsAreValid,
+    <>
+      API URL of the source cluster, e.g. <code>https://api.example.cluster:6443</code>
+    </>,
   );
 
-  const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
-    form.values.sourceApiSecret,
-    form.values.sourceNamespace,
-    form.fields.sourceNamespace.isTouched,
+  const sourceTokenFieldProps = getAsyncValidationFieldProps(
+    credentialsValidating,
+    credentialsAreValid,
+    <>
+      OAuth token of the source cluster. Can be found via <code>oc whoami -t</code>
+    </>,
+  );
+
+  const sourceNamespaceFieldProps = getAsyncValidationFieldProps(
+    validateSourceNamespaceQuery.isLoading,
+    validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
+    <>Name of the project to be migrated</>,
   );
 
   return (
@@ -92,14 +102,14 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           isRequired
           fieldId="api-url"
           onBlur={configureProxy}
-          {...credentialsFieldValidationProps}
+          {...apiUrlFieldProps}
         />
         <ValidatedPasswordInput
           field={form.fields.token}
           isRequired
           fieldId="token"
           onBlur={configureProxy}
-          {...credentialsFieldValidationProps}
+          {...sourceTokenFieldProps}
         />
         <ValidatedTextInput
           field={form.fields.sourceNamespace}
@@ -107,41 +117,18 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           fieldId="project-name"
           onChange={() => form.fields.sourceNamespace.setIsTouched(false)} // So we can use isTouched to enable/disable the validation query
           // isTouched is already automatically set to true on blur
-          {...getAsyncValidationFieldProps(
-            validateSourceNamespaceQuery.isLoading,
-            validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
-          )}
+          {...sourceNamespaceFieldProps}
         />
         <ValidatedPasswordInput
           field={form.fields.destinationToken}
           isRequired
           fieldId="destination-token"
           formGroupProps={{
-            labelIcon: (
-              <Popover
-                bodyContent={
-                  <>
-                    This field is not final and is necessary for the alpha version only (hopefully).
-                    <br />
-                    It is the OAuth token for the destination cluster (this cluster). You can find
-                    it by clicking your username in the top right corner of the screen and choosing
-                    &quot;Copy login command&quot;, then &quot;Display token&quot;.
-                  </>
-                }
-                maxWidth="30vw"
-              >
-                <Button
-                  variant="plain"
-                  aria-label={`More info for ${
-                    form.fields.destinationToken.schema.describe().label
-                  } field`}
-                  onClick={(e) => e.preventDefault()}
-                  aria-describedby="destination-token-info"
-                  className="pf-c-form__group-label-help"
-                >
-                  <HelpIcon noVerticalAlign />
-                </Button>
-              </Popover>
+            helperText: (
+              <>
+                OAuth token of the host cluster (this cluster). Can be found via{' '}
+                <code>oc whoami -t</code>
+              </>
             ),
           }}
         />
