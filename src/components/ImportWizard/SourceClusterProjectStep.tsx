@@ -81,8 +81,6 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     form.fields.sourceNamespace.isTouched,
   );
 
-  console.log({ validateSourceNamespaceQuery });
-
   return (
     <>
       <TextContent className={spacing.mbMd}>
