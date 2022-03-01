@@ -14,7 +14,10 @@ import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@ko
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureProxyMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
-import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
+import {
+  useSourceApiRootQuery,
+  useValidateSourceNamespaceQuery,
+} from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
@@ -37,29 +40,48 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     }
   };
 
-  const sourceNamespacesQuery = useSourceNamespacesQuery(
+  const sourceApiRootQuery = useSourceApiRootQuery(
     form.values.sourceApiSecret,
     !configureProxyMutation.isLoading,
   );
-  const credentialsValidating = configureProxyMutation.isLoading || sourceNamespacesQuery.isLoading;
+
+  const credentialsValidating = configureProxyMutation.isLoading || sourceApiRootQuery.isLoading;
   const credentialsAreValid = areSourceCredentialsValid(
     form.fields.apiUrl,
     form.fields.token,
     form.fields.sourceApiSecret,
-    sourceNamespacesQuery,
+    sourceApiRootQuery,
   );
+
+  // TODO show helperText on all 3 fields all the time, to prevent page jumping around
 
   // Override validation styles based on connection check.
   // Can't use greenWhenValid prop of ValidatedTextInput because fields can be valid before connection test passes.
   // This way we don't show the connection failed message when you just haven't finished entering credentials.
-  const credentialsInputProps: Pick<TextInputProps, 'validated'> = {
-    ...(credentialsValidating ? { validated: 'default' } : {}),
-    ...(credentialsAreValid ? { validated: 'success' } : {}),
+  const getAsyncValidationFieldProps = (validating: boolean, valid: boolean) => {
+    const inputProps: Pick<TextInputProps, 'validated'> = {
+      ...(validating ? { validated: 'default' } : {}),
+      ...(valid ? { validated: 'success' } : {}),
+    };
+    const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
+      ...inputProps,
+      helperText: validating ? 'Validating...' : null,
+    };
+    return { inputProps, formGroupProps };
   };
-  const credentialsFormGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
-    ...credentialsInputProps,
-    helperText: credentialsValidating ? 'Validating...' : null,
-  };
+
+  const credentialsFieldValidationProps = getAsyncValidationFieldProps(
+    credentialsValidating,
+    credentialsAreValid,
+  );
+
+  const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
+    form.values.sourceApiSecret,
+    form.values.sourceNamespace,
+    form.fields.sourceNamespace.isTouched,
+  );
+
+  console.log({ validateSourceNamespaceQuery });
 
   return (
     <>
@@ -72,22 +94,25 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           isRequired
           fieldId="api-url"
           onBlur={configureProxy}
-          inputProps={credentialsInputProps}
-          formGroupProps={credentialsFormGroupProps}
+          {...credentialsFieldValidationProps}
         />
         <ValidatedPasswordInput
           field={form.fields.token}
           isRequired
           fieldId="token"
           onBlur={configureProxy}
-          inputProps={credentialsInputProps}
-          formGroupProps={credentialsFormGroupProps}
+          {...credentialsFieldValidationProps}
         />
         <ValidatedTextInput
           field={form.fields.sourceNamespace}
           isRequired
           fieldId="project-name"
-          greenWhenValid
+          onChange={() => form.fields.sourceNamespace.setIsTouched(false)} // So we can use isTouched to enable/disable the validation query
+          // isTouched is already automatically set to true on blur
+          {...getAsyncValidationFieldProps(
+            validateSourceNamespaceQuery.isLoading,
+            validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
+          )}
         />
         <ValidatedPasswordInput
           field={form.fields.destinationToken}
@@ -126,7 +151,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           spinnerMode="none"
           resultsWithErrorTitles={[
             { result: configureProxyMutation, errorTitle: 'Cannot configure crane-proxy' },
-            { result: sourceNamespacesQuery, errorTitle: 'Cannot load source cluster namespaces' },
+            { result: sourceApiRootQuery, errorTitle: 'Cannot load cluster API versions' },
           ]}
         />
       </Form>

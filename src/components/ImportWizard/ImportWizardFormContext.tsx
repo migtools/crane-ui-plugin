@@ -12,10 +12,13 @@ import {
   getSourceNamespaceSchema,
   yamlSchema,
 } from 'src/common/schema';
-import { useSourceNamespacesQuery } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 import { secretMatchesCredentials } from 'src/api/queries/secrets';
 import { useWatchPipelines } from 'src/api/queries/pipelines';
+import {
+  useSourceApiRootQuery,
+  useValidateSourceNamespaceQuery,
+} from 'src/api/queries/sourceResources';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
@@ -25,7 +28,7 @@ export const useImportWizardFormState = () => {
     .string()
     .required()
     .test('is-not-validating', (_value, context) => {
-      if (sourceNamespacesQuery.isLoading) {
+      if (sourceApiRootQuery.isLoading) {
         return context.createError();
       }
       return true;
@@ -44,12 +47,12 @@ export const useImportWizardFormState = () => {
   const apiUrlField = useFormField('', credentialsFieldSchema.label('Cluster API URL'));
   const tokenField = useFormField('', credentialsFieldSchema.label('OAuth token'));
 
-  const sourceNamespacesQuery = useSourceNamespacesQuery(sourceApiSecretField.value);
+  const sourceApiRootQuery = useSourceApiRootQuery(sourceApiSecretField.value);
   const credentialsAreValid = areSourceCredentialsValid(
     apiUrlField,
     tokenField,
     sourceApiSecretField,
-    sourceNamespacesQuery,
+    sourceApiRootQuery,
   );
 
   // TODO load this from the host cluster via the SDK -- probably prefill async
@@ -84,17 +87,23 @@ export const useImportWizardFormState = () => {
     editValuesByPVCField.reinitialize(defaultEditValuesByPVC);
   };
 
+  const sourceNamespaceField = useFormField('', yup.string()); // Temporary schema reassigned below
+  const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
+    sourceApiSecretField.value,
+    sourceNamespaceField.value,
+    sourceNamespaceField.isTouched,
+  );
+  sourceNamespaceField.schema = getSourceNamespaceSchema(
+    validateSourceNamespaceQuery,
+    credentialsAreValid,
+  ).label('Project name');
+
   return {
     sourceClusterProject: useFormState(
       {
         apiUrl: apiUrlField,
         token: tokenField,
-        sourceNamespace: useFormField(
-          '',
-          getSourceNamespaceSchema(sourceNamespacesQuery, credentialsAreValid).label(
-            'Project name',
-          ),
-        ),
+        sourceNamespace: sourceNamespaceField,
         sourceApiSecret: sourceApiSecretField,
         destinationToken: useFormField(
           '',
