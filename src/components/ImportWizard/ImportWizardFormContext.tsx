@@ -111,7 +111,7 @@ export const useImportWizardFormState = () => {
         ),
       },
       {
-        revalidateOnChange: [credentialsAreValid],
+        revalidateOnChange: [credentialsAreValid, validateSourceNamespaceQuery.data],
       },
     ),
     pvcSelect: useFormState({
