@@ -66,7 +66,7 @@ Before you can deploy your plugin on a cluster, you must build an image and push
 2. Run the image:
 
    ```sh
-   docker run -it --rm -d -p 9001:80 quay.io/yourname/crane-ui-plugin:latest
+   docker run -it --rm -d -p 9001:8080 quay.io/yourname/crane-ui-plugin:latest
    ```
 
 3. Push the image:

@@ -1,10 +1,12 @@
-FROM node:16 AS build
-
+FROM registry.access.redhat.com/ubi8/nodejs-16:latest as build
 ADD . /usr/src/app
 WORKDIR /usr/src/app
-RUN yarn install && yarn build
+USER root
+RUN dnf config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo \
+ && dnf -y install yarn \
+ && yarn install \
+ && yarn build
 
-FROM nginx:stable
-
-RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+FROM registry.access.redhat.com/ubi8/nginx-120:latest
+COPY --from=build /usr/src/app/dist /opt/app-root/src
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
