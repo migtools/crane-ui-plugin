@@ -10,8 +10,8 @@
   {
     "type": "dev-console.add/action-group",
     "properties": {
-      "id": "smart-import",
-      "name": "Smart Import",
+      "id": "import-application-group",
+      "name": "Import Application",
       "insertBefore": "pipelines"
     }
   },
@@ -19,9 +19,9 @@
     "type": "dev-console.add/action",
     "properties": {
       "id": "import-application",
-      "groupId": "smart-import",
+      "groupId": "import-application-group",
       "label": "Import from cluster",
-      "description": "Migrate a manually deployed application to an automated gitops workflow.",
+      "description": "Import a manually deployed application on another cluster to an automated GitOps workflow.",
       "href": "/import-application/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
     }
