@@ -10,6 +10,7 @@ import {
 } from '@patternfly/react-core';
 import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
 import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
+import { useHistory } from 'react-router-dom';
 
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
@@ -36,6 +37,8 @@ enum StepId {
 }
 
 export const ImportWizard: React.FunctionComponent = () => {
+  const history = useHistory();
+
   const forms = useImportWizardFormState();
 
   const formsByStepId: Record<StepId, IFormState<unknown> | null> = {
@@ -108,7 +111,9 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
     // On success, navigate to the Tekton UI!
-    document.location = `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata.name}`;
+    history.push(
+      `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata.name}`,
+    );
   });
 
   const onSubmitWizard = () => {
@@ -197,7 +202,7 @@ export const ImportWizard: React.FunctionComponent = () => {
         ]}
         onSubmit={(event) => event.preventDefault()}
         onSave={onSubmitWizard}
-        onClose={() => (document.location = `/add/ns/${namespace}`)}
+        onClose={() => history.push(`/add/ns/${namespace}`)}
         onNext={onMoveToStep}
         onBack={onMoveToStep}
         onGoToStep={onMoveToStep}
