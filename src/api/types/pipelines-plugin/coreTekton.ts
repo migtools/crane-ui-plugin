@@ -11,7 +11,6 @@ export type TektonParam = {
 };
 
 export type TektonTaskSteps = {
-  // TODO: Figure out required fields (NOTE: this TODO is from original console code, see ./README.md)
   name: string;
   args?: string[];
   command?: string[];
@@ -46,7 +45,7 @@ export type TektonResourceGroup<ResourceType> = {
 export type TektonResource = {
   name: string;
   optional?: boolean;
-  type: string; // TODO: limit to known strings (NOTE: this TODO is from original console code, see ./README.md)
+  type: string;
 };
 
 export type TektonWorkspace = {

@@ -95,4 +95,4 @@ export const areSourceCredentialsValid = (
   sourceApiRootQuery.isSuccess &&
   sourceApiRootQuery.data?.kind === 'APIVersions';
 
-export const namespaceResource = new CoreClusterResource(CoreClusterResourceKind.Namespace); // TODO this should take arbitrary strings for kind
+export const namespaceResource = new CoreClusterResource(CoreClusterResourceKind.Namespace);

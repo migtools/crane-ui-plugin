@@ -77,17 +77,6 @@ export const ImportWizard: React.FunctionComponent = () => {
   const canMoveToStep = (stepId: StepId) =>
     !allNavDisabled && stepId >= 0 && stepIdReached >= stepId;
 
-  /*
-  const allMutationResults = []; // TODO do we need this?
-
-  // TODO do we need this?
-  const resetResultsOnNav: WizardStepFunctionType = (_newStep, prevStep) => {
-    if (prevStep.prevId === StepId.Review) {
-      allMutationResults.forEach((result) => result.reset());
-    }
-  };
-  */
-
   const namespace = useNamespaceContext();
 
   const configureDestinationSecretMutation = useConfigureDestinationSecretMutation({
@@ -106,6 +95,10 @@ export const ImportWizard: React.FunctionComponent = () => {
       configureDestinationSecretMutation.mutate({
         token: forms.sourceClusterProject.values.destinationToken,
       });
+    }
+    if (prevStep.prevId === StepId.Review) {
+      configureDestinationSecretMutation.reset();
+      createTektonResourcesMutation.reset();
     }
   };
 

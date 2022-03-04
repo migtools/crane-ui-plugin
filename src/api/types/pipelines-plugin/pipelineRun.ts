@@ -122,7 +122,6 @@ export type PipelineRunParam = {
   name: string;
   value: string | string[];
 
-  // TODO: To be validated
   input?: string;
   output?: string;
   resource?: object;
