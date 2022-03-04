@@ -25,5 +25,12 @@
       "href": "/import-application/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
     }
+  },
+  {
+    "type": "console.action/provider",
+    "properties": {
+      "contextId": "topology-context-actions",
+      "provider": { "$codeRef": "actions.useTopologyGraphActionProvider" }
+    }
   }
 ]
