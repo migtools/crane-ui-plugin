@@ -8,9 +8,9 @@ import { ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
-import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { columnNames } from './PVCEditStep';
 import { PVCEditRowFormValues, usePVCEditRowFormState } from './ImportWizardFormContext';
+import { isDefaultStorageClass, useWatchStorageClasses } from 'src/api/queries/storageClasses';
 
 interface PVCEditStepTableRowProps {
   pvc: PersistentVolumeClaim;
@@ -27,8 +27,7 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
   isEditMode,
   setIsEditMode,
 }) => {
-  // TODO load this from the host cluster via the SDK
-  const storageClasses = MOCK_STORAGE_CLASSES;
+  const storageClassWatch = useWatchStorageClasses();
 
   const rowForm = usePVCEditRowFormState(existingValues);
 
@@ -56,9 +55,10 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
           >
             <MenuContent>
               <MenuList>
-                {storageClasses.map((sc) => (
+                {storageClassWatch.data?.map((sc) => (
                   <MenuItem key={sc.metadata.name} itemId={sc.metadata.name}>
                     {sc.metadata.name}
+                    {isDefaultStorageClass(sc) ? ' (default)' : ''}
                   </MenuItem>
                 ))}
               </MenuList>
