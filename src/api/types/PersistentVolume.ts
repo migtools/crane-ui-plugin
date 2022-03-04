@@ -22,7 +22,7 @@ export interface PersistentVolume extends K8sResourceCommon {
       path: string;
       server: string;
     };
-    claimRef?: ObjectReference; // TODO is this always present?
+    claimRef?: ObjectReference;
   };
   status?: {
     phase: PVPhase;
