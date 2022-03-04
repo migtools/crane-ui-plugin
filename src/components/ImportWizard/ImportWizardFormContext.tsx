@@ -3,7 +3,6 @@ import * as yup from 'yup';
 import { useFormField, useFormState } from '@konveyor/lib-ui';
 import { OAuthSecret } from 'src/api/types/Secret';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
-import { MOCK_STORAGE_CLASSES } from 'src/api/mock/StorageClasses.mock';
 import { getCapacity } from 'src/utils/helpers';
 import {
   capacitySchema,
@@ -19,6 +18,7 @@ import {
   useSourceApiRootQuery,
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
+import { isDefaultStorageClass, useWatchStorageClasses } from 'src/api/queries/storageClasses';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
@@ -55,9 +55,7 @@ export const useImportWizardFormState = () => {
     sourceApiRootQuery,
   );
 
-  // TODO load this from the host cluster via the SDK -- probably prefill async
-  const storageClasses = MOCK_STORAGE_CLASSES; // TODO do we need to pass this in? call the SDK hook here?
-  const defaultStorageClass = storageClasses[0]; // TODO find real default value, use "storageclass.kubernetes.io/is-default-class" annotation?
+  const storageClassesWatch = useWatchStorageClasses();
 
   const isEditModeByPVCField = useFormField<PVIsEditModeByPVCName>(
     {},
@@ -72,11 +70,12 @@ export const useImportWizardFormState = () => {
   const onSelectedPVCsChange = (selectedPVCs: PersistentVolumeClaim[]) => {
     const defaultIsEditModeByPVC: PVIsEditModeByPVCName = {};
     const defaultEditValuesByPVC: PVCEditValuesByPVCName = {};
+    const defaultStorageClass = storageClassesWatch.data?.find(isDefaultStorageClass);
     selectedPVCs.forEach((pvc) => {
       defaultIsEditModeByPVC[pvc.metadata.name] = false;
       const defaultEditValues: PVCEditRowFormValues = {
         targetPvcName: pvc.metadata.name,
-        storageClass: defaultStorageClass.metadata.name,
+        storageClass: defaultStorageClass?.metadata.name || '',
         capacity: getCapacity(pvc),
         verifyCopy: false,
       };
@@ -154,7 +153,7 @@ export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => 
     targetPvcName: useFormField(
       targetPvcName,
       dnsLabelNameSchema.label('Target PVC name').required(),
-    ), // TODO check if it exists
+    ),
     storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()),
     capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),
