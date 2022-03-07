@@ -242,11 +242,11 @@ export const formsToTektonResources = (
       params: [
         {
           name: 'source-cluster-secret',
-          value: sourceApiSecret.metadata.name, // <--
+          value: sourceApiSecret?.metadata.name || '', // <--
         },
         {
           name: 'destination-cluster-secret',
-          value: destinationApiSecret.metadata.name, // <--
+          value: destinationApiSecret?.metadata.name || '', // <--
         },
         {
           name: 'source-namespace',

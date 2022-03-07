@@ -72,15 +72,17 @@ export const useImportWizardFormState = () => {
     const defaultEditValuesByPVC: PVCEditValuesByPVCName = {};
     const defaultStorageClass = storageClassesWatch.data?.find(isDefaultStorageClass);
     selectedPVCs.forEach((pvc) => {
-      defaultIsEditModeByPVC[pvc.metadata.name] = false;
-      const defaultEditValues: PVCEditRowFormValues = {
-        targetPvcName: pvc.metadata.name,
-        storageClass: defaultStorageClass?.metadata.name || '',
-        capacity: getCapacity(pvc),
-        verifyCopy: false,
-      };
-      defaultEditValuesByPVC[pvc.metadata.name] =
-        editValuesByPVCField.value[pvc.metadata.name] || defaultEditValues;
+      if (pvc.metadata?.name) {
+        defaultIsEditModeByPVC[pvc.metadata.name] = false;
+        const defaultEditValues: PVCEditRowFormValues = {
+          targetPvcName: pvc.metadata.name,
+          storageClass: defaultStorageClass?.metadata.name || '',
+          capacity: getCapacity(pvc),
+          verifyCopy: false,
+        };
+        defaultEditValuesByPVC[pvc.metadata.name] =
+          editValuesByPVCField.value[pvc.metadata.name] || defaultEditValues;
+      }
     });
     isEditModeByPVCField.reinitialize(defaultIsEditModeByPVC);
     editValuesByPVCField.reinitialize(defaultEditValuesByPVC);

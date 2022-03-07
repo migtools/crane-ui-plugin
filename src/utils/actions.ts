@@ -7,7 +7,7 @@ import { importIconElement } from './icons';
 type TopologyActionProvider = (data: {
   element: GraphElement;
   connectorSource?: Node;
-}) => [Action[], boolean, Error];
+}) => [Action[], boolean, Error | undefined];
 
 // Based on https://github.com/openshift/console/blob/d7b965d/frontend/packages/dev-console/src/actions/providers.ts#L66
 export const useTopologyGraphActionProvider: TopologyActionProvider = ({ element }) =>

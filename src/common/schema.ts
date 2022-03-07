@@ -31,7 +31,7 @@ export const getSourceNamespaceSchema = (
       });
     }
     return true;
-  });
+  }) as yup.StringSchema<string>;
 
 export const capacitySchema = yup.string().matches(/^(\d+)[KMGTP]i?$/, {
   message: ({ label }) =>
@@ -46,10 +46,11 @@ export const yamlSchema = yup.string().test({
     try {
       yaml.load(value || '');
     } catch (e) {
-      if (e.reason && e.mark) {
+      const error = e as { reason?: string; mark?: { line?: number; column?: number } };
+      if (error.reason && error.mark) {
         return context.createError({
-          message: `${context.schema.describe().label}: ${e.reason} (${e.mark.line}:${
-            e.mark.column
+          message: `${context.schema.describe().label}: ${error.reason} (${error.mark.line}:${
+            error.mark.column
           })`,
         });
       }
@@ -69,5 +70,5 @@ export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatch
       'A pipeline with this name already exists',
       (value) =>
         !pipelinesWatch.loaded ||
-        !pipelinesWatch.data?.find((pipeline) => pipeline.metadata.name === value),
+        !pipelinesWatch.data?.find((pipeline) => pipeline.metadata?.name === value),
     );

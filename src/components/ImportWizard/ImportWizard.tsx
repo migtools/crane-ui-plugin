@@ -61,9 +61,9 @@ export const ImportWizard: React.FunctionComponent = () => {
     return newStepId;
   };
 
-  const firstInvalidFormStepId = Object.values(StepId).find(
-    (id: StepId) => formsByStepId[id] && !hiddenStepIds.includes(id) && !formsByStepId[id].isValid,
-  ) as StepId | undefined;
+  const firstInvalidFormStepId = (Object.values(StepId) as StepId[]).find(
+    (id: StepId) => formsByStepId[id] && !hiddenStepIds.includes(id) && !formsByStepId[id]?.isValid,
+  );
   const stepIdReached =
     firstInvalidFormStepId !== undefined ? firstInvalidFormStepId : StepId.Review + 1;
 
@@ -105,7 +105,7 @@ export const ImportWizard: React.FunctionComponent = () => {
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
     // On success, navigate to the Tekton UI!
     history.push(
-      `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata.name}`,
+      `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata?.name}`,
     );
   });
 

@@ -8,13 +8,13 @@ import { Pod } from '../types/Pod';
 import { PersistentVolumeClaim } from '../types/PersistentVolume';
 import { Service } from '../types/Service';
 
-export const useSourceApiRootQuery = (sourceApiSecret?: OAuthSecret, isEnabled = true) => {
+export const useSourceApiRootQuery = (sourceApiSecret: OAuthSecret | null, isEnabled = true) => {
   const apiRootUrl = `${getProxyApiUrl(sourceApiSecret)}/api`;
   return useQuery<ApiRootQueryResponse>(['api-root', sourceApiSecret?.metadata.name], {
     queryFn: async () =>
       (
         await fetch(apiRootUrl, {
-          headers: { Authorization: `Bearer ${atob(sourceApiSecret.data.token)}` },
+          headers: { Authorization: `Bearer ${atob(sourceApiSecret?.data.token || '')}` },
         })
       ).json(),
     enabled: !!sourceApiSecret && isEnabled,
@@ -28,14 +28,14 @@ export const useValidateSourceNamespaceQuery = (
 ) => {
   const client = useProxyK8sClient(sourceApiSecret);
   return useQuery(['namespace', namespace], {
-    queryFn: () => client.get(namespaceResource, namespace),
+    queryFn: () => client?.get(namespaceResource, namespace),
     enabled: !!sourceApiSecret && !!namespace && isEnabled,
     retry: false,
   });
 };
 
 interface UseSourceNamespacedQueryArgs {
-  sourceApiSecret?: OAuthSecret;
+  sourceApiSecret: OAuthSecret | null;
   sourceNamespace: string;
 }
 
@@ -46,7 +46,7 @@ const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
   const client = useProxyK8sClient(sourceApiSecret);
   const resource = new CoreNamespacedResource(kindPlural, sourceNamespace);
   return useQuery([kindPlural, sourceApiSecret?.metadata.name, sourceNamespace], {
-    queryFn: () => client.list<T>(resource),
+    queryFn: () => client?.list<T>(resource),
     enabled: !!sourceApiSecret,
     refetchInterval: 15_000,
   });
