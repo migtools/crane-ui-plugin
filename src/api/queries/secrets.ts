@@ -34,7 +34,8 @@ export const useConfigureProxyMutation = ({
       let existingSecret = existingSecretFromState;
       if (!existingSecret) {
         // See if we have an existing secret for this cluster URL that isn't associated with a pipeline.
-        existingSecret = await findExistingSecret(secretModel, namespace, apiUrl, 'source');
+        existingSecret =
+          (await findExistingSecret(secretModel, namespace, apiUrl, 'source')) || null;
       }
 
       // If we have an existing secret that matches our credentials, we can just use it as-is.
@@ -72,7 +73,8 @@ export const useConfigureDestinationSecretMutation = ({
       let existingSecret = existingSecretFromState;
       if (!existingSecret) {
         // See if we have an existing secret for this cluster URL that isn't associated with a pipeline.
-        existingSecret = await findExistingSecret(secretModel, namespace, apiUrl, 'destination');
+        existingSecret =
+          (await findExistingSecret(secretModel, namespace, apiUrl, 'destination')) || null;
       }
       const updatedSecret = existingSecret
         ? await k8sPatch({
@@ -102,7 +104,7 @@ const findExistingSecret = async (
   });
   return nsSecrets.find(
     (secret) =>
-      secret.metadata.annotations?.['konveyor.io/crane-ui-plugin'] ===
+      secret.metadata?.annotations?.['konveyor.io/crane-ui-plugin'] ===
         `${sourceOrDestination}-cluster-oauth` &&
       (secret.metadata.ownerReferences || []).length === 0 &&
       secret.data.url === btoa(apiUrl),

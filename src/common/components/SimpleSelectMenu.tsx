@@ -25,11 +25,13 @@ export const SimpleSelectMenu = <T extends string | number>({
 
   React.useEffect(() => {
     const handleMenuKeys = (event: KeyboardEvent) => {
-      if (isOpen && menuRef.current?.contains(event.target as Node)) {
-        if (event.key === 'Escape' || event.key === 'Tab') {
-          setIsOpen(!isOpen);
-          toggleRef.current?.focus();
-        }
+      if (
+        isOpen &&
+        menuRef.current?.contains(event.target as Node) &&
+        (event.key === 'Escape' || event.key === 'Tab')
+      ) {
+        setIsOpen(!isOpen);
+        toggleRef.current?.focus();
       }
     };
     const handleClickOutside = (event: MouseEvent) => {
@@ -57,13 +59,18 @@ export const SimpleSelectMenu = <T extends string | number>({
   };
 
   const toggle = (
-    <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen} {...toggleProps}>
+    <MenuToggle
+      ref={toggleRef as React.Ref<HTMLButtonElement>}
+      onClick={onToggleClick}
+      isExpanded={isOpen}
+      {...toggleProps}
+    >
       {selectedLabel}
     </MenuToggle>
   );
   const menu = (
     <Menu
-      ref={menuRef}
+      ref={menuRef as React.Ref<HTMLDivElement>}
       id="select-menu"
       onSelect={(_ev, itemId) => {
         setSelected(itemId as T);

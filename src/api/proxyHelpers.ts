@@ -40,7 +40,7 @@ export interface IProxyK8sStatus extends K8sResourceCommon {
   };
 }
 
-export const getProxyApiUrl = (clusterSecret?: OAuthSecret) => {
+export const getProxyApiUrl = (clusterSecret: OAuthSecret | null) => {
   const proxyRootUrl = `/api/proxy/plugin/crane-ui-plugin/remote-cluster`;
   return `${proxyRootUrl}/${clusterSecret?.metadata.namespace}/${clusterSecret?.metadata.name}`;
 };
@@ -50,7 +50,7 @@ export interface OAuthUser {
   expiry_time?: number;
 }
 
-export const useProxyK8sClient = (clusterSecret?: OAuthSecret) => {
+export const useProxyK8sClient = (clusterSecret: OAuthSecret | null) => {
   if (!clusterSecret) return null;
   const clusterApiUrl = getProxyApiUrl(clusterSecret);
   const client = ClientFactory.cluster(
@@ -85,12 +85,12 @@ export const useProxyK8sClient = (clusterSecret?: OAuthSecret) => {
 export const areSourceCredentialsValid = (
   apiUrlField: IFormField<string>,
   tokenField: IFormField<string>,
-  sourceApiSecretField: IFormField<OAuthSecret>,
+  sourceApiSecretField: IFormField<OAuthSecret | null>,
   sourceApiRootQuery: ReturnType<typeof useSourceApiRootQuery>,
 ) =>
   !apiUrlField.isDirty &&
   !tokenField.isDirty &&
-  sourceApiSecretField.value &&
+  !!sourceApiSecretField.value &&
   secretMatchesCredentials(sourceApiSecretField.value, apiUrlField.value, tokenField.value) &&
   sourceApiRootQuery.isSuccess &&
   sourceApiRootQuery.data?.kind === 'APIVersions';

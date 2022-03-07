@@ -28,7 +28,9 @@ export const PVCEditStep: React.FunctionComponent = () => {
 
   const rowFilters: RowFilter<PersistentVolumeClaim>[] = []; // TODO do we need to add one here for storage classes, by the available ones in the source?
   const [data, filteredData, onFilterChange] = useListPageFilter(selectedPVCs, rowFilters);
-  const { sortBy, onSort, sortedItems } = useSortState(filteredData, (pvc) => [pvc.metadata.name]);
+  const { sortBy, onSort, sortedItems } = useSortState(filteredData, (pvc) => [
+    pvc.metadata?.name || '',
+  ]);
 
   return (
     <>
@@ -59,26 +61,29 @@ export const PVCEditStep: React.FunctionComponent = () => {
             </Tr>
           </Thead>
           <Tbody>
-            {sortedItems.map((pvc) => (
-              <PVCEditStepTableRow
-                key={pvc.metadata.name}
-                pvc={pvc}
-                existingValues={form.values.editValuesByPVC[pvc.metadata.name]}
-                setEditedValues={(newValues) => {
-                  form.fields.editValuesByPVC.setValue((oldValues) => ({
-                    ...oldValues,
-                    [pvc.metadata.name]: newValues,
-                  }));
-                }}
-                isEditMode={form.values.isEditModeByPVC[pvc.metadata.name]}
-                setIsEditMode={(isEditMode) => {
-                  form.fields.isEditModeByPVC.setValue((oldValues) => ({
-                    ...oldValues,
-                    [pvc.metadata.name]: isEditMode,
-                  }));
-                }}
-              />
-            ))}
+            {sortedItems.map((pvc) => {
+              const pvcName = pvc.metadata?.name || '';
+              return (
+                <PVCEditStepTableRow
+                  key={pvcName}
+                  pvc={pvc}
+                  existingValues={form.values.editValuesByPVC[pvcName]}
+                  setEditedValues={(newValues) => {
+                    form.fields.editValuesByPVC.setValue((oldValues) => ({
+                      ...oldValues,
+                      [pvcName]: newValues,
+                    }));
+                  }}
+                  isEditMode={form.values.isEditModeByPVC[pvcName]}
+                  setIsEditMode={(isEditMode) => {
+                    form.fields.isEditModeByPVC.setValue((oldValues) => ({
+                      ...oldValues,
+                      [pvcName]: isEditMode,
+                    }));
+                  }}
+                />
+              );
+            })}
           </Tbody>
         </TableComposable>
       </Form>

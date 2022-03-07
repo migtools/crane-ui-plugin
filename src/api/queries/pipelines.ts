@@ -38,7 +38,7 @@ export const useWatchPipelines = () => {
 
 interface CreateTektonResourcesParams {
   resources: WizardTektonResources;
-  secrets: OAuthSecret[];
+  secrets: (OAuthSecret | null)[];
 }
 export const useCreateTektonResourcesMutation = (
   onSuccess: (resources: WizardTektonResources) => void,
@@ -58,8 +58,9 @@ export const useCreateTektonResourcesMutation = (
       });
       const pipelineRef = getObjectRef(pipeline);
       await Promise.all(
-        secrets.map((secret) =>
-          k8sPatch({
+        secrets.map((secret) => {
+          if (!secret) return Promise.resolve();
+          return k8sPatch({
             model: secretModel,
             resource: secret,
             data: [
@@ -67,8 +68,8 @@ export const useCreateTektonResourcesMutation = (
                 ? { op: 'add', path: '/metadata/ownerReferences', value: [pipelineRef] }
                 : { op: 'add', path: '/metadata/ownerReferences/-', value: pipelineRef },
             ],
-          }),
-        ),
+          });
+        }),
       );
       return { pipeline, pipelineRun };
     },

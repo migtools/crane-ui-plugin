@@ -28,7 +28,9 @@ export const PVCSelectStep: React.FunctionComponent = () => {
   const rowFilters: RowFilter<PersistentVolumeClaim>[] = []; // TODO do we need to add one here for storage classes, by the available ones in the source?
   const [data, filteredData, onFilterChange] = useListPageFilter(pvcs, rowFilters);
 
-  const { sortBy, onSort, sortedItems } = useSortState(filteredData, (pvc) => [pvc.metadata.name]);
+  const { sortBy, onSort, sortedItems } = useSortState(filteredData, (pvc) => [
+    pvc.metadata?.name || '',
+  ]);
 
   const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } = useSelectionState({
     items: pvcs,
@@ -92,38 +94,41 @@ export const PVCSelectStep: React.FunctionComponent = () => {
                 </Td>
               </Tr>
             ) : (
-              sortedItems.map((pvc, rowIndex) => (
-                <Tr key={pvc.metadata.name}>
-                  <Td
-                    select={{
-                      rowIndex,
-                      onSelect: (_event, isSelecting) => toggleItemSelected(pvc, isSelecting),
-                      isSelected: isItemSelected(pvc),
-                    }}
-                  />
-                  <Td dataLabel={columnNames.pvcName}>{pvc.metadata.name}</Td>
-                  <Td dataLabel={columnNames.storageClass}>{pvc.spec.storageClassName}</Td>
-                  <Td dataLabel={columnNames.capacity}>{getCapacity(pvc)}</Td>
-                  <Td>
-                    <Popover
-                      className="json-popover"
-                      position="bottom"
-                      bodyContent={
-                        <div onClick={(event) => event.stopPropagation()}>
-                          <ReactJson src={pvc} enableClipboard={false} />
-                        </div>
-                      }
-                      aria-label={`View JSON for PVC ${pvc.metadata.name}`}
-                      closeBtnAriaLabel="Close JSON view"
-                      maxWidth="200rem"
-                    >
-                      <Button variant="link" className={text.textNowrap}>
-                        View JSON
-                      </Button>
-                    </Popover>
-                  </Td>
-                </Tr>
-              ))
+              sortedItems.map((pvc, rowIndex) => {
+                const pvcName = pvc.metadata?.name;
+                return (
+                  <Tr key={pvcName}>
+                    <Td
+                      select={{
+                        rowIndex,
+                        onSelect: (_event, isSelecting) => toggleItemSelected(pvc, isSelecting),
+                        isSelected: isItemSelected(pvc),
+                      }}
+                    />
+                    <Td dataLabel={columnNames.pvcName}>{pvcName}</Td>
+                    <Td dataLabel={columnNames.storageClass}>{pvc.spec.storageClassName}</Td>
+                    <Td dataLabel={columnNames.capacity}>{getCapacity(pvc)}</Td>
+                    <Td>
+                      <Popover
+                        className="json-popover"
+                        position="bottom"
+                        bodyContent={
+                          <div onClick={(event) => event.stopPropagation()}>
+                            <ReactJson src={pvc} enableClipboard={false} />
+                          </div>
+                        }
+                        aria-label={`View JSON for PVC ${pvcName}`}
+                        closeBtnAriaLabel="Close JSON view"
+                        maxWidth="200rem"
+                      >
+                        <Button variant="link" className={text.textNowrap}>
+                          View JSON
+                        </Button>
+                      </Popover>
+                    </Td>
+                  </Tr>
+                );
+              })
             )}
           </Tbody>
         </TableComposable>

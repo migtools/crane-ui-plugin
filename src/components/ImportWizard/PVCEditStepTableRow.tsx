@@ -28,17 +28,17 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
   setIsEditMode,
 }) => {
   const storageClassWatch = useWatchStorageClasses();
-
   const rowForm = usePVCEditRowFormState(existingValues);
+  const pvcName = pvc.metadata?.name || '';
 
   return (
-    <Tr key={pvc.metadata.name}>
-      <Td dataLabel={columnNames.sourcePvcName}>{pvc.metadata.name}</Td>
+    <Tr key={pvcName}>
+      <Td dataLabel={columnNames.sourcePvcName}>{pvcName}</Td>
       <Td dataLabel={columnNames.targetPvcName}>
         {isEditMode ? (
           <ValidatedTextInput
             field={rowForm.fields.targetPvcName}
-            fieldId={`target-pvc-name-${pvc.metadata.name}`}
+            fieldId={`target-pvc-name-${pvcName}`}
             label={null}
           />
         ) : (
@@ -51,7 +51,7 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
             selected={rowForm.values.storageClass}
             setSelected={rowForm.fields.storageClass.setValue}
             toggleProps={{ style: { width: '100%' } }}
-            id={`storage-class-select-${pvc.metadata.name}`}
+            id={`storage-class-select-${pvcName}`}
           >
             <MenuContent>
               <MenuList>
@@ -72,7 +72,7 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
         {isEditMode ? (
           <ValidatedTextInput
             field={rowForm.fields.capacity}
-            fieldId={`capacity-${pvc.metadata.name}`}
+            fieldId={`capacity-${pvcName}`}
             label={null}
           />
         ) : (
@@ -81,11 +81,11 @@ export const PVCEditStepTableRow: React.FunctionComponent<PVCEditStepTableRowPro
       </Td>
       <Td dataLabel={columnNames.verifyCopy} textCenter>
         <Checkbox
-          aria-label={`Verify copy for PVC ${pvc.metadata.name}`}
+          aria-label={`Verify copy for PVC ${pvcName}`}
           isDisabled={!isEditMode}
           isChecked={rowForm.values.verifyCopy}
           onChange={rowForm.fields.verifyCopy.setValue}
-          id={`verify-copy-${pvc.metadata.name}`}
+          id={`verify-copy-${pvcName}`}
         />
       </Td>
       <Td modifier="nowrap">
