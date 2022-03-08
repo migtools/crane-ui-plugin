@@ -25,7 +25,7 @@ import './ImportWizard.css';
 import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
 import { formsToTektonResources } from 'src/api/pipelineHelpers';
 import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
-import { PipelineKind, PipelineRunKind } from 'src/api/types/pipelines-plugin';
+import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
 
 enum StepId {
   SourceClusterProject = 0,

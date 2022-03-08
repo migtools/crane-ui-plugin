@@ -1,6 +1,6 @@
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
-import { PipelineKind, PipelineRunKind } from './types/pipelines-plugin';
+import { PipelineKind, PipelineRunKind } from '../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from './types/Secret';
 
 export interface WizardTektonResources {
