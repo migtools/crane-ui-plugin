@@ -84,8 +84,9 @@ export const ImportWizard: React.FunctionComponent = () => {
     onSuccess: (newSecret) => {
       forms.review.fields.destinationApiSecret.setValue(newSecret);
       const tektonResources = formsToTektonResources(forms, newSecret, namespace);
-      forms.review.fields.pipelineYaml.prefill(yaml.dump(tektonResources.pipeline));
-      forms.review.fields.pipelineRunYaml.prefill(yaml.dump(tektonResources.pipelineRun));
+      // TODO prefill 4 editors if we have stage/cutover
+      forms.review.fields.pipelineYaml.prefill(yaml.dump(tektonResources.cutoverPipeline));
+      forms.review.fields.pipelineRunYaml.prefill(yaml.dump(tektonResources.cutoverPipelineRun));
     },
   });
 
@@ -104,16 +105,23 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
     // On success, navigate to the Tekton UI!
+    // TODO if more than one PipelineRun, navigate to the list view instead
     history.push(
-      `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata?.name}`,
+      `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.cutoverPipelineRun.metadata?.name}`,
     );
   });
 
   const onSubmitWizard = () => {
-    const pipeline = yaml.load(forms.review.values.pipelineYaml) as PipelineKind;
-    const pipelineRun = yaml.load(forms.review.values.pipelineRunYaml) as PipelineRunKind;
+    // TODO handle 4 editors here if we have stage/cutover
+    const cutoverPipeline = yaml.load(forms.review.values.pipelineYaml) as PipelineKind;
+    const cutoverPipelineRun = yaml.load(forms.review.values.pipelineRunYaml) as PipelineRunKind;
     createTektonResourcesMutation.mutate({
-      resources: { pipeline, pipelineRun },
+      resources: {
+        cutoverPipeline,
+        cutoverPipelineRun,
+        stagePipeline: null,
+        stagePipelineRun: null,
+      },
       secrets: [
         forms.sourceClusterProject.values.sourceApiSecret,
         forms.review.values.destinationApiSecret,

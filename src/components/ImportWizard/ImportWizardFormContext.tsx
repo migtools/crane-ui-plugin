@@ -155,7 +155,7 @@ export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => 
     targetPvcName: useFormField(
       targetPvcName,
       dnsLabelNameSchema.label('Target PVC name').required(),
-    ),
+    ), // TODO validate that it doesn't exist (oops)
     storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()),
     capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),

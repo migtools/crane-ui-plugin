@@ -60,11 +60,16 @@ export const yamlSchema = yup.string().test({
   },
 });
 
-export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatchPipelines>) =>
-  dnsLabelNameSchema
+// TODO validate that the pipeline name doesn't exist already with -stage, -cutover suffixes either (if necessary?)
+export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatchPipelines>) => {
+  // k8s resource name length is limited to 63 characters.
+  // We will use it as a prefix for generateName, which will add 6 characters.
+  // We also may put a suffix of "-stage", "-cutover", or "-rollback" on the name, which adds up to 9 characters.
+  const maxLength = 48; // 63 - 6 - 9
+  return dnsLabelNameSchema
     .label('Pipeline name')
     .required()
-    .max(57) // So it can be used as the generateName for a PipelineRun, which will add 6 characters
+    .max(maxLength) // So it can be used as the generateName for a PipelineRun, which will add 6 characters
     .test(
       'unique-name',
       'A pipeline with this name already exists',
@@ -72,3 +77,4 @@ export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatch
         !pipelinesWatch.loaded ||
         !pipelinesWatch.data?.find((pipeline) => pipeline.metadata?.name === value),
     );
+};

@@ -2,12 +2,14 @@ import {
   k8sCreate,
   K8sGroupVersionKind,
   k8sPatch,
+  K8sResourceCommon,
   useK8sModel,
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation } from 'react-query';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-import { getObjectRef } from 'src/utils/helpers';
+import { attachOwnerReference, getObjectRef } from 'src/utils/helpers';
 import { WizardTektonResources } from '../pipelineHelpers';
 import { PipelineKind } from '../types/pipelines-plugin';
 import { OAuthSecret } from '../types/Secret';
@@ -48,15 +50,25 @@ export const useCreateTektonResourcesMutation = (
   const [secretModel] = useK8sModel(secretGVK);
   return useMutation<WizardTektonResources, Error, CreateTektonResourcesParams>(
     async ({ resources, secrets }) => {
-      const pipeline = await k8sCreate({
+      const cutoverPipeline = await k8sCreate({
         model: pipelineModel,
-        data: resources.pipeline,
+        data: resources.cutoverPipeline,
       });
-      const pipelineRun = await k8sCreate({
-        model: pipelineRunModel,
-        data: resources.pipelineRun,
-      });
-      const pipelineRef = getObjectRef(pipeline);
+      const cutoverPipelineRef = getObjectRef(cutoverPipeline);
+
+      const createOwnedResource = <T extends K8sResourceCommon>(model: K8sModel, data: T) =>
+        k8sCreate({ model, data: attachOwnerReference(data, cutoverPipelineRef) });
+
+      const [cutoverPipelineRun, stagePipeline, stagePipelineRun] = await Promise.all([
+        createOwnedResource(pipelineRunModel, resources.cutoverPipelineRun),
+        resources.stagePipeline
+          ? createOwnedResource(pipelineModel, resources.stagePipeline)
+          : Promise.resolve(null),
+        resources.stagePipelineRun
+          ? createOwnedResource(pipelineRunModel, resources.stagePipelineRun)
+          : Promise.resolve(null),
+      ]);
+
       await Promise.all(
         secrets.map((secret) => {
           if (!secret) return Promise.resolve();
@@ -65,13 +77,13 @@ export const useCreateTektonResourcesMutation = (
             resource: secret,
             data: [
               !secret.metadata.ownerReferences
-                ? { op: 'add', path: '/metadata/ownerReferences', value: [pipelineRef] }
-                : { op: 'add', path: '/metadata/ownerReferences/-', value: pipelineRef },
+                ? { op: 'add', path: '/metadata/ownerReferences', value: [cutoverPipelineRef] }
+                : { op: 'add', path: '/metadata/ownerReferences/-', value: cutoverPipelineRef },
             ],
           });
         }),
       );
-      return { pipeline, pipelineRun };
+      return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
     },
     { onSuccess },
   );
