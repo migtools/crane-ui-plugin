@@ -1,17 +1,8 @@
 import * as React from 'react';
 import { Tooltip } from '@patternfly/react-core';
 import { createSvgIdUrl, useHover } from '@patternfly/react-topology';
-import * as cx from 'classnames';
+import cx from 'classnames';
 import * as _ from 'lodash';
-import { Link } from 'react-router-dom';
-import {
-  Firehose,
-  resourcePathFromModel,
-  truncateMiddle,
-} from '@console/internal/components/utils';
-import { referenceForModel } from '@console/internal/module/k8s';
-import { SvgDropShadowFilter } from '@console/topology/src/components/svg';
-import { PipelineRunModel, TaskModel, ClusterTaskModel } from '../../../../models';
 import { TektonTaskSpec, PipelineTaskRef, TaskKind, WhenExpression } from '../../../../types';
 import { runStatus, getRunStatusColor } from '../../../../utils/pipeline-augment';
 import { WHEN_EXPRESSSION_DIAMOND_SIZE } from '../../pipeline-topology/const';
@@ -19,8 +10,12 @@ import WhenExpressionDecorator from '../../pipeline-topology/WhenExpressionDecor
 import { createStepStatus, StepStatus, TaskStatus } from './pipeline-step-utils';
 import { PipelineVisualizationStepList } from './PipelineVisualizationStepList';
 import { StatusIcon } from './StatusIcon';
+import SvgDropShadowFilter from 'src/reused/topology/src/components/svg/SvgDropShadowFilter';
+import { truncateMiddle } from 'src/reused/public/components/utils/truncate-middle';
 
-import './PipelineVisualizationTask.scss';
+// import './PipelineVisualizationTask.scss';
+
+// crane-ui-plugin NOTE: this component has been changed to remove the dependency on Firehose. The task status tooltip has been disabled.
 
 type PipelineVisualizationTask = {
   name?: string;
@@ -106,34 +101,9 @@ export const PipelineVisualizationTask: React.FC<PipelineVisualizationTaskProp> 
     />
   );
 
-  if (disableTooltip || task.taskSpec) {
-    return taskComponent;
-  }
-
-  let resources;
-  if (task.taskRef.kind === ClusterTaskModel.kind) {
-    resources = [
-      {
-        kind: referenceForModel(ClusterTaskModel),
-        name: task.taskRef.name,
-        prop: 'task',
-      },
-    ];
-  } else {
-    resources = [
-      {
-        kind: referenceForModel(TaskModel),
-        name: task.taskRef.name,
-        namespace,
-        prop: 'task',
-      },
-    ];
-  }
-  return <Firehose resources={resources}>{taskComponent}</Firehose>;
+  return taskComponent; // <- changed from original console code
 };
 const TaskComponent: React.FC<TaskProps> = ({
-  pipelineRunName,
-  namespace,
   task,
   status,
   name,
@@ -146,19 +116,13 @@ const TaskComponent: React.FC<TaskProps> = ({
   pipelineTask,
 }) => {
   const stepList = task?.data?.spec?.steps || [];
-  const stepStatusList: StepStatus[] = stepList.map((step) => createStepStatus(step, status));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stepStatusList: StepStatus[] = stepList.map((step: any) => createStepStatus(step, status));
   const showStatusState: boolean = isPipelineRun && !!status && !!status.reason;
   const visualName = name || _.get(task, ['metadata', 'name'], '');
-  const path = pipelineRunName
-    ? `${resourcePathFromModel(PipelineRunModel, pipelineRunName, namespace)}/logs/${name}`
-    : undefined;
-  const enableLogLink =
-    status?.reason !== runStatus.Idle &&
-    status?.reason !== runStatus.Pending &&
-    status?.reason !== runStatus.Cancelled &&
-    !!path;
-  const hasWhenExpression = pipelineTask?.when?.length > 0;
-  const hasRunAfter = pipelineTask?.runAfter?.length > 0;
+  const enableLogLink = false; // <- changed from original console code
+  const hasWhenExpression = (pipelineTask?.when?.length || 0) > 0;
+  const hasRunAfter = (pipelineTask?.runAfter?.length || 0) > 0;
   const taskStatusColor = status
     ? getRunStatusColor(status.reason).pftoken.value
     : getRunStatusColor(runStatus.Cancelled).pftoken.value;
@@ -183,7 +147,7 @@ const TaskComponent: React.FC<TaskProps> = ({
   );
 
   let taskPill = (
-    <g ref={hoverRef}>
+    <g ref={hoverRef as React.LegacyRef<SVGGElement>}>
       <SvgDropShadowFilter dy={1} id={FILTER_ID} />
       <rect
         filter={hover ? createSvgIdUrl(FILTER_ID) : ''}
@@ -258,19 +222,13 @@ const TaskComponent: React.FC<TaskProps> = ({
           status={status.reason}
           enableTooltip
           leftOffset={disableVisualizationTooltip && !isFinallyTask ? 3 : 2}
-          isFinallyTask={isFinallyTask}
+          isFinallyTask={!!isFinallyTask}
         />
       )}
       {taskPill}
     </>
   );
-  return enableLogLink ? (
-    <Link to={path}>
-      <g data-test={`task ${visualName}`}>{taskNode}</g>
-    </Link>
-  ) : (
-    taskNode
-  );
+  return taskNode;
 };
 
 interface SvgTaskStatusProps {

@@ -21,11 +21,15 @@ const BuilderNode: React.FC<BuilderNodeProps> = ({ element }) => {
   const { t } = useTranslation();
   const [showAdd, hoverRef] = useHover();
   const { width, height } = element.getBounds();
-  const data = element.getData();
+  const data = element.getData() as BuilderNodeModelData;
   const { error, onAddNode, onNodeSelection } = data;
 
   return (
-    <g className="odc-builder-node" data-test={`builder-node ${data.task.name}`} ref={hoverRef}>
+    <g
+      className="odc-builder-node"
+      data-test={`builder-node ${data.task.name}`}
+      ref={hoverRef as React.LegacyRef<SVGGElement>}
+    >
       <rect
         x={-BUILDER_NODE_ADD_RADIUS * 2}
         y={0}

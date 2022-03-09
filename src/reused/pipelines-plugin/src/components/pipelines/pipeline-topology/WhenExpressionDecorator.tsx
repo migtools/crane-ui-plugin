@@ -1,18 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import { Tooltip } from '@patternfly/react-core';
 import { global_BorderColor_100 as lightBorderColor } from '@patternfly/react-tokens/dist/js/global_BorderColor_100';
-import { runStatus } from '../../../utils/pipeline-augment';
 import { NODE_HEIGHT } from './const';
 import { getWhenExpressionDiamondState } from './utils';
 
-import './WhenExpressionDecorator.scss';
+// import './WhenExpressionDecorator.scss';
 
 type WhenExpressionDecoratorProps = {
   width: number;
   height: number;
   leftOffset?: number;
   stroke?: string;
-  status: runStatus;
+  status: any;
   appendLine?: boolean;
   enableTooltip?: boolean;
   isFinallyTask: boolean;

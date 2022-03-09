@@ -1,35 +1,33 @@
 import * as React from 'react';
 import { Tooltip } from '@patternfly/react-core';
 import { useHover } from '@patternfly/react-topology';
-import * as cx from 'classnames';
+import cx from 'classnames';
 import * as _ from 'lodash';
 import { useTranslation } from 'react-i18next';
-import { KebabOption, ResourceIcon, truncateMiddle } from '@console/internal/components/utils';
-import { referenceForModel } from '@console/internal/module/k8s';
 import { TaskKind } from '../../../types';
-import { getResourceModelFromTaskKind } from '../../../utils/pipeline-augment';
 import { BUILDER_NODE_ADD_RADIUS } from './const';
 import RemoveNodeDecorator from './RemoveNodeDecorator';
 import { NewTaskNodeCallback } from './types';
+import { KebabOption } from 'src/reused/public/components/utils/kebab';
+import { truncateMiddle } from 'src/reused/public/components/utils/truncate-middle';
 
 type KeyedKebabOption = KebabOption & { key: string };
 
 const taskToOption = (task: TaskKind, callback: NewTaskNodeCallback): KeyedKebabOption => {
-  const {
-    kind,
-    metadata: { name },
-  } = task;
+  const { kind } = task;
+  const name = task.metadata?.name || '';
 
   return {
     key: `${name}-${kind}`,
     label: name,
-    icon: <ResourceIcon kind={referenceForModel(getResourceModelFromTaskKind(kind))} />,
+    icon: null, // <-- changed from the original file to remove dependency on k8s models
     callback: () => {
       callback(task);
     },
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TaskList: React.FC<any> = ({
   width,
   height,
@@ -44,7 +42,7 @@ const TaskList: React.FC<any> = ({
   const [hover, hoverRef] = useHover();
 
   const options = _.sortBy(
-    listOptions.map((task) => taskToOption(task, onNewTask)),
+    listOptions.map((task: TaskKind) => taskToOption(task, onNewTask)),
     (o) => o.label,
   );
   const unselectedTaskText = unselectedText || t('pipelines-plugin~Add task');
@@ -67,7 +65,7 @@ const TaskList: React.FC<any> = ({
     <>
       <g
         data-test="task-list"
-        ref={hoverRef}
+        ref={hoverRef as React.LegacyRef<SVGGElement>}
         className="odc-task-list-node__trigger"
         onClick={(e) => {
           e.stopPropagation();

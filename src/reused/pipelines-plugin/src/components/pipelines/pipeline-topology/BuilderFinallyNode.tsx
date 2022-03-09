@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import { chart_color_blue_300 as blueColor } from '@patternfly/react-tokens';
 import { observer, Node, NodeModel, Point } from '@patternfly/react-topology';
@@ -20,8 +21,10 @@ import LoadingTask from './LoadingTask';
 import PlusNodeDecorator from './PlusNodeDecorator';
 import TaskList from './TaskList';
 import { BuilderFinallyNodeModel } from './types';
+import { TektonTaskSpec, PipelineTaskRef, WhenExpression } from '../../../types';
+import { TaskStatus } from '../detail-page-tabs/pipeline-details/pipeline-step-utils';
 
-import './BuilderFinallyNode.scss';
+// import './BuilderFinallyNode.scss';
 
 type BuilderFinallyNodeProps = {
   element: Node<NodeModel, BuilderFinallyNodeModel>;
@@ -30,7 +33,13 @@ type BuilderFinallyNodeProps = {
 const BuilderFinallyNode: React.FC<BuilderFinallyNodeProps> = ({ element }) => {
   const { t } = useTranslation();
   const { width, height } = element.getBounds();
-  const { clusterTaskList = [], namespaceTaskList = [], task, namespace } = element.getData();
+  const {
+    clusterTaskList = [],
+    namespaceTaskList = [],
+    task,
+    namespace,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = element.getData() as any;
 
   const {
     addNewFinallyListNode,
@@ -38,6 +47,7 @@ const BuilderFinallyNode: React.FC<BuilderFinallyNodeProps> = ({ element }) => {
     finallyListTasks = [],
     finallyLoadingTasks = [],
     finallyInvalidListTasks = [],
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     onTaskSearch = () => {},
   } = task;
   const allTasksLength =
@@ -70,116 +80,146 @@ const BuilderFinallyNode: React.FC<BuilderFinallyNodeProps> = ({ element }) => {
   return (
     <g data-test="builder-finally-node">
       <rect className="opp-builder-finally-node" width={width} height={height} rx="20" ry="20" />
-
-      {finallyTasks.map((ft, i) => (
-        <g key={ft.name}>
-          <IntegralShape taskIndex={i} />
-          <g
-            data-test={`finally-task-node ${ft.name}`}
-            transform={`translate(${leftPadding}, ${NODE_HEIGHT * i +
-              FINALLY_NODE_VERTICAL_SPACING * i +
-              FINALLY_NODE_PADDING})`}
-            onClick={ft.onTaskSelection}
-          >
-            <PipelineVisualizationTask
-              task={ft}
-              namespace={namespace}
-              disableTooltip
-              selected={ft.selected}
-              width={NODE_WIDTH}
-              height={NODE_HEIGHT}
-              isFinallyTask
-            />
-            {ft.error && (
-              <ErrorNodeDecorator
-                x={BUILDER_NODE_ADD_RADIUS / 2}
-                y={BUILDER_NODE_DECORATOR_RADIUS / 4}
-                errorStr={ft.error}
+      {finallyTasks.map(
+        (
+          ft: {
+            name: any;
+            onTaskSelection?: any;
+            selected?: any;
+            error?: any;
+            taskSpec?: TektonTaskSpec | undefined;
+            taskRef?: PipelineTaskRef | undefined;
+            runAfter?: string[] | undefined;
+            when?: WhenExpression[] | undefined;
+            status?: TaskStatus | undefined;
+          },
+          i: number,
+        ) => (
+          <g key={ft.name}>
+            <IntegralShape taskIndex={i} />
+            <g
+              data-test={`finally-task-node ${ft.name}`}
+              transform={`translate(${leftPadding}, ${
+                NODE_HEIGHT * i + FINALLY_NODE_VERTICAL_SPACING * i + FINALLY_NODE_PADDING
+              })`}
+              onClick={ft.onTaskSelection}
+            >
+              <PipelineVisualizationTask
+                task={ft}
+                namespace={namespace}
+                disableTooltip
+                selected={ft.selected}
+                width={NODE_WIDTH}
+                height={NODE_HEIGHT}
+                isFinallyTask
               />
-            )}
+              {ft.error && (
+                <ErrorNodeDecorator
+                  x={BUILDER_NODE_ADD_RADIUS / 2}
+                  y={BUILDER_NODE_DECORATOR_RADIUS / 4}
+                  errorStr={ft.error}
+                />
+              )}
+            </g>
           </g>
-        </g>
-      ))}
-      {finallyLoadingTasks.map((fld, i) => (
+        ),
+      )}
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      {finallyLoadingTasks.map((fld: { name: string }, i: any) => (
         <g key={fld.name} data-test={`finally-loading-task-list-node ${fld.name}`}>
           <IntegralShape taskIndex={i + finallyTasks.length} />
           <g
             transform={`translate(${leftPadding},
-          ${NODE_HEIGHT * (i + finallyTasks.length) +
+          ${
+            NODE_HEIGHT * (i + finallyTasks.length) +
             FINALLY_NODE_VERTICAL_SPACING * (i + finallyTasks.length) +
-            FINALLY_NODE_PADDING})`}
+            FINALLY_NODE_PADDING
+          })`}
           >
             <LoadingTask width={NODE_WIDTH} height={NODE_HEIGHT} name={fld.name} key={fld.name} />
           </g>
         </g>
       ))}
-      {finallyInvalidListTasks.map((ivl, i) => (
-        <g key={ivl.name} data-test={`finally-invalid-task-list-node ${ivl.name}`}>
-          <IntegralShape taskIndex={i + finallyTasks.length + finallyLoadingTasks.length} />
-          <g
-            transform={`translate(${leftPadding},
-              ${NODE_HEIGHT * (i + finallyTasks.length + finallyLoadingTasks.length) +
+      {finallyInvalidListTasks.map(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (ivl: { name: string; onRemoveTask: any; convertList: any }, i: any) => (
+          <g key={ivl.name} data-test={`finally-invalid-task-list-node ${ivl.name}`}>
+            <IntegralShape taskIndex={i + finallyTasks.length + finallyLoadingTasks.length} />
+            <g
+              transform={`translate(${leftPadding},
+              ${
+                NODE_HEIGHT * (i + finallyTasks.length + finallyLoadingTasks.length) +
                 FINALLY_NODE_VERTICAL_SPACING *
                   (i + finallyTasks.length + finallyLoadingTasks.length) +
-                FINALLY_NODE_PADDING})`}
-          >
-            <TaskList
-              width={NODE_WIDTH}
-              height={NODE_HEIGHT}
-              listOptions={[...clusterTaskList, ...namespaceTaskList]}
-              onRemoveTask={ivl.onRemoveTask}
-              onNewTask={ivl.convertList}
-              onTaskSearch={onTaskSearch}
-              unselectedText={ivl.name}
-            />
-            <ErrorNodeDecorator
-              x={BUILDER_NODE_DECORATOR_RADIUS / 2}
-              y={BUILDER_NODE_DECORATOR_RADIUS / 4}
-              errorStr={t('pipelines-plugin~Task does not exist')}
-            />
+                FINALLY_NODE_PADDING
+              })`}
+            >
+              <TaskList
+                width={NODE_WIDTH}
+                height={NODE_HEIGHT}
+                listOptions={[...clusterTaskList, ...namespaceTaskList]}
+                onRemoveTask={ivl.onRemoveTask}
+                onNewTask={ivl.convertList}
+                onTaskSearch={onTaskSearch}
+                unselectedText={ivl.name}
+              />
+              <ErrorNodeDecorator
+                x={BUILDER_NODE_DECORATOR_RADIUS / 2}
+                y={BUILDER_NODE_DECORATOR_RADIUS / 4}
+                errorStr={t('pipelines-plugin~Task does not exist')}
+              />
+            </g>
           </g>
-        </g>
-      ))}
-
-      {finallyListTasks.map((flt, i) => (
-        <g key={flt.name} data-test={`finally-task-list-node ${flt.name}`}>
-          <IntegralShape
-            taskIndex={
-              i + finallyTasks.length + finallyLoadingTasks.length + finallyInvalidListTasks.length
-            }
-          />
-          <g
-            transform={`translate(${leftPadding},
-              ${NODE_HEIGHT *
-                (i +
-                  finallyTasks.length +
-                  finallyLoadingTasks.length +
-                  finallyInvalidListTasks.length) +
+        ),
+      )}
+      {finallyListTasks.map(
+        (flt: { name: string; onRemoveTask: any; convertList: any }, i: any) => (
+          <g key={flt.name} data-test={`finally-task-list-node ${flt.name}`}>
+            <IntegralShape
+              taskIndex={
+                i +
+                finallyTasks.length +
+                finallyLoadingTasks.length +
+                finallyInvalidListTasks.length
+              }
+            />
+            <g
+              transform={`translate(${leftPadding},
+              ${
+                NODE_HEIGHT *
+                  (i +
+                    finallyTasks.length +
+                    finallyLoadingTasks.length +
+                    finallyInvalidListTasks.length) +
                 FINALLY_NODE_VERTICAL_SPACING *
                   (i +
                     finallyTasks.length +
                     finallyLoadingTasks.length +
                     finallyInvalidListTasks.length) +
-                FINALLY_NODE_PADDING})`}
-          >
-            <TaskList
-              width={NODE_WIDTH}
-              height={NODE_HEIGHT}
-              listOptions={[...clusterTaskList, ...namespaceTaskList]}
-              onRemoveTask={flt.onRemoveTask}
-              onNewTask={flt.convertList}
-              onTaskSearch={onTaskSearch}
-            />
+                FINALLY_NODE_PADDING
+              })`}
+            >
+              <TaskList
+                width={NODE_WIDTH}
+                height={NODE_HEIGHT}
+                listOptions={[...clusterTaskList, ...namespaceTaskList]}
+                onRemoveTask={flt.onRemoveTask}
+                onNewTask={flt.convertList}
+                onTaskSearch={onTaskSearch}
+              />
+            </g>
           </g>
-        </g>
-      ))}
+        ),
+      )}
       {
         <g
-          transform={`translate(${finallyTaskLinkX}, ${allTasksLength * NODE_HEIGHT +
+          transform={`translate(${finallyTaskLinkX}, ${
+            allTasksLength * NODE_HEIGHT +
             (allTasksLength - 1) * FINALLY_NODE_VERTICAL_SPACING +
             NODE_HEIGHT +
             FINALLY_ADD_LINK_TEXT_HEIGHT +
-            FINALLY_NODE_PADDING})`}
+            FINALLY_NODE_PADDING
+          })`}
           style={{ cursor: 'pointer' }}
           onClick={addNewFinallyListNode}
         >

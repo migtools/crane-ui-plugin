@@ -4,7 +4,7 @@ import { InProgressIcon } from '@patternfly/react-icons';
 import { global_BackgroundColor_light_100 as white } from '@patternfly/react-tokens';
 import { BUILDER_NODE_DECORATOR_RADIUS } from './const';
 
-import './InstallingNodeDecorator.scss';
+// import './InstallingNodeDecorator.scss';
 
 type InstallingNodeDecoratorProps = {
   content: string;

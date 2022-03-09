@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Tooltip } from '@patternfly/react-core';
 import i18next from 'i18next';
-import { truncateMiddle } from '@console/internal/components/utils';
 import { BUILDER_NODE_ADD_RADIUS } from './const';
 import InstallingNodeDecorator from './InstallingNodeDecorator';
+import { truncateMiddle } from 'src/reused/public/components/utils/truncate-middle';
 
-import './LoadingTask.scss';
+// import './LoadingTask.scss';
 
 type LoadingTaskProps = {
   width: number;

@@ -4,7 +4,7 @@ import { TrashIcon } from '@patternfly/react-icons';
 import { global_palette_black_500 as greyColor } from '@patternfly/react-tokens';
 import { BUILDER_NODE_DECORATOR_RADIUS } from './const';
 
-import './RemoveNodeDecorator.scss';
+// import './RemoveNodeDecorator.scss';
 
 type RemoveNodeDecoratorProps = {
   content: string;
@@ -17,6 +17,7 @@ const RemoveNodeDecorator: React.FC<RemoveNodeDecoratorProps> = ({
   content,
   x,
   y,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   removeCallback = () => {},
 }) => {
   return (

@@ -1,13 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { chart_color_green_400 as successColor } from '@patternfly/react-tokens/dist/js/chart_color_green_400';
 import { global_BackgroundColor_200 as greyBackgroundColor } from '@patternfly/react-tokens/dist/js/global_BackgroundColor_200';
 import { global_BackgroundColor_light_100 as lightBackgroundColor } from '@patternfly/react-tokens/dist/js/global_BackgroundColor_light_100';
 import * as dagre from 'dagre';
 import * as _ from 'lodash';
-import i18n from '@console/internal/i18n';
 import { PipelineKind, PipelineRunKind, PipelineTask } from '../../../types';
-import { getRunStatusColor, runStatus } from '../../../utils/pipeline-augment';
-import { getPipelineTasks, getFinallyTasksWithStatus } from '../../../utils/pipeline-utils';
-import { CheckTaskErrorMessage } from '../pipeline-builder/types';
 import {
   NODE_HEIGHT,
   NodeType,
@@ -64,7 +61,7 @@ export const createBuilderNode: NodeCreator<BuilderNodeModelData> = createGeneri
   NodeType.BUILDER_NODE,
 );
 
-export const createFinallyNode = (height): NodeCreator<FinallyNodeModel> =>
+export const createFinallyNode = (height: number | undefined): NodeCreator<FinallyNodeModel> =>
   createGenericNode(
     NodeType.FINALLY_NODE,
     NODE_WIDTH + WHEN_EXPRESSION_SPACING + FINALLY_NODE_PADDING * 2,
@@ -84,15 +81,15 @@ export const createBuilderFinallyNode = (
 export const getNodeCreator = (type: NodeType): NodeCreator<PipelineRunAfterNodeModelData> => {
   switch (type) {
     case NodeType.TASK_LIST_NODE:
-      return createTaskListNode;
+      return createTaskListNode as NodeCreator<PipelineRunAfterNodeModelData>;
     case NodeType.BUILDER_NODE:
-      return createBuilderNode;
+      return createBuilderNode as NodeCreator<PipelineRunAfterNodeModelData>;
     case NodeType.SPACER_NODE:
       return createSpacerNode;
     case NodeType.LOADING_NODE:
-      return createLoadingNode;
+      return createLoadingNode as NodeCreator<PipelineRunAfterNodeModelData>;
     case NodeType.INVALID_TASK_LIST_NODE:
-      return createInvalidTaskListNode;
+      return createInvalidTaskListNode as NodeCreator<PipelineRunAfterNodeModelData>;
     case NodeType.TASK_NODE:
     default:
       return createTaskNode;
@@ -222,7 +219,7 @@ export const tasksToBuilderNodes = (
   taskList: PipelineTask[],
   onAddNode: (task: PipelineTask, direction: AddNodeDirection) => void,
   onNodeSelection: (task: PipelineTask) => void,
-  getError: CheckTaskErrorMessage,
+  getError: any,
   selectedIds: string[],
 ): PipelineMixedNodeModel[] => {
   return taskList.map((task, idx) => {
@@ -251,7 +248,7 @@ export const getEdgesFromNodes = (nodes: PipelineMixedNodeModel[]): PipelineEdge
 
       if (runAfter.length === 0) return null;
 
-      return runAfter.map((source) => ({
+      return runAfter.map((source: any) => ({
         id: `${source}~to~${target}`,
         type: 'edge',
         source,
@@ -276,9 +273,19 @@ export const getFinallyTaskWidth = (allTasksLength: number): number => {
 
 export const getLastRegularTasks = (regularTasks: PipelineMixedNodeModel[]): string[] => {
   const runAfters = _.uniq(
-    regularTasks.reduce((acc, { data: { task: { runAfter } } }) => {
-      return runAfter ? acc.concat(runAfter) : acc;
-    }, []),
+    regularTasks.reduce(
+      (
+        acc,
+        {
+          data: {
+            task: { runAfter },
+          },
+        },
+      ) => {
+        return runAfter ? acc.concat(runAfter) : acc;
+      },
+      [],
+    ),
   );
   return _.difference(
     regularTasks.map((n) => n.id),
@@ -292,8 +299,8 @@ export const connectFinallyTasksToNodes = (
   pipelineRun?: PipelineRunKind,
 ): PipelineMixedNodeModel[] => {
   const finallyTasks = pipelineRun
-    ? getFinallyTasksWithStatus(pipeline, pipelineRun)
-    : pipeline.spec?.finally ?? [];
+    ? getFinallyTasksWithStatus(pipeline as PipelineKind, pipelineRun)
+    : pipeline?.spec?.finally ?? [];
   if (finallyTasks.length === 0) {
     return nodes;
   }
@@ -303,13 +310,13 @@ export const connectFinallyTasksToNodes = (
     getFinallyTaskHeight(finallyTasks.length, true),
   )(name, {
     isFinallyTask: true,
-    pipeline,
+    pipeline: pipeline as PipelineKind,
     pipelineRun,
     task: {
       isFinallyTask: true,
       name,
       runAfter: regularRunAfters,
-      finallyTasks: finallyTasks.map((ft) => ({
+      finallyTasks: finallyTasks.map((ft: any) => ({
         ...ft,
         disableTooltip: false,
       })),
@@ -335,7 +342,7 @@ export const getTopologyNodesEdges = (
   return { nodes, edges };
 };
 
-export const taskHasWhenExpression = (task: PipelineTask): boolean => task?.when?.length > 0;
+export const taskHasWhenExpression = (task: PipelineTask): boolean => (task?.when?.length || 0) > 0;
 
 export const nodesHasWhenExpression = (nodes: PipelineMixedNodeModel[]): boolean =>
   nodes.some((n) => taskHasWhenExpression(n.data.task));
@@ -356,7 +363,7 @@ export const getLayoutData = (layout: PipelineLayout): dagre.GraphLabel => {
     case PipelineLayout.DAGRE_BUILDER_SPACED:
       return DAGRE_BUILDER_SPACED_PROPS;
     default:
-      return null;
+      return null as unknown as dagre.GraphLabel;
   }
 };
 
@@ -382,13 +389,13 @@ export const getWhenExpressionDiamondState = (
   switch (status) {
     case runStatus.Succeeded:
     case runStatus.Failed:
-      tooltipContent = i18n.t('pipelines-plugin~When expression was met');
+      tooltipContent = 'When expression was met'; // <-- edited to remove dependency on i18n
       break;
     case runStatus.Skipped:
-      tooltipContent = i18n.t('pipelines-plugin~When expression was not met');
+      tooltipContent = 'When expression was not met'; // <-- edited to remove dependency on i18n
       break;
     default:
-      tooltipContent = i18n.t('pipelines-plugin~When expression');
+      tooltipContent = 'When expression'; // <-- edited to remove dependency on i18n
   }
   return { tooltipContent, diamondColor };
 };

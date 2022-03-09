@@ -14,7 +14,7 @@ const InvalidTaskListNode: React.FC<InvalidTaskListNodeProps> = ({ element }) =>
   const { t } = useTranslation();
   const {
     task: { name },
-  } = element.getData();
+  } = element.getData() as TaskListNodeModelData;
 
   return (
     <g>

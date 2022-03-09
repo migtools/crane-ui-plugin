@@ -61,8 +61,8 @@ export const straightPath: DoubleDraw = (start, finish) => join(moveTo(start), l
 
 export const integralShapePath: DoubleDraw = (start, finish) => {
   // Integral shape: ∫
-  let firstCurve: string = null;
-  let secondCurve: string = null;
+  let firstCurve: string | null = null;
+  let secondCurve: string | null = null;
 
   if (start.y !== finish.y) {
     const cornerX = Math.floor(start.x + NODE_SEPARATION_HORIZONTAL / 2);
@@ -73,7 +73,7 @@ export const integralShapePath: DoubleDraw = (start, finish) => {
     secondCurve = curve(firstCorner, secondCorner, finish);
   }
 
-  return join(moveTo(start), firstCurve, secondCurve, lineTo(finish));
+  return join(moveTo(start), firstCurve as string, secondCurve as string, lineTo(finish));
 };
 
 export const path = (start: Point, finish: Point, drawDesign?: DrawDesign) => {

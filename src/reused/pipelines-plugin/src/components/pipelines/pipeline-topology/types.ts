@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EdgeModel, NodeModel } from '@patternfly/react-topology';
 import { PipelineKind, TaskKind, PipelineRunKind, PipelineTask } from '../../../types';
-import { PipelineBuilderLoadingTask, TaskSearchCallback } from '../pipeline-builder/types';
 import { AddNodeDirection, NodeType } from './const';
 
 // Builder Callbacks
@@ -44,10 +44,10 @@ export type FinallyNodeData = {
 export type BuilderFinallyNodeData = {
   task: FinallyNodeTask & {
     finallyInvalidListTasks: FinallyListTask[];
-    finallyLoadingTasks: PipelineBuilderLoadingTask[];
+    finallyLoadingTasks: any[];
     finallyListTasks: FinallyListTask[];
     addNewFinallyListNode?: () => void;
-    onTaskSearch: TaskSearchCallback;
+    onTaskSearch: any;
   };
 };
 export type FinallyNodeModel = FinallyNodeData & {
@@ -70,7 +70,7 @@ export type TaskListNodeModelData = PipelineRunAfterNodeModelData & {
   namespaceTaskList: TaskKind[];
   onNewTask: NewTaskNodeCallback;
   onRemoveTask: RemoveListTaskCallback | null;
-  onTaskSearch: TaskSearchCallback;
+  onTaskSearch: any;
 };
 export type BuilderNodeModelData = PipelineRunAfterNodeModelData & {
   error?: string;
@@ -78,7 +78,7 @@ export type BuilderNodeModelData = PipelineRunAfterNodeModelData & {
   onAddNode: NewTaskListNodeCallback;
   onNodeSelection: NodeSelectionCallback;
 };
-export type SpacerNodeModelData = PipelineRunAfterNodeModelData & {};
+export type SpacerNodeModelData = PipelineRunAfterNodeModelData & Record<string, unknown>;
 export type TaskNodeModelData = PipelineRunAfterNodeModelData & {
   task: PipelineTask;
   pipeline?: PipelineKind;

@@ -5,7 +5,7 @@ import { getRunStatusColor, runStatus } from '../../../../utils/pipeline-augment
 import { StepStatus } from './pipeline-step-utils';
 import { StatusIcon } from './StatusIcon';
 
-import './PipelineVisualizationStepList.scss';
+// import './PipelineVisualizationStepList.scss';
 
 export interface PipelineVisualizationStepListProps {
   isSpecOverview: boolean;
@@ -14,7 +14,7 @@ export interface PipelineVisualizationStepListProps {
   isFinallyTask?: boolean;
 }
 
-const TooltipColoredStatusIcon = ({ status }) => {
+const TooltipColoredStatusIcon: React.FC<{ status: StepStatus['runStatus'] }> = ({ status }) => {
   const size = 18;
   const sharedProps = {
     height: size,

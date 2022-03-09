@@ -4,7 +4,7 @@ import { ExclamationIcon } from '@patternfly/react-icons';
 import { global_danger_color_100 as redColor } from '@patternfly/react-tokens/dist/js/global_danger_color_100';
 import { BUILDER_NODE_DECORATOR_RADIUS } from './const';
 
-import './ErrorNodeDecorator.scss';
+// import './ErrorNodeDecorator.scss';
 
 type ErrorNodeDecoratorProps = {
   errorStr: string;

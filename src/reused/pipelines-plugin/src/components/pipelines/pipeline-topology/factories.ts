@@ -21,27 +21,27 @@ import { getLayoutData } from './utils';
 export const componentFactory: ComponentFactory = (kind: ModelKind, type: string) => {
   switch (kind) {
     case ModelKind.graph:
-      return GraphComponent;
+      return GraphComponent as ReturnType<ComponentFactory>;
     case ModelKind.edge:
-      return TaskEdge;
+      return TaskEdge as ReturnType<ComponentFactory>;
     case ModelKind.node:
       switch (type) {
         case NodeType.TASK_NODE:
-          return TaskNode;
+          return TaskNode as ReturnType<ComponentFactory>;
         case NodeType.SPACER_NODE:
-          return SpacerNode;
+          return SpacerNode as ReturnType<ComponentFactory>;
         case NodeType.TASK_LIST_NODE:
-          return TaskListNode;
+          return TaskListNode as ReturnType<ComponentFactory>;
         case NodeType.INVALID_TASK_LIST_NODE:
-          return InvalidTaskListNode;
+          return InvalidTaskListNode as ReturnType<ComponentFactory>;
         case NodeType.BUILDER_NODE:
-          return BuilderNode;
+          return BuilderNode as ReturnType<ComponentFactory>;
         case NodeType.FINALLY_NODE:
-          return FinallyNode;
+          return FinallyNode as ReturnType<ComponentFactory>;
         case NodeType.BUILDER_FINALLY_NODE:
-          return BuilderFinallyNode;
+          return BuilderFinallyNode as ReturnType<ComponentFactory>;
         case NodeType.LOADING_NODE:
-          return LoadingNode;
+          return LoadingNode as ReturnType<ComponentFactory>;
         default:
           return undefined;
       }

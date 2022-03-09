@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import * as React from 'react';
 import { observer, Node, NodeModel } from '@patternfly/react-topology';
 import TaskList from './TaskList';
 import { TaskListNodeModelData } from './types';
 
-import './TaskListNode.scss';
+// import './TaskListNode.scss';
 
 type TaskListNodeProps = {
   element: Node<NodeModel, TaskListNodeModelData>;
