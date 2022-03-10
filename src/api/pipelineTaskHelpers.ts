@@ -163,7 +163,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     params: [
       { name: 'pvcs', value: selectedPVCs.map((pvc) => pvc.metadata?.name) },
       { name: 'namespace', value: '$(params.source-namespace)' },
-      { name: 'context', value: '$(params.context)' },
+      { name: 'context', value: 'destination' },
     ],
     runAfter: ['transfer-pvc'],
     taskRef: { kind: 'ClusterTask', name: 'crane-ownership-change' },
