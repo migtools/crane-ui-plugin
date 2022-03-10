@@ -62,7 +62,7 @@ export const ReviewStep: React.FunctionComponent = () => {
           setSelected={setSelectedEditorKey}
           selectedLabel={selectedEditorFormField.schema.describe().label}
           id="editor-select"
-          toggleProps={{ style: { width: '150px' } }}
+          toggleProps={{ style: { width: '200px' } }}
         >
           <MenuContent>
             <MenuList>
