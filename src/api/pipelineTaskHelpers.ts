@@ -161,7 +161,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
   const chownTask = {
     name: 'chown',
     params: [
-      { name: 'pvcs', value: selectedPVCs.map((pvc) => pvc.metadata?.name) },
+      { name: 'pvcs', value: selectedPVCs.map((pvc) => pvc.metadata?.name).join(',') },
       { name: 'namespace', value: '$(params.source-namespace)' },
       { name: 'context', value: 'destination' },
     ],
