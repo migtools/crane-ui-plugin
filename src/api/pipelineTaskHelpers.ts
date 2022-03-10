@@ -139,6 +139,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
   const transferPvcTasks: PipelineTask[] = selectedPVCs.map((pvc) => {
     const editValues = editValuesByPVC[pvc.metadata?.name || ''];
     const { targetPvcName, storageClass, capacity, verifyCopy } = editValues; // TODO where to put verifyCopy?
+    console.log('TODO: use verifyCopy flag!', pvc.metadata?.name, verifyCopy);
     return {
       name: 'transfer-pvc',
       params: [
