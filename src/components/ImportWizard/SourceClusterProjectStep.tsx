@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { TextContent, Text, Form, TextInputProps, FormGroupProps } from '@patternfly/react-core';
+import {
+  TextContent,
+  Text,
+  Form,
+  TextInputProps,
+  FormGroupProps,
+  Alert,
+} from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import formStyles from '@patternfly/react-styles/css/components/Form/form';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
@@ -12,8 +19,10 @@ import {
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
+  const namespace = useNamespaceContext();
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
 
   const configureProxyMutation = useConfigureProxyMutation({
@@ -120,19 +129,6 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           // isTouched is already automatically set to true on blur
           {...sourceNamespaceFieldProps}
         />
-        <ValidatedPasswordInput
-          field={form.fields.destinationToken}
-          isRequired
-          fieldId="destination-token"
-          formGroupProps={{
-            helperText: (
-              <div className={formStyles.formHelperText}>
-                OAuth token of the host cluster (this cluster). Can be found via{' '}
-                <code>oc whoami -t</code>
-              </div>
-            ),
-          }}
-        />
         <ResolvedQueries
           spinnerMode="none"
           resultsWithErrorTitles={[
@@ -141,6 +137,16 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           ]}
         />
       </Form>
+      {form.isValid ? (
+        <Alert
+          className={spacing.mtXl}
+          variant="info"
+          isInline
+          title={`By proceeding, your current session's OAuth token will be stored in a secret in the ${namespace} namespace.`}
+        >
+          This allows the migration pipeline tasks to be performed with the required permissions.
+        </Alert>
+      ) : null}
     </>
   );
 };

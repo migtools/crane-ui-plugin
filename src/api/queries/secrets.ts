@@ -56,10 +56,7 @@ export const useConfigureProxyMutation = ({
   );
 };
 
-interface ConfigureDestinationSecretParams {
-  token: string;
-}
-
+// TODO use a backend service to generate this using the session token instead of k8sPatch/k8sCreate
 export const useConfigureDestinationSecretMutation = ({
   existingSecretFromState,
   onSuccess,
@@ -67,8 +64,9 @@ export const useConfigureDestinationSecretMutation = ({
   const [secretModel] = useK8sModel(secretGVK);
   const namespace = useNamespaceContext();
   const apiUrl = 'https://kubernetes.default.svc';
-  return useMutation<OAuthSecret, Error, ConfigureDestinationSecretParams>(
-    async ({ token }) => {
+  return useMutation<OAuthSecret, Error>(
+    async () => {
+      const token = ''; // TODO remove me
       // If we have a secret in state, use that instead of looking for one to update.
       let existingSecret = existingSecretFromState;
       if (!existingSecret) {

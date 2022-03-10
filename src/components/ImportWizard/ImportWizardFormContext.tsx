@@ -124,10 +124,6 @@ export const useImportWizardFormState = () => {
         token: tokenField,
         sourceNamespace: sourceNamespaceField,
         sourceApiSecret: sourceApiSecretField,
-        destinationToken: useFormField(
-          '',
-          yup.string().label('Destination cluster OAuth token').required(),
-        ),
       },
       {
         revalidateOnChange: [credentialsAreValid, validateSourceNamespaceQuery.data],

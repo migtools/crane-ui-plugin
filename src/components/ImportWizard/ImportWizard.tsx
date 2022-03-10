@@ -106,9 +106,7 @@ export const ImportWizard: React.FunctionComponent = () => {
   const onMoveToStep: WizardStepFunctionType = (newStep, prevStep) => {
     if (newStep.id === StepId.Review) {
       // Triggers prefilling of Tekton resource YAML in review step form fields
-      configureDestinationSecretMutation.mutate({
-        token: forms.sourceClusterProject.values.destinationToken,
-      });
+      configureDestinationSecretMutation.mutate();
     }
     if (prevStep.prevId === StepId.Review) {
       configureDestinationSecretMutation.reset();
