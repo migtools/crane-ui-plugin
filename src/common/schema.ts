@@ -60,12 +60,13 @@ export const yamlSchema = yup.string().test({
   },
 });
 
-// TODO validate that the pipeline name doesn't exist already with -stage, -cutover suffixes either (if necessary?)
-export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatchPipelines>) => {
+export const getPipelineNameSchema = (
+  pipelinesWatch: ReturnType<typeof useWatchPipelines>,
+  isStatefulMigration: boolean,
+) => {
   // k8s resource name length is limited to 63 characters.
-  // We will use it as a prefix for generateName, which will add 6 characters.
-  // We also may put a suffix of "-stage", "-cutover", or "-rollback" on the name, which adds up to 9 characters.
-  const maxLength = 48; // 63 - 6 - 9
+  let maxLength = 63 - 6; // We will use it as a prefix for generateName, which will add 6 characters.
+  if (isStatefulMigration) maxLength -= 8; // We also add a suffix "-stage" or "-cutover", which adds up to 8 characters.
   return dnsLabelNameSchema
     .label('Pipeline name')
     .required()
@@ -75,6 +76,11 @@ export const getPipelineNameSchema = (pipelinesWatch: ReturnType<typeof useWatch
       'A pipeline with this name already exists',
       (value) =>
         !pipelinesWatch.loaded ||
-        !pipelinesWatch.data?.find((pipeline) => pipeline.metadata?.name === value),
+        !pipelinesWatch.data?.find(
+          (pipeline) =>
+            pipeline.metadata?.name === value ||
+            (isStatefulMigration &&
+              [`${value}-stage`, `${value}-cutover`].includes(pipeline.metadata?.name || '')),
+        ),
     );
 };

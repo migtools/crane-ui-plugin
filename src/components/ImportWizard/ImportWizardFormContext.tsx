@@ -99,6 +99,12 @@ export const useImportWizardFormState = () => {
     credentialsAreValid,
   ).label('Project name');
 
+  const selectedPVCsField = useFormField<PersistentVolumeClaim[]>([], yup.array(), {
+    onChange: onSelectedPVCsChange,
+  });
+
+  const isStatefulMigration = selectedPVCsField.value.length > 0;
+
   return {
     sourceClusterProject: useFormState(
       {
@@ -116,16 +122,17 @@ export const useImportWizardFormState = () => {
       },
     ),
     pvcSelect: useFormState({
-      selectedPVCs: useFormField<PersistentVolumeClaim[]>([], yup.array(), {
-        onChange: onSelectedPVCsChange,
-      }),
+      selectedPVCs: selectedPVCsField,
     }),
     pvcEdit: useFormState({
       isEditModeByPVC: isEditModeByPVCField,
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: useFormField('', getPipelineNameSchema(useWatchPipelines())),
+      pipelineName: useFormField(
+        '',
+        getPipelineNameSchema(useWatchPipelines(), isStatefulMigration),
+      ),
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
