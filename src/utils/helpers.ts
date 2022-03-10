@@ -1,4 +1,8 @@
-import { K8sResourceCommon, ObjectReference } from '@openshift-console/dynamic-plugin-sdk';
+import {
+  K8sResourceCommon,
+  ObjectReference,
+  OwnerReference,
+} from '@openshift-console/dynamic-plugin-sdk';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
 export const isSameResource = (
@@ -26,4 +30,15 @@ export const getObjectRef = (resource: K8sResourceCommon): ObjectReference => ({
   name: resource.metadata?.name,
   namespace: resource.metadata?.namespace,
   uid: resource.metadata?.uid,
+});
+
+export const attachOwnerReference = <T extends K8sResourceCommon>(
+  resource: T,
+  ownerRef: ObjectReference,
+) => ({
+  ...resource,
+  metadata: {
+    ...resource.metadata,
+    ownerReferences: [...(resource.metadata?.ownerReferences || []), ownerRef as OwnerReference],
+  },
 });

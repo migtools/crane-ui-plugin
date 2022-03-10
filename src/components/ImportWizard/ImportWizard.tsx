@@ -84,8 +84,16 @@ export const ImportWizard: React.FunctionComponent = () => {
     onSuccess: (newSecret) => {
       forms.review.fields.destinationApiSecret.setValue(newSecret);
       const tektonResources = formsToTektonResources(forms, newSecret, namespace);
-      forms.review.fields.pipelineYaml.prefill(yaml.dump(tektonResources.pipeline));
-      forms.review.fields.pipelineRunYaml.prefill(yaml.dump(tektonResources.pipelineRun));
+      if (tektonResources.stagePipeline && tektonResources.stagePipelineRun) {
+        forms.review.fields.stagePipelineYaml.prefill(yaml.dump(tektonResources.stagePipeline));
+        forms.review.fields.stagePipelineRunYaml.prefill(
+          yaml.dump(tektonResources.stagePipelineRun),
+        );
+      }
+      forms.review.fields.cutoverPipelineYaml.prefill(yaml.dump(tektonResources.cutoverPipeline));
+      forms.review.fields.cutoverPipelineRunYaml.prefill(
+        yaml.dump(tektonResources.cutoverPipelineRun),
+      );
     },
   });
 
@@ -104,16 +112,28 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
     // On success, navigate to the Tekton UI!
+    const pipelineRuns = [newResources.stagePipelineRun, newResources.cutoverPipelineRun].filter(
+      (plr) => !!plr,
+    );
+    const pipelineRunsUrl = `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun`;
     history.push(
-      `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${newResources.pipelineRun.metadata?.name}`,
+      pipelineRuns.length === 1
+        ? `${pipelineRunsUrl}/${newResources.cutoverPipelineRun.metadata?.name}`
+        : pipelineRunsUrl,
     );
   });
 
   const onSubmitWizard = () => {
-    const pipeline = yaml.load(forms.review.values.pipelineYaml) as PipelineKind;
-    const pipelineRun = yaml.load(forms.review.values.pipelineRunYaml) as PipelineRunKind;
+    const { stagePipelineYaml, stagePipelineRunYaml, cutoverPipelineYaml, cutoverPipelineRunYaml } =
+      forms.review.values;
+    const stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as PipelineKind) : null;
+    const stagePipelineRun = stagePipelineRunYaml
+      ? (yaml.load(stagePipelineRunYaml) as PipelineRunKind)
+      : null;
+    const cutoverPipeline = yaml.load(cutoverPipelineYaml) as PipelineKind;
+    const cutoverPipelineRun = yaml.load(cutoverPipelineRunYaml) as PipelineRunKind;
     createTektonResourcesMutation.mutate({
-      resources: { pipeline, pipelineRun },
+      resources: { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun },
       secrets: [
         forms.sourceClusterProject.values.sourceApiSecret,
         forms.review.values.destinationApiSecret,

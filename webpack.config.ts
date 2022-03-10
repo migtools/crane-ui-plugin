@@ -11,14 +11,16 @@ interface Configuration extends WebpackConfiguration {
 }
 
 const config: Configuration = {
-  mode: 'development',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   // No regular entry points. The remote container entry is handled by ConsoleRemotePlugin.
   entry: {},
   context: path.resolve(__dirname, 'src'),
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name]-bundle.js',
-    chunkFilename: '[name]-chunk.js',
+    filename:
+      process.env.NODE_ENV === 'production' ? '[name]-bundle-[hash].min.js' : '[name]-bundle.js',
+    chunkFilename:
+      process.env.NODE_ENV === 'production' ? '[name]-chunk-[chunkhash].min.js' : '[name]-chunk.js',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -78,17 +80,9 @@ const config: Configuration = {
   ],
   devtool: 'source-map',
   optimization: {
-    chunkIds: 'named',
-    minimize: false, // TODO look into why this is false in the template. enabling it would remove dead code (mock data in prod)
+    chunkIds: process.env.NODE_ENV === 'production' ? 'deterministic' : 'named',
+    minimize: process.env.NODE_ENV === 'production',
   },
 };
-
-if (process.env.NODE_ENV === 'production') {
-  config.mode = 'production';
-  config.output.filename = '[name]-bundle-[hash].min.js';
-  config.output.chunkFilename = '[name]-chunk-[chunkhash].min.js';
-  config.optimization.chunkIds = 'deterministic';
-  config.optimization.minimize = true;
-}
 
 export default config;

@@ -19,25 +19,29 @@ import { ImportWizardFormContext, ImportWizardFormState } from './ImportWizardFo
 
 type YamlFieldKey = keyof Pick<
   ImportWizardFormState['review']['fields'],
-  'pipelineYaml' | 'pipelineRunYaml'
+  'stagePipelineYaml' | 'stagePipelineRunYaml' | 'cutoverPipelineYaml' | 'cutoverPipelineRunYaml'
 >;
-const YAML_FIELD_KEYS: YamlFieldKey[] = ['pipelineYaml', 'pipelineRunYaml'];
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
 
+  const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
+  const yamlFieldKeys: YamlFieldKey[] = isStatefulMigration
+    ? ['stagePipelineYaml', 'stagePipelineRunYaml', 'cutoverPipelineYaml', 'cutoverPipelineRunYaml']
+    : ['cutoverPipelineYaml', 'cutoverPipelineRunYaml'];
+
   // TODO warn somehow if the user is going to override their manual edits here when they go to another step (use isTouched)? not sure how to do that if they use canJumpTo
 
-  const [selectedEditorKey, setSelectedEditorKey] = React.useState<YamlFieldKey>('pipelineYaml');
+  const [selectedEditorKey, setSelectedEditorKey] =
+    React.useState<YamlFieldKey>('cutoverPipelineYaml');
   const selectedEditorFormField = forms.review.fields[selectedEditorKey];
 
   const editorContainerRef = React.useRef<HTMLDivElement>(null);
   const editorContainerHeight = useSize(editorContainerRef)[1];
 
-  const yamlErrors = [
-    forms.review.fields.pipelineYaml.error?.message,
-    forms.review.fields.pipelineRunYaml.error?.message,
-  ].filter((err) => !!err);
+  const yamlErrors = yamlFieldKeys
+    .map((fieldKey) => forms.review.fields[fieldKey].error?.message)
+    .filter((err) => !!err);
 
   // TODO on smaller screen sizes and when errors show, this flex layout turns into columns, we need a better fix for the editor height
   // TODO take a look at onEditorDidMount in the PF examples, what's going on with that, how is it implemented?
@@ -49,7 +53,9 @@ export const ReviewStep: React.FunctionComponent = () => {
       <TextContent className={spacing.mbMd}>
         <Text component="h2">Review</Text>
         <Text component="p">
-          Review the YAML for the OpenShift Pipeline and PipelineRun that will be created.
+          Review the YAML for the OpenShift{' '}
+          {isStatefulMigration ? 'Pipelines and PipelineRuns' : 'Pipeline and PipelineRun'} that
+          will be created.
         </Text>
       </TextContent>
       <FlexItem>
@@ -58,11 +64,11 @@ export const ReviewStep: React.FunctionComponent = () => {
           setSelected={setSelectedEditorKey}
           selectedLabel={selectedEditorFormField.schema.describe().label}
           id="editor-select"
-          toggleProps={{ style: { width: '150px' } }}
+          toggleProps={{ style: { width: '200px' } }}
         >
           <MenuContent>
             <MenuList>
-              {YAML_FIELD_KEYS.map((fieldKey) => (
+              {yamlFieldKeys.map((fieldKey) => (
                 <MenuItem key={fieldKey} itemId={fieldKey}>
                   {forms.review.fields[fieldKey].schema.describe().label}
                 </MenuItem>

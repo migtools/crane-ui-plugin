@@ -99,6 +99,12 @@ export const useImportWizardFormState = () => {
     credentialsAreValid,
   ).label('Project name');
 
+  const selectedPVCsField = useFormField<PersistentVolumeClaim[]>([], yup.array(), {
+    onChange: onSelectedPVCsChange,
+  });
+
+  const isStatefulMigration = selectedPVCsField.value.length > 0;
+
   return {
     sourceClusterProject: useFormState(
       {
@@ -116,22 +122,31 @@ export const useImportWizardFormState = () => {
       },
     ),
     pvcSelect: useFormState({
-      selectedPVCs: useFormField<PersistentVolumeClaim[]>([], yup.array(), {
-        onChange: onSelectedPVCsChange,
-      }),
+      selectedPVCs: selectedPVCsField,
     }),
     pvcEdit: useFormState({
       isEditModeByPVC: isEditModeByPVCField,
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: useFormField('', getPipelineNameSchema(useWatchPipelines())),
+      pipelineName: useFormField(
+        '',
+        getPipelineNameSchema(useWatchPipelines(), isStatefulMigration),
+      ),
       startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
       destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
-      pipelineYaml: useFormField('', yamlSchema.label('Pipeline').required()),
-      pipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun').required()),
+      stagePipelineYaml: useFormField('', yamlSchema.label('Pipeline (stage)').required()),
+      stagePipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun (stage)').required()),
+      cutoverPipelineYaml: useFormField(
+        '',
+        yamlSchema.label(`Pipeline${isStatefulMigration ? ' (cutover)' : ''}`).required(),
+      ),
+      cutoverPipelineRunYaml: useFormField(
+        '',
+        yamlSchema.label(`PipelineRun${isStatefulMigration ? ' (cutover)' : ''}`).required(),
+      ),
     }),
   };
 };
@@ -155,7 +170,7 @@ export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => 
     targetPvcName: useFormField(
       targetPvcName,
       dnsLabelNameSchema.label('Target PVC name').required(),
-    ),
+    ), // TODO validate that it doesn't exist (oops)
     storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()),
     capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),
