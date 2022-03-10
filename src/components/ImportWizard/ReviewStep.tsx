@@ -53,7 +53,9 @@ export const ReviewStep: React.FunctionComponent = () => {
       <TextContent className={spacing.mbMd}>
         <Text component="h2">Review</Text>
         <Text component="p">
-          Review the YAML for the OpenShift Pipeline and PipelineRun that will be created.
+          Review the YAML for the OpenShift{' '}
+          {isStatefulMigration ? 'Pipelines and PipelineRuns' : 'Pipeline and PipelineRun'} that
+          will be created.
         </Text>
       </TextContent>
       <FlexItem>
