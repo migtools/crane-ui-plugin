@@ -137,8 +137,16 @@ export const useImportWizardFormState = () => {
     }),
     review: useFormState({
       destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
-      pipelineYaml: useFormField('', yamlSchema.label('Pipeline').required()),
-      pipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun').required()),
+      stagePipelineYaml: useFormField('', yamlSchema.label('Pipeline (stage)').required()),
+      stagePipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun (stage)').required()),
+      cutoverPipelineYaml: useFormField(
+        '',
+        yamlSchema.label(`Pipeline${isStatefulMigration ? ' (cutover)' : ''}`).required(),
+      ),
+      cutoverPipelineRunYaml: useFormField(
+        '',
+        yamlSchema.label(`PipelineRun${isStatefulMigration ? ' (cutover)' : ''}`).required(),
+      ),
     }),
   };
 };
