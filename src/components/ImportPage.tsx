@@ -25,7 +25,7 @@ const ImportPage: React.FunctionComponent<PipelineWizardPageProps> = ({
       <NamespaceContext.Provider value={namespace}>
         <Page>
           <PageSection variant="light">
-            <Title headingLevel="h1">Smart Import Wizard Name</Title>
+            <Title headingLevel="h1">Import application</Title>
           </PageSection>
           <PageSection variant="light" type="wizard">
             <ImportWizard />
