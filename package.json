@@ -26,6 +26,7 @@
     "@patternfly/react-table": "^4.61.15",
     "@patternfly/react-tokens": "^4.44.15",
     "@patternfly/react-topology": "^4.45.5",
+    "@react-hook/size": "^2.1.2",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^16.11.13",
     "@types/react": "^17.0.38",

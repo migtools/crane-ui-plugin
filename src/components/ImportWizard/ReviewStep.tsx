@@ -1,4 +1,5 @@
 import * as React from 'react';
+import useSize from '@react-hook/size';
 import { TextContent, Text, MenuContent, MenuItem, MenuList, Alert } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
@@ -36,6 +37,15 @@ export const ReviewStep: React.FunctionComponent = () => {
   // TODO figure out what's going wrong when we try to set up monaco-editor-webpack-plugin, which we need for syntax highlighting
 
   const { stagePipeline, cutoverPipeline } = yamlToTektonResources(forms);
+
+  const errorContainerRef = React.useRef<HTMLDivElement>(null);
+  const errorContainerHeight = useSize(errorContainerRef)[1];
+
+  React.useEffect(() => {
+    if (yamlErrors.length > 0) {
+      requestAnimationFrame(() => errorContainerRef.current?.scrollIntoView());
+    }
+  }, [yamlErrors.length]);
 
   return (
     <>
@@ -90,15 +100,18 @@ export const ReviewStep: React.FunctionComponent = () => {
         code={selectedEditorFormField.value}
         onChange={selectedEditorFormField.setValue}
         language={Language.yaml}
-        height="400px"
+        height={`${500 - errorContainerHeight}px`}
+        className={spacing.mbMd}
       />
-      {yamlErrors.length > 0 ? (
-        <Alert isInline variant="danger" title="Invalid YAML">
-          {yamlErrors.map((error) => (
-            <div key={error}>{error}</div>
-          ))}
-        </Alert>
-      ) : null}
+      <div ref={errorContainerRef} className={yamlErrors.length > 0 ? spacing.pbMd : ''}>
+        {yamlErrors.length > 0 ? (
+          <Alert isInline variant="danger" title="Invalid YAML">
+            {yamlErrors.map((error) => (
+              <div key={error}>{error}</div>
+            ))}
+          </Alert>
+        ) : null}
+      </div>
     </>
   );
 };
