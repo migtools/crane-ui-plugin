@@ -35,6 +35,7 @@ export const ReviewStep: React.FunctionComponent = () => {
   // https://www.patternfly.org/v4/components/code-editor/
   // TODO figure out what's going wrong when we try to set up monaco-editor-webpack-plugin, which we need for syntax highlighting
 
+  const { pipelineName } = forms.pipelineSettings.values;
   const { stagePipeline, cutoverPipeline } = yamlToTektonResources(forms);
 
   return (
@@ -47,22 +48,32 @@ export const ReviewStep: React.FunctionComponent = () => {
           will be created.
         </Text>
       </TextContent>
-      {stagePipeline ? (
+      {isStatefulMigration ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Text component="h3">{stagePipeline.metadata?.name || ''}</Text>
+            <Text component="h3">{`${pipelineName}-stage`}</Text>
           </TextContent>
-          <PipelineVisualization pipeline={stagePipeline} />
+          {forms.review.fields.stagePipelineYaml.error ? (
+            <Alert isInline variant="danger" title="Invalid YAML">
+              {forms.review.fields.stagePipelineYaml.error.message}
+            </Alert>
+          ) : stagePipeline ? (
+            <PipelineVisualization pipeline={stagePipeline} />
+          ) : null}
         </>
       ) : null}
-      {cutoverPipeline ? (
-        <>
-          <TextContent className={spacing.mbSm}>
-            <Text component="h3">{cutoverPipeline.metadata?.name || ''}</Text>
-          </TextContent>
-          <PipelineVisualization pipeline={cutoverPipeline} />
-        </>
+      <TextContent className={spacing.mbSm}>
+        <Text component="h3">{isStatefulMigration ? `${pipelineName}-cutover` : pipelineName}</Text>
+      </TextContent>
+      {forms.review.fields.cutoverPipelineYaml.error ? (
+        <Alert isInline variant="danger" title="Invalid YAML">
+          {forms.review.fields.cutoverPipelineYaml.error.message}
+        </Alert>
+      ) : cutoverPipeline ? (
+        <PipelineVisualization pipeline={cutoverPipeline} />
       ) : null}
+      <br />
+      <br />
       TODO: put below under an Advanced accordion
       <SimpleSelectMenu<YamlFieldKey>
         selected={selectedEditorKey}
@@ -91,6 +102,7 @@ export const ReviewStep: React.FunctionComponent = () => {
         onChange={selectedEditorFormField.setValue}
         language={Language.yaml}
         height="400px"
+        className={spacing.mbSm}
       />
       {yamlErrors.length > 0 ? (
         <Alert isInline variant="danger" title="Invalid YAML">
