@@ -137,8 +137,8 @@ export const useImportWizardFormState = () => {
     }),
     review: useFormState({
       destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
-      stagePipelineYaml: useFormField('', yamlSchema.label('Pipeline (stage)').required()),
-      stagePipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun (stage)').required()),
+      stagePipelineYaml: useFormField('', yamlSchema.label('Pipeline (stage)')),
+      stagePipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun (stage)')),
       cutoverPipelineYaml: useFormField(
         '',
         yamlSchema.label(`Pipeline${isStatefulMigration ? ' (cutover)' : ''}`).required(),

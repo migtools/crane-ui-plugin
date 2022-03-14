@@ -50,7 +50,7 @@ export const ImportWizard: React.FunctionComponent = () => {
     [StepId.PVCSelect]: forms.pvcSelect,
     [StepId.PVCEdit]: forms.pvcEdit,
     [StepId.PipelineSettings]: forms.pipelineSettings,
-    [StepId.Review]: null,
+    [StepId.Review]: forms.review,
   };
   const hiddenStepIds = forms.pvcSelect.values.selectedPVCs.length === 0 ? [StepId.PVCEdit] : [];
   const nextVisibleStep = (currentStepId: StepId) => {
