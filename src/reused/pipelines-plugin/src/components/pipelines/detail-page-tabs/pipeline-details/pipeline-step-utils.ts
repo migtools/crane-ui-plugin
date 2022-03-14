@@ -1,6 +1,8 @@
-import { runStatus } from '../../../../utils/pipeline-augment';
-import { calculateDuration } from '../../../../utils/pipeline-utils';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { runStatus } from 'src/reused/pipelines-plugin/src/utils/pipeline-augment';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 enum TerminatedReasons {
   Completed = 'Completed',
 }
@@ -17,7 +19,7 @@ export type TaskStatusStep = {
 };
 
 export type TaskStatus = {
-  reason: runStatus;
+  reason: any;
   duration?: string;
   steps?: TaskStatusStep[];
 };
@@ -32,16 +34,6 @@ const getMatchingStep = (step: { name: string }, status: TaskStatus): TaskStatus
 };
 
 const getMatchingStepDuration = (matchingStep?: TaskStatusStep) => {
-  if (!matchingStep) return '';
-
-  if (matchingStep.terminated) {
-    return calculateDuration(matchingStep.terminated.startedAt, matchingStep.terminated.finishedAt);
-  }
-
-  if (matchingStep.running) {
-    return calculateDuration(matchingStep.running.startedAt);
-  }
-
   return '';
 };
 
@@ -79,7 +71,7 @@ export const createStepStatus = (step: { name: string }, status: TaskStatus): St
     // Not in progress, just use the run status reason
     stepRunStatus = status.reason;
 
-    duration = getMatchingStepDuration(getMatchingStep(step, status)) || status.duration;
+    duration = getMatchingStepDuration(getMatchingStep(step, status)) || status.duration || null;
   }
 
   return {

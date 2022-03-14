@@ -1,9 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import { getRunStatusColor, runStatus } from '../../../../utils/pipeline-augment';
 import { StepStatus } from './pipeline-step-utils';
-import { StatusIcon } from './StatusIcon';
 
 // import './PipelineVisualizationStepList.scss';
 
@@ -13,36 +12,6 @@ export interface PipelineVisualizationStepListProps {
   steps: StepStatus[];
   isFinallyTask?: boolean;
 }
-
-const TooltipColoredStatusIcon: React.FC<{ status: StepStatus['runStatus'] }> = ({ status }) => {
-  const size = 18;
-  const sharedProps = {
-    height: size,
-    width: size,
-  };
-
-  const icon = <StatusIcon status={status} {...sharedProps} />;
-
-  if (status === runStatus.Succeeded || status === runStatus.Failed) {
-    // Succeeded and Failed icons have transparent centers shapes - in tooltips, this becomes an undesired black
-    // This will simply wrap the icon and place a white backdrop
-    return (
-      <div style={{ color: getRunStatusColor(status).pftoken.value }}>
-        <svg {...sharedProps}>
-          <circle
-            className="odc-pipeline-visualization-step-list__icon-backdrop"
-            cx={size / 2}
-            cy={size / 2}
-            r={size / 2 - 1}
-          />
-          {icon}
-        </svg>
-      </div>
-    );
-  }
-
-  return icon;
-};
 
 export const PipelineVisualizationStepList: React.FC<PipelineVisualizationStepListProps> = ({
   isSpecOverview,
@@ -67,11 +36,7 @@ export const PipelineVisualizationStepList: React.FC<PipelineVisualizationStepLi
             })}
             key={name}
           >
-            {!isSpecOverview ? (
-              <div className="odc-pipeline-visualization-step-list__icon">
-                <TooltipColoredStatusIcon status={status} />
-              </div>
-            ) : (
+            {!isSpecOverview ? null : (
               <span className="odc-pipeline-visualization-step-list__bullet">&bull;</span>
             )}
             <div className="odc-pipeline-visualization-step-list__name">{name}</div>

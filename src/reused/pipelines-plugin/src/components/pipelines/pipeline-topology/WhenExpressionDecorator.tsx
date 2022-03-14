@@ -4,6 +4,7 @@ import { Tooltip } from '@patternfly/react-core';
 import { global_BorderColor_100 as lightBorderColor } from '@patternfly/react-tokens/dist/js/global_BorderColor_100';
 import { NODE_HEIGHT } from './const';
 import { getWhenExpressionDiamondState } from './utils';
+import { runStatus } from '../../../utils/pipeline-augment';
 
 // import './WhenExpressionDecorator.scss';
 
@@ -12,7 +13,7 @@ type WhenExpressionDecoratorProps = {
   height: number;
   leftOffset?: number;
   stroke?: string;
-  status: any;
+  status: runStatus;
   appendLine?: boolean;
   enableTooltip?: boolean;
   isFinallyTask: boolean;

@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { chart_color_green_400 as successColor } from '@patternfly/react-tokens/dist/js/chart_color_green_400';
-import { global_BackgroundColor_200 as greyBackgroundColor } from '@patternfly/react-tokens/dist/js/global_BackgroundColor_200';
 import { global_BackgroundColor_light_100 as lightBackgroundColor } from '@patternfly/react-tokens/dist/js/global_BackgroundColor_light_100';
 import * as dagre from 'dagre';
 import * as _ from 'lodash';
 import { PipelineKind, PipelineRunKind, PipelineTask } from '../../../types';
+import { runStatus } from '../../../utils/pipeline-augment';
+import { getPipelineTasks } from '../../../utils/pipeline-utils';
 import {
   NODE_HEIGHT,
   NodeType,
@@ -298,9 +299,7 @@ export const connectFinallyTasksToNodes = (
   pipeline?: PipelineKind,
   pipelineRun?: PipelineRunKind,
 ): PipelineMixedNodeModel[] => {
-  const finallyTasks = pipelineRun
-    ? getFinallyTasksWithStatus(pipeline as PipelineKind, pipelineRun)
-    : pipeline?.spec?.finally ?? [];
+  const finallyTasks = pipeline?.spec?.finally ?? [];
   if (finallyTasks.length === 0) {
     return nodes;
   }
@@ -372,6 +371,7 @@ export const getWhenExpressionDiamondState = (
   isPipelineRun: boolean,
   isFinallyTask: boolean,
 ): DiamondStateType => {
+  /*
   let diamondColor: string;
   if (isPipelineRun) {
     if (status === runStatus.Failed) {
@@ -398,4 +398,6 @@ export const getWhenExpressionDiamondState = (
       tooltipContent = 'When expression'; // <-- edited to remove dependency on i18n
   }
   return { tooltipContent, diamondColor };
+  */
+  return { tooltipContent: '', diamondColor: lightBackgroundColor.value };
 };

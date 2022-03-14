@@ -4,12 +4,10 @@ import { createSvgIdUrl, useHover } from '@patternfly/react-topology';
 import cx from 'classnames';
 import * as _ from 'lodash';
 import { TektonTaskSpec, PipelineTaskRef, TaskKind, WhenExpression } from '../../../../types';
-import { runStatus, getRunStatusColor } from '../../../../utils/pipeline-augment';
 import { WHEN_EXPRESSSION_DIAMOND_SIZE } from '../../pipeline-topology/const';
 import WhenExpressionDecorator from '../../pipeline-topology/WhenExpressionDecorator';
 import { createStepStatus, StepStatus, TaskStatus } from './pipeline-step-utils';
 import { PipelineVisualizationStepList } from './PipelineVisualizationStepList';
-import { StatusIcon } from './StatusIcon';
 import SvgDropShadowFilter from 'src/reused/topology/src/components/svg/SvgDropShadowFilter';
 import { truncateMiddle } from 'src/reused/public/components/utils/truncate-middle';
 
@@ -66,23 +64,11 @@ export const PipelineVisualizationTask: React.FC<PipelineVisualizationTaskProp> 
   pipelineRunStatus,
   disableTooltip,
   selected,
-  isSkipped,
   width,
   height,
   isFinallyTask,
 }) => {
-  const taskStatus = task.status || {
-    duration: '',
-    reason: runStatus.Idle,
-  };
-  if (pipelineRunStatus === runStatus.Failed || pipelineRunStatus === runStatus.Cancelled) {
-    if (task.status?.reason === runStatus.Idle || task.status?.reason === runStatus.Pending) {
-      taskStatus.reason = runStatus.Cancelled;
-    }
-  }
-  if (isSkipped) {
-    taskStatus.reason = runStatus.Skipped;
-  }
+  const taskStatus = task.status; // NOTE status-related code has been removed for crane-ui-plugin
 
   const taskComponent = (
     <TaskComponent
@@ -90,7 +76,7 @@ export const PipelineVisualizationTask: React.FC<PipelineVisualizationTaskProp> 
       name={task.name || ''}
       task={task.taskSpec && { data: { spec: task.taskSpec } }}
       namespace={namespace}
-      status={taskStatus}
+      status={taskStatus as TaskStatus}
       isPipelineRun={!!pipelineRunStatus}
       disableVisualizationTooltip={disableTooltip}
       selected={selected}
@@ -123,9 +109,6 @@ const TaskComponent: React.FC<TaskProps> = ({
   const enableLogLink = false; // <- changed from original console code
   const hasWhenExpression = (pipelineTask?.when?.length || 0) > 0;
   const hasRunAfter = (pipelineTask?.runAfter?.length || 0) > 0;
-  const taskStatusColor = status
-    ? getRunStatusColor(status.reason).pftoken.value
-    : getRunStatusColor(runStatus.Cancelled).pftoken.value;
 
   const [hover, hoverRef] = useHover();
   const truncatedVisualName = React.useMemo(
@@ -164,29 +147,7 @@ const TaskComponent: React.FC<TaskProps> = ({
       ) : (
         renderVisualName
       )}
-
-      {showStatusState && (
-        <>
-          <svg
-            width={30}
-            height={30}
-            viewBox="-5 -4 20 20"
-            style={{
-              color: taskStatusColor,
-            }}
-          >
-            <g
-              className={cx({
-                'fa-spin odc-pipeline-vis-task--icon-spin': status.reason === runStatus.Running,
-                'odc-pipeline-vis-task--icon-stop': status.reason !== runStatus.Running,
-              })}
-            >
-              <StatusIcon status={status.reason} disableSpin />
-            </g>
-          </svg>
-          <SvgTaskStatus steps={stepStatusList} x={30} y={23} width={width / 2 + 15} />
-        </>
-      )}
+      {/* NOTE status related code has been removed for crane-ui-plugin */}
     </g>
   );
 
@@ -231,33 +192,4 @@ const TaskComponent: React.FC<TaskProps> = ({
   return taskNode;
 };
 
-interface SvgTaskStatusProps {
-  steps: StepStatus[];
-  x: number;
-  y: number;
-  width: number;
-}
-
-const SvgTaskStatus: React.FC<SvgTaskStatusProps> = ({ steps, x, y, width }) => {
-  if (steps.length === 0) {
-    return null;
-  }
-  const stepWidth = width / steps.length;
-  const gap = 2;
-  return (
-    <g>
-      {steps.map((step, index) => {
-        return (
-          <rect
-            key={step.name}
-            x={x + stepWidth * index}
-            y={y}
-            width={stepWidth - gap}
-            height={2}
-            fill={getRunStatusColor(step.runStatus).pftoken.value}
-          />
-        );
-      })}
-    </g>
-  );
-};
+// NOTE status-related code has been removed for crane-ui-plugin

@@ -1,5 +1,5 @@
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
-import { PipelineTask } from './types/pipelines-plugin';
+import { PipelineTask } from 'src/reused/pipelines-plugin/src/types';
 
 export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: string) => {
   const { sourceNamespace } = forms.sourceClusterProject.values;

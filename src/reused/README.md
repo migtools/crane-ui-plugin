@@ -8,6 +8,8 @@ In order to reuse some components and types developed for the OpenShift UI that 
 
 We don't want to maintain our own forked versions of these files. They are only copied here because there is currently no other way to reuse them. Any changes here will make it more difficult to update these later from the original source if we want to.
 
+We have had to modify the files considerably to decouple them from the data fetching and task status pieces of the originals, however. We should just try to prevent adding new features.
+
 ## We should remove these some day.
 
 Eventually it would be great to find a way to deduplicate this code and import these components from the console directly somehow. Until then we'll need to make sure this remains up to date if there are important changes.
