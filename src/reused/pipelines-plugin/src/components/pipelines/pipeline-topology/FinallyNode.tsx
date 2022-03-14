@@ -14,7 +14,7 @@ import { FinallyNodeModel } from './types';
 import { TektonTaskSpec, PipelineTaskRef, WhenExpression } from '../../../types';
 import { TaskStatus } from '../detail-page-tabs/pipeline-details/pipeline-step-utils';
 
-// import './FinallyNode.scss';
+import './FinallyNode.scss';
 
 type FinallyNodeProps = {
   element: Node<NodeModel, FinallyNodeModel>;

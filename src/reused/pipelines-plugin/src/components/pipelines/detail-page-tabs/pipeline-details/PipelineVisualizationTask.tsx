@@ -11,7 +11,7 @@ import { PipelineVisualizationStepList } from './PipelineVisualizationStepList';
 import SvgDropShadowFilter from 'src/reused/topology/src/components/svg/SvgDropShadowFilter';
 import { truncateMiddle } from 'src/reused/public/components/utils/truncate-middle';
 
-// import './PipelineVisualizationTask.scss';
+import './PipelineVisualizationTask.scss';
 
 // crane-ui-plugin NOTE: this component has been changed to remove the dependency on Firehose. The task status tooltip has been disabled.
 

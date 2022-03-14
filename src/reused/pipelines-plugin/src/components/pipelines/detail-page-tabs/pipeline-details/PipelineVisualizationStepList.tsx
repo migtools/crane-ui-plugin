@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { StepStatus } from './pipeline-step-utils';
 
-// import './PipelineVisualizationStepList.scss';
+import './PipelineVisualizationStepList.scss';
 
 export interface PipelineVisualizationStepListProps {
   isSpecOverview: boolean;

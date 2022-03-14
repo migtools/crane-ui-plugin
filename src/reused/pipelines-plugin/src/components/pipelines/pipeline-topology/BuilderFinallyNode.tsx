@@ -24,7 +24,7 @@ import { BuilderFinallyNodeModel } from './types';
 import { TektonTaskSpec, PipelineTaskRef, WhenExpression } from '../../../types';
 import { TaskStatus } from '../detail-page-tabs/pipeline-details/pipeline-step-utils';
 
-// import './BuilderFinallyNode.scss';
+import './BuilderFinallyNode.scss';
 
 type BuilderFinallyNodeProps = {
   element: Node<NodeModel, BuilderFinallyNodeModel>;

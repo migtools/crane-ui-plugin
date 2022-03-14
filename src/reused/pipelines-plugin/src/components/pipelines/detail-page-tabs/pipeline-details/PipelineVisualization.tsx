@@ -6,7 +6,7 @@ import { PipelineLayout } from '../../pipeline-topology/const';
 import PipelineTopologyGraph from '../../pipeline-topology/PipelineTopologyGraph';
 import { getTopologyNodesEdges, hasWhenExpression } from '../../pipeline-topology/utils';
 
-// import './PipelineVisualization.scss';
+import './PipelineVisualization.scss';
 
 interface PipelineTopologyVisualizationProps {
   pipeline: PipelineKind;

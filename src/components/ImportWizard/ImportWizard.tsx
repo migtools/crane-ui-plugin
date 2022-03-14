@@ -20,12 +20,15 @@ import { PVCEditStep } from './PVCEditStep';
 import { PipelineSettingsStep } from './PipelineSettingsStep';
 import { ReviewStep } from './ReviewStep';
 import { ImportWizardFormContext, useImportWizardFormState } from './ImportWizardFormContext';
+import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
+import {
+  formsToTektonResources,
+  WizardTektonResources,
+  yamlToTektonResources,
+} from 'src/api/pipelineHelpers';
+import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
 
 import './ImportWizard.css';
-import { useConfigureDestinationSecretMutation } from 'src/api/queries/secrets';
-import { formsToTektonResources } from 'src/api/pipelineHelpers';
-import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
-import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -124,21 +127,16 @@ export const ImportWizard: React.FunctionComponent = () => {
   });
 
   const onSubmitWizard = () => {
-    const { stagePipelineYaml, stagePipelineRunYaml, cutoverPipelineYaml, cutoverPipelineRunYaml } =
-      forms.review.values;
-    const stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as PipelineKind) : null;
-    const stagePipelineRun = stagePipelineRunYaml
-      ? (yaml.load(stagePipelineRunYaml) as PipelineRunKind)
-      : null;
-    const cutoverPipeline = yaml.load(cutoverPipelineYaml) as PipelineKind;
-    const cutoverPipelineRun = yaml.load(cutoverPipelineRunYaml) as PipelineRunKind;
-    createTektonResourcesMutation.mutate({
-      resources: { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun },
-      secrets: [
-        forms.sourceClusterProject.values.sourceApiSecret,
-        forms.review.values.destinationApiSecret,
-      ],
-    });
+    const tektonResources = yamlToTektonResources(forms);
+    if (forms.review.isValid) {
+      createTektonResourcesMutation.mutate({
+        resources: tektonResources as WizardTektonResources, // If there are no validation errors, we know the required resources will be defined
+        secrets: [
+          forms.sourceClusterProject.values.sourceApiSecret,
+          forms.review.values.destinationApiSecret,
+        ],
+      });
+    }
   };
 
   return (

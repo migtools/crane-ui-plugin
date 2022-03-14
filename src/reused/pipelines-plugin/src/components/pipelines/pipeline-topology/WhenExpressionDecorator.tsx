@@ -6,7 +6,7 @@ import { NODE_HEIGHT } from './const';
 import { getWhenExpressionDiamondState } from './utils';
 import { runStatus } from '../../../utils/pipeline-augment';
 
-// import './WhenExpressionDecorator.scss';
+import './WhenExpressionDecorator.scss';
 
 type WhenExpressionDecoratorProps = {
   width: number;

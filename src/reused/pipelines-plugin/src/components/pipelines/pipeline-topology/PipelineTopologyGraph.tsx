@@ -4,7 +4,7 @@ import { PipelineLayout } from './const';
 import PipelineVisualizationSurface from './PipelineVisualizationSurface';
 import { PipelineEdgeModel, PipelineMixedNodeModel } from './types';
 
-// import './PipelineTopologyGraph.scss';
+import './PipelineTopologyGraph.scss';
 
 type PipelineTopologyGraphProps = {
   id: string;
