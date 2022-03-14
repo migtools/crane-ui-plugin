@@ -110,6 +110,10 @@ export const ImportWizard: React.FunctionComponent = () => {
     if (prevStep.prevId === StepId.Review) {
       configureDestinationSecretMutation.reset();
       createTektonResourcesMutation.reset();
+      forms.review.fields.stagePipelineYaml.clear();
+      forms.review.fields.stagePipelineRunYaml.clear();
+      forms.review.fields.cutoverPipelineYaml.clear();
+      forms.review.fields.cutoverPipelineRunYaml.clear();
     }
   };
 
