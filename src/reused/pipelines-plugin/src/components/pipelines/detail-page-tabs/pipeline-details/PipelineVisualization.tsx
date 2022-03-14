@@ -13,6 +13,32 @@ interface PipelineTopologyVisualizationProps {
   pipelineRun?: PipelineRunKind;
 }
 
+// NOTE: error boundary added by crane-ui-plugin to prevent crashing page if visualization throws render-time errors
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <Alert isInline variant="danger" title="Failed to render pipeline visualization" />;
+    }
+    return this.props.children;
+  }
+}
+
 const PipelineVisualization: React.FC<PipelineTopologyVisualizationProps> = ({
   pipeline,
   pipelineRun,
@@ -34,17 +60,19 @@ const PipelineVisualization: React.FC<PipelineTopologyVisualizationProps> = ({
     );
   } else {
     content = (
-      <PipelineTopologyGraph
-        id={`${pipelineRun?.metadata?.name || pipeline?.metadata?.name}-graph`}
-        data-test="pipeline-visualization"
-        nodes={nodes}
-        edges={edges}
-        layout={
-          hasWhenExpression(pipeline)
-            ? PipelineLayout.DAGRE_VIEWER_SPACED
-            : PipelineLayout.DAGRE_VIEWER
-        }
-      />
+      <ErrorBoundary key={JSON.stringify(pipeline)}>
+        <PipelineTopologyGraph
+          id={`${pipelineRun?.metadata?.name || pipeline?.metadata?.name}-graph`}
+          data-test="pipeline-visualization"
+          nodes={nodes}
+          edges={edges}
+          layout={
+            hasWhenExpression(pipeline)
+              ? PipelineLayout.DAGRE_VIEWER_SPACED
+              : PipelineLayout.DAGRE_VIEWER
+          }
+        />
+      </ErrorBoundary>
     );
   }
 
