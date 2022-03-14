@@ -33,7 +33,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   render() {
     if (this.state.hasError) {
-      return <Alert isInline variant="danger" title="Failed to render pipeline visualization" />;
+      return (
+        <Alert isInline variant="danger" title="Cannot visualize pipeline">
+          The pipeline is invalid
+        </Alert>
+      );
     }
     return this.props.children;
   }
@@ -59,8 +63,9 @@ const PipelineVisualization: React.FC<PipelineTopologyVisualizationProps> = ({
       />
     );
   } else {
+    const pipelineJSON = JSON.stringify(pipeline);
     content = (
-      <ErrorBoundary key={JSON.stringify(pipeline)}>
+      <ErrorBoundary key={pipelineJSON}>
         <PipelineTopologyGraph
           id={`${pipelineRun?.metadata?.name || pipeline?.metadata?.name}-graph`}
           data-test="pipeline-visualization"
@@ -71,6 +76,7 @@ const PipelineVisualization: React.FC<PipelineTopologyVisualizationProps> = ({
               ? PipelineLayout.DAGRE_VIEWER_SPACED
               : PipelineLayout.DAGRE_VIEWER
           }
+          key={pipelineJSON}
         />
       </ErrorBoundary>
     );
