@@ -34,8 +34,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render() {
     if (this.state.hasError) {
       return (
-        <Alert isInline variant="danger" title="Cannot visualize pipeline">
-          The pipeline is invalid
+        <Alert isInline variant="danger" title="Cannot preview pipeline">
+          The pipeline object is invalid
         </Alert>
       );
     }

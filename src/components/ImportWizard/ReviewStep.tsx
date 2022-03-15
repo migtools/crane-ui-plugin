@@ -16,6 +16,7 @@ type YamlFieldKey = keyof Pick<
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
+  const { pipelineName } = forms.pipelineSettings.values;
 
   const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
   const yamlFieldKeys: YamlFieldKey[] = isStatefulMigration
@@ -41,11 +42,19 @@ export const ReviewStep: React.FunctionComponent = () => {
   const errorContainerRef = React.useRef<HTMLDivElement>(null);
   const errorContainerHeight = useSize(errorContainerRef)[1];
 
+  const scrollToEditor = () =>
+    requestAnimationFrame(() => errorContainerRef.current?.scrollIntoView());
+  const [hasTouchedEditor, setHasTouchedEditor] = React.useState(false);
+  const hasYamlErrors = hasTouchedEditor && yamlErrors.length > 0;
   React.useEffect(() => {
-    if (yamlErrors.length > 0) {
-      requestAnimationFrame(() => errorContainerRef.current?.scrollIntoView());
-    }
-  }, [yamlErrors.length]);
+    if (hasYamlErrors) scrollToEditor();
+  }, [hasYamlErrors]);
+
+  const invalidAlert = (
+    <Alert isInline variant="danger" title="Cannot preview pipeline" className={spacing.mbMd}>
+      The pipeline object is invalid
+    </Alert>
+  );
 
   return (
     <>
@@ -57,23 +66,19 @@ export const ReviewStep: React.FunctionComponent = () => {
           will be created.
         </Text>
       </TextContent>
-      {stagePipeline ? (
+      {isStatefulMigration ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Text component="h3">{stagePipeline.metadata?.name || ''}</Text>
+            <Text component="h3">{`${pipelineName}-stage`}</Text>
           </TextContent>
-          <PipelineVisualization pipeline={stagePipeline} />
+          {stagePipeline ? <PipelineVisualization pipeline={stagePipeline} /> : invalidAlert}
         </>
       ) : null}
-      {cutoverPipeline ? (
-        <>
-          <TextContent className={spacing.mbSm}>
-            <Text component="h3">{cutoverPipeline.metadata?.name || ''}</Text>
-          </TextContent>
-          <PipelineVisualization pipeline={cutoverPipeline} />
-        </>
-      ) : null}
-      TODO: put below under an Advanced accordion
+      <TextContent className={spacing.mbSm}>
+        <Text component="h3">{isStatefulMigration ? `${pipelineName}-cutover` : pipelineName}</Text>
+      </TextContent>
+      {cutoverPipeline ? <PipelineVisualization pipeline={cutoverPipeline} /> : invalidAlert}
+      TODO: put below under an Advanced toggle
       <SimpleSelectMenu<YamlFieldKey>
         selected={selectedEditorKey}
         setSelected={setSelectedEditorKey}
@@ -98,7 +103,11 @@ export const ReviewStep: React.FunctionComponent = () => {
         isLanguageLabelVisible
         isMinimapVisible
         code={selectedEditorFormField.value}
-        onChange={selectedEditorFormField.setValue}
+        onChange={(value) => {
+          selectedEditorFormField.setValue(value);
+          selectedEditorFormField.setIsTouched(true);
+          setHasTouchedEditor(true);
+        }}
         language={Language.yaml}
         height={`${500 - errorContainerHeight}px`}
         className={spacing.mbMd}
