@@ -6,8 +6,8 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { ImportWizardFormContext, ImportWizardFormState } from './ImportWizardFormContext';
-import PipelineVisualization from 'src/reused/pipelines-plugin/src/components/pipelines/detail-page-tabs/pipeline-details/PipelineVisualization';
 import { yamlToTektonResources } from 'src/api/pipelineHelpers';
+import { PipelineVisualizationWrapper } from 'src/common/components/PipelineVisualizationWrapper';
 
 type YamlFieldKey = keyof Pick<
   ImportWizardFormState['review']['fields'],
@@ -64,13 +64,13 @@ export const ReviewStep: React.FunctionComponent = () => {
           <TextContent className={spacing.mbMd}>
             <Text component="h3">{`${pipelineName}-stage`}</Text>
           </TextContent>
-          <PipelineVisualization pipeline={stagePipeline} onUpdate={onVisualizationUpdate} />
+          <PipelineVisualizationWrapper pipeline={stagePipeline} onUpdate={onVisualizationUpdate} />
         </>
       ) : null}
       <TextContent className={spacing.mbMd}>
         <Text component="h3">{isStatefulMigration ? `${pipelineName}-cutover` : pipelineName}</Text>
       </TextContent>
-      <PipelineVisualization pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
+      <PipelineVisualizationWrapper pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       TODO: put below under an Advanced toggle
       <SimpleSelectMenu<YamlFieldKey>
         selected={selectedEditorKey}
