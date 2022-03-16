@@ -8,15 +8,23 @@ import { getTopologyNodesEdges, hasWhenExpression } from '../../pipeline-topolog
 
 import './PipelineVisualization.scss';
 
+const InvalidPipelineAlert: React.FC = () => (
+  <Alert isInline variant="danger" title="Cannot preview pipeline">
+    The pipeline object is invalid
+  </Alert>
+);
+
 interface PipelineTopologyVisualizationProps {
-  pipeline: PipelineKind;
+  pipeline?: PipelineKind | null;
   pipelineRun?: PipelineRunKind;
+  onUpdate: (hasError: boolean) => void;
 }
 
 // NOTE: error boundary added by crane-ui-plugin to prevent crashing page if visualization throws render-time errors
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
+  onUpdate: (hasError: boolean) => void;
 }
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -31,13 +39,17 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     return { hasError: true };
   }
 
+  componentDidMount() {
+    this.props.onUpdate(this.state.hasError);
+  }
+
+  componentDidUpdate() {
+    this.props.onUpdate(this.state.hasError);
+  }
+
   render() {
     if (this.state.hasError) {
-      return (
-        <Alert isInline variant="danger" title="Cannot preview pipeline">
-          The pipeline object is invalid
-        </Alert>
-      );
+      return <InvalidPipelineAlert />;
     }
     return this.props.children;
   }
@@ -46,8 +58,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 const PipelineVisualization: React.FC<PipelineTopologyVisualizationProps> = ({
   pipeline,
   pipelineRun,
+  onUpdate,
 }) => {
   const { t } = useTranslation();
+
+  if (!pipeline) return <InvalidPipelineAlert />;
+
   let content: React.ReactElement;
 
   const { nodes, edges } = getTopologyNodesEdges(pipeline, pipelineRun);
@@ -65,7 +81,7 @@ const PipelineVisualization: React.FC<PipelineTopologyVisualizationProps> = ({
   } else {
     const pipelineJSON = JSON.stringify(pipeline);
     content = (
-      <ErrorBoundary key={pipelineJSON}>
+      <ErrorBoundary key={pipelineJSON} onUpdate={onUpdate}>
         <PipelineTopologyGraph
           id={`${pipelineRun?.metadata?.name || pipeline?.metadata?.name}-graph`}
           data-test="pipeline-visualization"

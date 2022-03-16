@@ -45,16 +45,9 @@ export const ReviewStep: React.FunctionComponent = () => {
   const scrollToEditor = () =>
     requestAnimationFrame(() => errorContainerRef.current?.scrollIntoView());
   const [hasTouchedEditor, setHasTouchedEditor] = React.useState(false);
-  const hasYamlErrors = hasTouchedEditor && yamlErrors.length > 0;
-  React.useEffect(() => {
-    if (hasYamlErrors) scrollToEditor();
-  }, [hasYamlErrors]);
-
-  const invalidAlert = (
-    <Alert isInline variant="danger" title="Cannot preview pipeline" className={spacing.mbMd}>
-      The pipeline object is invalid
-    </Alert>
-  );
+  const onVisualizationUpdate = (hasError: boolean) => {
+    if (hasTouchedEditor && !hasError) scrollToEditor();
+  };
 
   return (
     <>
@@ -68,16 +61,16 @@ export const ReviewStep: React.FunctionComponent = () => {
       </TextContent>
       {isStatefulMigration ? (
         <>
-          <TextContent className={spacing.mbSm}>
+          <TextContent className={spacing.mbMd}>
             <Text component="h3">{`${pipelineName}-stage`}</Text>
           </TextContent>
-          {stagePipeline ? <PipelineVisualization pipeline={stagePipeline} /> : invalidAlert}
+          <PipelineVisualization pipeline={stagePipeline} onUpdate={onVisualizationUpdate} />
         </>
       ) : null}
-      <TextContent className={spacing.mbSm}>
+      <TextContent className={spacing.mbMd}>
         <Text component="h3">{isStatefulMigration ? `${pipelineName}-cutover` : pipelineName}</Text>
       </TextContent>
-      {cutoverPipeline ? <PipelineVisualization pipeline={cutoverPipeline} /> : invalidAlert}
+      <PipelineVisualization pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       TODO: put below under an Advanced toggle
       <SimpleSelectMenu<YamlFieldKey>
         selected={selectedEditorKey}
@@ -96,22 +89,23 @@ export const ReviewStep: React.FunctionComponent = () => {
           </MenuList>
         </MenuContent>
       </SimpleSelectMenu>
-      <CodeEditor
-        key={selectedEditorKey}
-        isDarkTheme
-        isLineNumbersVisible
-        isLanguageLabelVisible
-        isMinimapVisible
-        code={selectedEditorFormField.value}
-        onChange={(value) => {
-          selectedEditorFormField.setValue(value);
-          selectedEditorFormField.setIsTouched(true);
-          setHasTouchedEditor(true);
-        }}
-        language={Language.yaml}
-        height={`${500 - errorContainerHeight}px`}
-        className={spacing.mbMd}
-      />
+      <div className={spacing.pbMd}>
+        <CodeEditor
+          key={selectedEditorKey}
+          isDarkTheme
+          isLineNumbersVisible
+          isLanguageLabelVisible
+          isMinimapVisible
+          code={selectedEditorFormField.value}
+          onChange={(value) => {
+            selectedEditorFormField.setValue(value);
+            selectedEditorFormField.setIsTouched(true);
+            setHasTouchedEditor(true);
+          }}
+          language={Language.yaml}
+          height={`${500 - errorContainerHeight}px`}
+        />
+      </div>
       <div ref={errorContainerRef} className={yamlErrors.length > 0 ? spacing.pbMd : ''}>
         {yamlErrors.length > 0 ? (
           <Alert isInline variant="danger" title="Invalid YAML">
