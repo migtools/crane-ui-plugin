@@ -17,7 +17,7 @@ export const formsToTektonResources = (
   namespace: string,
 ): WizardTektonResources => {
   const { sourceNamespace, sourceApiSecret } = forms.sourceClusterProject.values;
-  const { pipelineName, startImmediately } = forms.pipelineSettings.values;
+  const { pipelineName } = forms.pipelineSettings.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const isStatefulMigration = selectedPVCs.length > 0;
 
@@ -38,6 +38,7 @@ export const formsToTektonResources = (
     apiVersion: 'tekton.dev/v1beta1',
     kind: 'PipelineRun',
     spec: {
+      status: 'PipelineRunPending',
       params: [
         { name: 'source-cluster-secret', value: sourceApiSecret?.metadata.name || '' },
         { name: 'destination-cluster-secret', value: destinationApiSecret?.metadata.name || '' },
@@ -77,7 +78,6 @@ export const formsToTektonResources = (
         metadata: { generateName: `${pipelineName}-stage-`, namespace },
         spec: {
           ...pipelineRunCommon.spec,
-          ...(!startImmediately ? { status: 'PipelineRunPending' } : {}),
           pipelineRef: { name: `${pipelineName}-stage` },
           workspaces: [{ name: 'kubeconfig', volumeClaimTemplate: workspaceVolumeClaimTemplate }],
         },
@@ -128,7 +128,6 @@ export const formsToTektonResources = (
     },
     spec: {
       ...pipelineRunCommon.spec,
-      ...(isStatefulMigration || !startImmediately ? { status: 'PipelineRunPending' } : {}),
       pipelineRef: { name: isStatefulMigration ? `${pipelineName}-cutover` : pipelineName },
       workspaces: [
         { name: 'shared-data', volumeClaimTemplate: workspaceVolumeClaimTemplate },

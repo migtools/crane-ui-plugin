@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextContent, Text, Form, Checkbox } from '@patternfly/react-core';
+import { TextContent, Text, Form } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -21,16 +21,6 @@ export const PipelineSettingsStep: React.FunctionComponent = () => {
       </TextContent>
       <Form isWidthLimited>
         <ValidatedTextInput field={form.fields.pipelineName} isRequired fieldId="pipeline-name" />
-        <Checkbox
-          label={
-            isStatefulMigration
-              ? 'Start the stage pipeline immediately'
-              : 'Start the pipeline immediately'
-          }
-          id="start-immediately-checkbox"
-          isChecked={form.values.startImmediately}
-          onChange={form.fields.startImmediately.setValue}
-        />
       </Form>
     </>
   );

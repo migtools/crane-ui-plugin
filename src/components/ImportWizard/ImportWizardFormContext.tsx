@@ -133,7 +133,6 @@ export const useImportWizardFormState = () => {
         '',
         getPipelineNameSchema(useWatchPipelines(), isStatefulMigration),
       ),
-      startImmediately: useFormField(false, yup.boolean().required()),
     }),
     review: useFormState({
       destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
