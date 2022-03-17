@@ -69,9 +69,6 @@ export const ReviewStep: React.FunctionComponent = () => {
 
   const summaryThPadding = `${spacing.prXl} ${spacing.pl_0}`;
 
-  // TODO put derived pipeline names into form state labels?
-  // TODO factor the PV table out into a common table with optional read-only mode?
-
   return (
     <div className={spacing.pbLg}>
       <TextContent className={spacing.mbMd}>
