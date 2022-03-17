@@ -66,9 +66,8 @@ export const ReviewStep: React.FunctionComponent = () => {
 
   const stagePipelineName = stagePipeline?.metadata?.name || `${pipelineName}-stage`;
   const cutoverPipelineName =
-    cutoverPipeline?.metadata?.name || isStatefulMigration
-      ? `${pipelineName}-cutover`
-      : pipelineName;
+    cutoverPipeline?.metadata?.name ||
+    (isStatefulMigration ? `${pipelineName}-cutover` : pipelineName);
 
   const summaryThPadding = `${spacing.prXl} ${spacing.pl_0}`;
 
