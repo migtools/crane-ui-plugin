@@ -8,14 +8,18 @@ import {
   MenuList,
   Alert,
   Switch,
+  Button,
+  Popover,
 } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { ImportWizardFormContext, ImportWizardFormState } from './ImportWizardFormContext';
 import { yamlToTektonResources } from 'src/api/pipelineHelpers';
 import { PipelineVisualizationWrapper } from 'src/common/components/PipelineVisualizationWrapper';
+import { columnNames as pvcColumnNames } from './PVCEditStep';
 
 type YamlFieldKey = keyof Pick<
   ImportWizardFormState['review']['fields'],
@@ -60,30 +64,113 @@ export const ReviewStep: React.FunctionComponent = () => {
     if (hasTouchedEditor && isAdvancedMode) scrollToEditor();
   };
 
-  // TODO use the real metadata names for headings if present? helper function for that?
-  // TODO the spacing is all weird around the Switch?
-  // TODO details at the top of the Review step, see mockup
+  const stagePipelineName = stagePipeline?.metadata?.name || `${pipelineName}-stage`;
+  const cutoverPipelineName =
+    cutoverPipeline?.metadata?.name || isStatefulMigration
+      ? `${pipelineName}-cutover`
+      : pipelineName;
+
+  const summaryThPadding = `${spacing.prXl} ${spacing.pl_0}`;
+
+  // TODO remove start immediately checkbox and logic
+  // TODO put derived pipeline names into form state labels?
 
   return (
-    <div className={spacing.pbMd}>
+    <div className={spacing.pbLg}>
       <TextContent className={spacing.mbMd}>
         <Text component="h2">Review</Text>
         <Text component="p">
-          Review the OpenShift{' '}
-          {isStatefulMigration ? 'Pipelines and PipelineRuns' : 'Pipeline and PipelineRun'} that
-          will be created.
+          Review the settings for the OpenShift {isStatefulMigration ? 'pipelines' : 'pipeline'}{' '}
+          that will be created when you select Finish.
         </Text>
       </TextContent>
+      <TableComposable variant="compact" borders={false} className={spacing.mbLg}>
+        <Tbody>
+          <Tr>
+            <Th modifier="fitContent" className={summaryThPadding}>
+              <strong>Pipeline names</strong>
+            </Th>
+            <Td dataLabel="Pipeline names">
+              {(isStatefulMigration
+                ? [stagePipelineName, cutoverPipelineName]
+                : [cutoverPipelineName]
+              ).join(', ')}
+            </Td>
+          </Tr>
+          <Tr>
+            <Th modifier="fitContent" className={summaryThPadding}>
+              <strong>Source cluster API URL</strong>
+            </Th>
+            <Td>{forms.sourceClusterProject.values.apiUrl}</Td>
+          </Tr>
+          <Tr>
+            <Th modifier="fitContent" className={summaryThPadding}>
+              <strong>Source project name</strong>
+            </Th>
+            <Td>{forms.sourceClusterProject.values.sourceNamespace}</Td>
+          </Tr>
+          <Tr>
+            <Th modifier="fitContent" className={summaryThPadding}>
+              <strong>Persistent volume claims</strong>
+            </Th>
+            <Td>
+              {forms.pvcSelect.values.selectedPVCs.length > 0 ? (
+                <Popover
+                  aria-label="Persistent volume claim details"
+                  headerContent="Persistent volume claims"
+                  hasAutoWidth
+                  bodyContent={
+                    <TableComposable variant="compact" borders={false}>
+                      <Thead>
+                        <Tr>
+                          <Th modifier="nowrap">{pvcColumnNames.sourcePvcName}</Th>
+                          <Th modifier="nowrap">{pvcColumnNames.targetPvcName}</Th>
+                          <Th modifier="nowrap">{pvcColumnNames.storageClass}</Th>
+                          <Th modifier="nowrap">{pvcColumnNames.capacity}</Th>
+                          <Th modifier="nowrap">{pvcColumnNames.verifyCopy}</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {forms.pvcSelect.values.selectedPVCs.map((pvc) => {
+                          const { targetPvcName, storageClass, capacity, verifyCopy } =
+                            forms.pvcEdit.values.editValuesByPVC[pvc.metadata?.name || ''];
+                          return (
+                            <Tr key={pvc.metadata?.name}>
+                              <Td dataLabel={pvcColumnNames.sourcePvcName}>{pvc.metadata?.name}</Td>
+                              <Td dataLabel={pvcColumnNames.targetPvcName}>{targetPvcName}</Td>
+                              <Td dataLabel={pvcColumnNames.storageClass}>{storageClass}</Td>
+                              <Td dataLabel={pvcColumnNames.capacity}>{capacity}</Td>
+                              <Td dataLabel={pvcColumnNames.verifyCopy}>
+                                {verifyCopy ? 'Yes' : 'No'}
+                              </Td>
+                            </Tr>
+                          );
+                        })}
+                      </Tbody>
+                    </TableComposable>
+                  }
+                >
+                  <Button variant="link" isInline>
+                    {forms.pvcSelect.values.selectedPVCs.length}
+                  </Button>
+                </Popover>
+              ) : (
+                0
+              )}
+            </Td>
+          </Tr>
+        </Tbody>
+      </TableComposable>
       {isStatefulMigration ? (
         <>
-          <TextContent className={spacing.mbMd}>
-            <Text component="h3">{`${pipelineName}-stage`}</Text>
+          <TextContent className={spacing.mbSm}>
+            <Text component="h3">{stagePipelineName}</Text>
           </TextContent>
           <PipelineVisualizationWrapper pipeline={stagePipeline} onUpdate={onVisualizationUpdate} />
         </>
       ) : null}
-      <TextContent className={spacing.mbMd}>
-        <Text component="h3">{isStatefulMigration ? `${pipelineName}-cutover` : pipelineName}</Text>
+      <TextContent className={spacing.mbSm}>
+        <Text component="h3">{cutoverPipelineName}</Text>
       </TextContent>
       <PipelineVisualizationWrapper pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       <Switch
@@ -115,23 +202,21 @@ export const ReviewStep: React.FunctionComponent = () => {
               </MenuList>
             </MenuContent>
           </SimpleSelectMenu>
-          <div className={spacing.pbMd}>
-            <CodeEditor
-              key={selectedEditorKey}
-              isDarkTheme
-              isLineNumbersVisible
-              isLanguageLabelVisible
-              isMinimapVisible
-              code={selectedEditorFormField.value}
-              onChange={(value) => {
-                selectedEditorFormField.setValue(value);
-                selectedEditorFormField.setIsTouched(true);
-                setHasTouchedEditor(true);
-              }}
-              language={Language.yaml}
-              height={`${450 - errorContainerHeight}px`}
-            />
-          </div>
+          <CodeEditor
+            key={selectedEditorKey}
+            isDarkTheme
+            isLineNumbersVisible
+            isLanguageLabelVisible
+            isMinimapVisible
+            code={selectedEditorFormField.value}
+            onChange={(value) => {
+              selectedEditorFormField.setValue(value);
+              selectedEditorFormField.setIsTouched(true);
+              setHasTouchedEditor(true);
+            }}
+            language={Language.yaml}
+            height={`${450 - errorContainerHeight}px`}
+          />
         </div>
       ) : null}
       <div ref={errorContainerRef}>
