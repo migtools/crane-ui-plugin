@@ -105,6 +105,16 @@ export const useImportWizardFormState = () => {
 
   const isStatefulMigration = selectedPVCsField.value.length > 0;
 
+  const pipelineNameField = useFormField(
+    '',
+    getPipelineNameSchema(useWatchPipelines(), isStatefulMigration),
+  );
+
+  const stagePipelineName = `${pipelineNameField.value}-stage`;
+  const cutoverPipelineName = isStatefulMigration
+    ? `${pipelineNameField.value}-cutover`
+    : pipelineNameField.value;
+
   return {
     sourceClusterProject: useFormState(
       {
@@ -129,22 +139,22 @@ export const useImportWizardFormState = () => {
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: useFormField(
-        '',
-        getPipelineNameSchema(useWatchPipelines(), isStatefulMigration),
-      ),
+      pipelineName: pipelineNameField,
     }),
     review: useFormState({
       destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
-      stagePipelineYaml: useFormField('', yamlSchema.label('Pipeline (stage)')),
-      stagePipelineRunYaml: useFormField('', yamlSchema.label('PipelineRun (stage)')),
+      stagePipelineYaml: useFormField('', yamlSchema.label(`Pipeline (${stagePipelineName})`)),
+      stagePipelineRunYaml: useFormField(
+        '',
+        yamlSchema.label(`PipelineRun (${stagePipelineName})`),
+      ),
       cutoverPipelineYaml: useFormField(
         '',
-        yamlSchema.label(`Pipeline${isStatefulMigration ? ' (cutover)' : ''}`).required(),
+        yamlSchema.label(`Pipeline (${cutoverPipelineName})`).required(),
       ),
       cutoverPipelineRunYaml: useFormField(
         '',
-        yamlSchema.label(`PipelineRun${isStatefulMigration ? ' (cutover)' : ''}`).required(),
+        yamlSchema.label(`PipelineRun (${cutoverPipelineName})`).required(),
       ),
     }),
   };

@@ -64,10 +64,8 @@ export const ReviewStep: React.FunctionComponent = () => {
     if (hasTouchedEditor && isAdvancedMode) scrollToEditor();
   };
 
-  const stagePipelineName = stagePipeline?.metadata?.name || `${pipelineName}-stage`;
-  const cutoverPipelineName =
-    cutoverPipeline?.metadata?.name ||
-    (isStatefulMigration ? `${pipelineName}-cutover` : pipelineName);
+  const stagePipelineName = `${pipelineName}-stage`;
+  const cutoverPipelineName = isStatefulMigration ? `${pipelineName}-cutover` : pipelineName;
 
   const summaryThPadding = `${spacing.prXl} ${spacing.pl_0}`;
 
@@ -189,7 +187,7 @@ export const ReviewStep: React.FunctionComponent = () => {
             setSelected={setSelectedEditorKey}
             selectedLabel={selectedEditorFormField.schema.describe().label}
             id="editor-select"
-            toggleProps={{ style: { width: '200px' } }}
+            toggleProps={{ style: { width: '350px' } }}
           >
             <MenuContent>
               <MenuList>
