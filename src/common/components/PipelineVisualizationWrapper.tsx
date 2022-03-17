@@ -15,9 +15,11 @@ export const PipelineVisualizationWrapper: React.FunctionComponent<
   const pipelineJSON = JSON.stringify(pipeline);
   if (!pipeline) return <InvalidPipelineAlert />;
   return (
-    <ErrorBoundary key={pipelineJSON} onUpdate={onUpdate}>
-      <PipelineVisualization pipeline={pipeline} />
-    </ErrorBoundary>
+    <div className={spacing.mbLg}>
+      <ErrorBoundary key={pipelineJSON} onUpdate={onUpdate}>
+        <PipelineVisualization pipeline={pipeline} />
+      </ErrorBoundary>
+    </div>
   );
 };
 

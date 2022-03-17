@@ -175,7 +175,7 @@ export const ReviewStep: React.FunctionComponent = () => {
       <PipelineVisualizationWrapper pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       <Switch
         id="advanced-switch"
-        className="advanced-switch"
+        className={`advanced-switch ${spacing.mtMd}`}
         label="View Pipeline and PipelineRun YAML files (advanced)"
         isChecked={isAdvancedMode}
         onChange={(isChecked) => {
@@ -221,7 +221,7 @@ export const ReviewStep: React.FunctionComponent = () => {
       ) : null}
       <div ref={errorContainerRef}>
         {yamlErrors.length > 0 ? (
-          <Alert isInline variant="danger" title="Invalid YAML">
+          <Alert isInline variant="danger" title="Invalid YAML" className={spacing.mtMd}>
             {yamlErrors.map((error) => (
               <div key={error}>{error}</div>
             ))}
