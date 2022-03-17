@@ -51,8 +51,10 @@ export const ReviewStep: React.FunctionComponent = () => {
   const errorContainerRef = React.useRef<HTMLDivElement>(null);
   const errorContainerHeight = useSize(errorContainerRef)[1];
 
-  const scrollToEditor = () =>
-    requestAnimationFrame(() => errorContainerRef.current?.scrollIntoView());
+  const scrollToEditor = (smooth = false) =>
+    requestAnimationFrame(() =>
+      errorContainerRef.current?.scrollIntoView(smooth ? { behavior: 'smooth' } : {}),
+    );
   const [hasTouchedEditor, setHasTouchedEditor] = React.useState(false);
   const onVisualizationUpdate = () => {
     if (hasTouchedEditor && isAdvancedMode) scrollToEditor();
@@ -63,7 +65,7 @@ export const ReviewStep: React.FunctionComponent = () => {
   // TODO details at the top of the Review step, see mockup
 
   return (
-    <>
+    <div className={spacing.pbMd}>
       <TextContent className={spacing.mbMd}>
         <Text component="h2">Review</Text>
         <Text component="p">
@@ -86,12 +88,16 @@ export const ReviewStep: React.FunctionComponent = () => {
       <PipelineVisualizationWrapper pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       <Switch
         id="advanced-switch"
+        className="advanced-switch"
         label="View Pipeline and PipelineRun YAML files (advanced)"
         isChecked={isAdvancedMode}
-        onChange={setIsAdvancedMode}
+        onChange={(isChecked) => {
+          setIsAdvancedMode(isChecked);
+          if (isChecked) scrollToEditor(true);
+        }}
       />
       {isAdvancedMode ? (
-        <div>
+        <div className={spacing.mtMd}>
           <SimpleSelectMenu<YamlFieldKey>
             selected={selectedEditorKey}
             setSelected={setSelectedEditorKey}
@@ -123,12 +129,12 @@ export const ReviewStep: React.FunctionComponent = () => {
                 setHasTouchedEditor(true);
               }}
               language={Language.yaml}
-              height={`${550 - errorContainerHeight}px`}
+              height={`${450 - errorContainerHeight}px`}
             />
           </div>
         </div>
       ) : null}
-      <div ref={errorContainerRef} className={yamlErrors.length > 0 ? spacing.pbMd : ''}>
+      <div ref={errorContainerRef}>
         {yamlErrors.length > 0 ? (
           <Alert isInline variant="danger" title="Invalid YAML">
             {yamlErrors.map((error) => (
@@ -137,6 +143,6 @@ export const ReviewStep: React.FunctionComponent = () => {
           </Alert>
         ) : null}
       </div>
-    </>
+    </div>
   );
 };
