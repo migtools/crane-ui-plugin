@@ -115,7 +115,12 @@ export const formsToTektonResources = (
         tasks.craneTransformTask,
         tasks.craneApplyTask,
         tasks.kustomizeInitTask,
-        tasks.kubectlApplyKustomizeTask,
+        isStatefulMigration
+          ? {
+              ...tasks.kubectlApplyKustomizeTask,
+              runAfter: ['chown', 'kustomize-init'],
+            }
+          : tasks.kubectlApplyKustomizeTask,
       ],
     },
   };
