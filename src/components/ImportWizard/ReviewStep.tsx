@@ -16,15 +16,11 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
-import { ImportWizardFormContext, ImportWizardFormState } from './ImportWizardFormContext';
+import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { yamlToTektonResources } from 'src/api/pipelineHelpers';
 import { PipelineVisualizationWrapper } from 'src/common/components/PipelineVisualizationWrapper';
 import { columnNames as pvcColumnNames } from './PVCEditStep';
-
-type YamlFieldKey = keyof Pick<
-  ImportWizardFormState['review']['fields'],
-  'stagePipelineYaml' | 'stagePipelineRunYaml' | 'cutoverPipelineYaml' | 'cutoverPipelineRunYaml'
->;
+import { getYamlFieldKeys, YamlFieldKey } from './helpers';
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
@@ -40,9 +36,7 @@ export const ReviewStep: React.FunctionComponent = () => {
 
   const [isAdvancedMode, setIsAdvancedMode] = React.useState(false);
 
-  const yamlFieldKeys: YamlFieldKey[] = isStatefulMigration
-    ? ['stagePipelineYaml', 'stagePipelineRunYaml', 'cutoverPipelineYaml', 'cutoverPipelineRunYaml']
-    : ['cutoverPipelineYaml', 'cutoverPipelineRunYaml'];
+  const yamlFieldKeys = getYamlFieldKeys(isStatefulMigration);
 
   const [selectedEditorKey, setSelectedEditorKey] =
     React.useState<YamlFieldKey>('cutoverPipelineYaml');

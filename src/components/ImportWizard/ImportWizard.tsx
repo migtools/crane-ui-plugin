@@ -29,6 +29,8 @@ import {
 import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
 
 import './ImportWizard.css';
+import { getYamlFieldKeys } from './helpers';
+import { ConfirmModal } from 'src/common/components/ConfirmModal';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -100,7 +102,7 @@ export const ImportWizard: React.FunctionComponent = () => {
     },
   });
 
-  const onMoveToStep: WizardStepFunctionType = async (newStep, prevStep) => {
+  const onMoveToStep: WizardStepFunctionType = (newStep, prevStep) => {
     if (newStep.id === StepId.Review) {
       // Triggers prefilling of Tekton resource YAML in review step form fields
       configureDestinationSecretMutation.mutate({
@@ -143,6 +145,13 @@ export const ImportWizard: React.FunctionComponent = () => {
     }
   };
 
+  const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
+  const yamlFieldKeys = getYamlFieldKeys(isStatefulMigration);
+  const hasUnsavedYamlChanges = yamlFieldKeys.some(
+    (fieldKey) => forms.review.fields[fieldKey].isDirty,
+  );
+  const [isResetYamlConfirmModalOpen, setIsResetYamlConfirmModalOpen] = React.useState(false);
+
   return (
     <ImportWizardFormContext.Provider value={forms}>
       <Wizard
@@ -155,13 +164,13 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.SourceClusterProject,
                 name: 'Cluster and project',
                 component: <SourceClusterProjectStep />,
-                canJumpTo: canMoveToStep(StepId.SourceClusterProject),
+                canJumpTo: canMoveToStep(StepId.SourceClusterProject) && !hasUnsavedYamlChanges,
               },
               {
                 id: StepId.SourceProjectDetails,
                 name: 'Project details',
                 component: <SourceProjectDetailsStep />,
-                canJumpTo: canMoveToStep(StepId.SourceProjectDetails),
+                canJumpTo: canMoveToStep(StepId.SourceProjectDetails) && !hasUnsavedYamlChanges,
               },
             ],
           },
@@ -172,7 +181,7 @@ export const ImportWizard: React.FunctionComponent = () => {
                 id: StepId.PVCSelect,
                 name: 'Select',
                 component: <PVCSelectStep />,
-                canJumpTo: canMoveToStep(StepId.PVCSelect),
+                canJumpTo: canMoveToStep(StepId.PVCSelect) && !hasUnsavedYamlChanges,
               },
               ...(!hiddenStepIds.includes(StepId.PVCEdit)
                 ? [
@@ -180,7 +189,7 @@ export const ImportWizard: React.FunctionComponent = () => {
                       id: StepId.PVCEdit,
                       name: 'Edit',
                       component: <PVCEditStep />,
-                      canJumpTo: canMoveToStep(StepId.PVCEdit),
+                      canJumpTo: canMoveToStep(StepId.PVCEdit) && !hasUnsavedYamlChanges,
                     },
                   ]
                 : []),
@@ -190,7 +199,7 @@ export const ImportWizard: React.FunctionComponent = () => {
             id: StepId.PipelineSettings,
             name: 'Pipeline settings',
             component: <PipelineSettingsStep />,
-            canJumpTo: canMoveToStep(StepId.PipelineSettings),
+            canJumpTo: canMoveToStep(StepId.PipelineSettings) && !hasUnsavedYamlChanges,
           },
           {
             id: StepId.Review,
@@ -228,6 +237,15 @@ export const ImportWizard: React.FunctionComponent = () => {
                 const onFinalStep = activeStep.id === StepId.Review;
                 const isNextDisabled = !canMoveToStep(nextVisibleStep(activeStep.id as StepId));
                 const isBackDisabled = !canMoveToStep(prevVisibleStep(activeStep.id as StepId));
+
+                const onBackClick = () => {
+                  if (activeStep.id === StepId.Review && hasUnsavedYamlChanges) {
+                    setIsResetYamlConfirmModalOpen(true);
+                  } else {
+                    onBack();
+                  }
+                };
+
                 return (
                   <>
                     <Tooltip
@@ -247,7 +265,11 @@ export const ImportWizard: React.FunctionComponent = () => {
                       content={navDisabledReason}
                       trigger={navDisabledReason ? 'mouseenter focus' : ''}
                     >
-                      <Button variant="secondary" onClick={onBack} isAriaDisabled={isBackDisabled}>
+                      <Button
+                        variant="secondary"
+                        onClick={onBackClick}
+                        isAriaDisabled={isBackDisabled}
+                      >
                         Back
                       </Button>
                     </Tooltip>
@@ -256,6 +278,16 @@ export const ImportWizard: React.FunctionComponent = () => {
                         Cancel
                       </Button>
                     </div>
+                    <ConfirmModal
+                      title="Discard YAML changes?"
+                      isOpen={isResetYamlConfirmModalOpen}
+                      toggleOpen={() =>
+                        setIsResetYamlConfirmModalOpen(!isResetYamlConfirmModalOpen)
+                      }
+                      mutateFn={onBack}
+                      confirmButtonText="Discard"
+                      body="Moving back through the wizard will discard the changes you have made to the YAML on this step."
+                    />
                   </>
                 );
               }}
