@@ -1,6 +1,7 @@
+import * as yaml from 'js-yaml';
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
-import { PipelineKind, PipelineRunKind } from './types/pipelines-plugin';
+import { PipelineKind, PipelineRunKind } from '../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from './types/Secret';
 
 export interface WizardTektonResources {
@@ -16,7 +17,7 @@ export const formsToTektonResources = (
   namespace: string,
 ): WizardTektonResources => {
   const { sourceNamespace, sourceApiSecret } = forms.sourceClusterProject.values;
-  const { pipelineName, startImmediately } = forms.pipelineSettings.values;
+  const { pipelineName } = forms.pipelineSettings.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const isStatefulMigration = selectedPVCs.length > 0;
 
@@ -37,6 +38,7 @@ export const formsToTektonResources = (
     apiVersion: 'tekton.dev/v1beta1',
     kind: 'PipelineRun',
     spec: {
+      status: 'PipelineRunPending',
       params: [
         { name: 'source-cluster-secret', value: sourceApiSecret?.metadata.name || '' },
         { name: 'destination-cluster-secret', value: destinationApiSecret?.metadata.name || '' },
@@ -76,7 +78,6 @@ export const formsToTektonResources = (
         metadata: { generateName: `${pipelineName}-stage-`, namespace },
         spec: {
           ...pipelineRunCommon.spec,
-          ...(!startImmediately ? { status: 'PipelineRunPending' } : {}),
           pipelineRef: { name: `${pipelineName}-stage` },
           workspaces: [{ name: 'kubeconfig', volumeClaimTemplate: workspaceVolumeClaimTemplate }],
         },
@@ -127,7 +128,6 @@ export const formsToTektonResources = (
     },
     spec: {
       ...pipelineRunCommon.spec,
-      ...(isStatefulMigration || !startImmediately ? { status: 'PipelineRunPending' } : {}),
       pipelineRef: { name: isStatefulMigration ? `${pipelineName}-cutover` : pipelineName },
       workspaces: [
         { name: 'shared-data', volumeClaimTemplate: workspaceVolumeClaimTemplate },
@@ -136,5 +136,35 @@ export const formsToTektonResources = (
     },
   };
 
+  return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
+};
+
+export const yamlToTektonResources = (
+  forms: ImportWizardFormState,
+): Partial<WizardTektonResources> => {
+  const { stagePipelineYaml, stagePipelineRunYaml, cutoverPipelineYaml, cutoverPipelineRunYaml } =
+    forms.review.values;
+  let stagePipeline: PipelineKind | null | undefined;
+  let stagePipelineRun: PipelineRunKind | null | undefined;
+  let cutoverPipeline: PipelineKind | undefined;
+  let cutoverPipelineRun: PipelineRunKind | undefined;
+  try {
+    stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as PipelineKind) : null;
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+  try {
+    stagePipelineRun = stagePipelineRunYaml
+      ? (yaml.load(stagePipelineRunYaml) as PipelineRunKind)
+      : null;
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+  try {
+    cutoverPipeline = yaml.load(cutoverPipelineYaml) as PipelineKind;
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
+  try {
+    cutoverPipelineRun = yaml.load(cutoverPipelineRunYaml) as PipelineRunKind;
+    // eslint-disable-next-line no-empty
+  } catch (e) {}
   return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
 };

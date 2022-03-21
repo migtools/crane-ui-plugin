@@ -1,0 +1,121 @@
+import * as React from 'react';
+import { Tooltip } from '@patternfly/react-core';
+import { useHover } from '@patternfly/react-topology';
+import cx from 'classnames';
+import * as _ from 'lodash';
+import { useTranslation } from 'react-i18next';
+import { TaskKind } from '../../../types';
+import { BUILDER_NODE_ADD_RADIUS } from './const';
+import RemoveNodeDecorator from './RemoveNodeDecorator';
+import { NewTaskNodeCallback } from './types';
+import { KebabOption } from 'src/reused/public/components/utils/kebab';
+import { truncateMiddle } from 'src/reused/public/components/utils/truncate-middle';
+
+type KeyedKebabOption = KebabOption & { key: string };
+
+const taskToOption = (task: TaskKind, callback: NewTaskNodeCallback): KeyedKebabOption => {
+  const { kind } = task;
+  const name = task.metadata?.name || '';
+
+  return {
+    key: `${name}-${kind}`,
+    label: name,
+    icon: null, // <-- changed from the original file to remove dependency on k8s models
+    callback: () => {
+      callback(task);
+    },
+  };
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TaskList: React.FC<any> = ({
+  width,
+  height,
+  listOptions,
+  unselectedText,
+  onRemoveTask,
+  onNewTask,
+  onTaskSearch,
+}) => {
+  const { t } = useTranslation();
+  const triggerRef = React.useRef(null);
+  const [hover, hoverRef] = useHover();
+
+  const options = _.sortBy(
+    listOptions.map((task: TaskKind) => taskToOption(task, onNewTask)),
+    (o) => o.label,
+  );
+  const unselectedTaskText = unselectedText || t('pipelines-plugin~Add task');
+
+  const truncatedTaskText = React.useMemo(
+    () =>
+      truncateMiddle(unselectedTaskText, {
+        length: 10,
+        truncateEnd: true,
+      }),
+    [unselectedTaskText],
+  );
+  const renderText = (
+    <text x={width / 2} y={height / 2 + 1}>
+      {truncatedTaskText}
+    </text>
+  );
+
+  return (
+    <>
+      <g
+        data-test="task-list"
+        ref={hoverRef as React.LegacyRef<SVGGElement>}
+        className="odc-task-list-node__trigger"
+        onClick={(e) => {
+          e.stopPropagation();
+          onTaskSearch(onNewTask);
+        }}
+      >
+        <rect
+          ref={triggerRef}
+          className={cx('odc-task-list-node__trigger-background', {
+            'is-disabled': options.length === 0,
+          })}
+          width={width}
+          height={height}
+        />
+        {options.length === 0 ? (
+          <text className="odc-task-list-node__trigger-disabled" x={width / 2} y={height / 2 + 1}>
+            {t('pipelines-plugin~No tasks')}
+          </text>
+        ) : (
+          <g>
+            <rect
+              className={
+                hover
+                  ? 'odc-task-list-node__trigger-underline--hover'
+                  : 'odc-task-list-node__trigger-underline'
+              }
+              y={height}
+              width={width}
+              height={hover ? 2 : 1}
+            />
+
+            {onRemoveTask && hover && (
+              <g>
+                <RemoveNodeDecorator
+                  removeCallback={onRemoveTask}
+                  x={120}
+                  y={BUILDER_NODE_ADD_RADIUS / 4}
+                  content={t('pipelines-plugin~Delete task')}
+                />
+              </g>
+            )}
+            {unselectedTaskText !== truncatedTaskText ? (
+              <Tooltip content={unselectedTaskText}>{renderText}</Tooltip>
+            ) : (
+              renderText
+            )}
+          </g>
+        )}
+      </g>
+    </>
+  );
+};
+export default TaskList;

@@ -6,8 +6,12 @@
   width: auto;
 }
 
-.json-popover .pf-c-popover__content {
+#crane-import-wizard .json-popover .pf-c-popover__content {
   overflow-y: scroll;
   max-height: 20rem;
   width: 40rem;
+}
+
+#crane-import-wizard .advanced-switch .pf-c-switch__label {
+  font-weight: normal;
 }

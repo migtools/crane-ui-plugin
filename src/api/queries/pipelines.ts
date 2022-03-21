@@ -11,7 +11,7 @@ import { useMutation } from 'react-query';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { attachOwnerReference, getObjectRef } from 'src/utils/helpers';
 import { WizardTektonResources } from '../pipelineHelpers';
-import { PipelineKind } from '../types/pipelines-plugin';
+import { PipelineKind } from '../../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
 
