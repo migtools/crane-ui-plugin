@@ -31,6 +31,7 @@ import { useCreateTektonResourcesMutation } from 'src/api/queries/pipelines';
 import './ImportWizard.css';
 import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
+import { RouteGuard } from 'src/common/components/RouteGuard';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -154,6 +155,11 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   return (
     <ImportWizardFormContext.Provider value={forms}>
+      <RouteGuard
+        when={forms.isSomeFormDirty && createTektonResourcesMutation.status === 'idle'}
+        title="Leave this page?"
+        message="All unsaved changes will be lost."
+      />
       <Wizard
         id="crane-import-wizard"
         steps={[
@@ -235,7 +241,9 @@ export const ImportWizard: React.FunctionComponent = () => {
             <WizardContextConsumer>
               {({ activeStep, onNext, onBack, onClose }) => {
                 const onFinalStep = activeStep.id === StepId.Review;
-                const isNextDisabled = !canMoveToStep(nextVisibleStep(activeStep.id as StepId));
+                const isNextDisabled =
+                  !canMoveToStep(nextVisibleStep(activeStep.id as StepId)) ||
+                  createTektonResourcesMutation.status === 'loading';
                 const isBackDisabled = !canMoveToStep(prevVisibleStep(activeStep.id as StepId));
 
                 const onBackClick = () => {
