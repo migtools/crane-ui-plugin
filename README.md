@@ -20,7 +20,22 @@ You'll need:
 1. Install dependencies on your cluster. You can install them by installing the [mtk-operator](https://github.com/konveyor/mtk-operator), or manually:
 
    - Install the **Red Hat OpenShift Pipelines** operator from OperatorHub
-   - Install the [crane-reverse-proxy](https://github.com/konveyor/crane-reverse-proxy) service
+   - Deploy [crane-reverse-proxy](https://github.com/konveyor/crane-reverse-proxy) including its dev-only route:
+
+     ```sh
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/rbac.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/deploy.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/dev-route.yml
+     ```
+
+   - Deploy [crane-secret-service](https://github.com/konveyor/crane-secret-service) including its dev-only route:
+
+     ```sh
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/deployment.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/service.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/rbac.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/dev/route.yml
+     ```
 
 2. Clone and build the [openshift/console](https://github.com/openshift/console) repository in a separate directory.
 
@@ -40,18 +55,19 @@ You'll need:
    yarn start    # Start an HTTP server hosting the generated assets on port 9001
    ```
 
-   The server runs on port 9001 with CORS enabled.
+   The plugin module server runs on port 9001 with CORS enabled.
 
-2. In a separate shell, from your clone of the [openshift/console](https://github.com/openshift/console) repository:
+2. In a second terminal window, also from the `crane-ui-plugin` directory:
 
-   - `oc login` to your cluster
-   - `oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/dev-route.yml` to create the dev route
-   - Start the console bridge with the following options:
-     ```sh
-     source ./contrib/oc-environment.sh && ./bin/bridge -plugins crane-ui-plugin=http://localhost:9001/ --plugin-proxy="{\"services\":[{\"consoleAPIPath\":\"/api/proxy/plugin/crane-ui-plugin/remote-cluster/\",\"endpoint\":\"https://$(oc get route -n openshift-migration proxy -o go-template='{{ .spec.host }}')\",\"authorize\":false}]}"
-     ```
+   _(NOTE: replace `../console` below with the path to your clone of the [openshift/console](https://github.com/openshift/console) repository if it is located elsewhere)_
+
+   ```sh
+   # `oc login` to your cluster, and then:
+   yarn start-console ../console
+   ```
 
 3. Open the Console in your browser at http://localhost:9000/
+4. Find our UI by using the Developer perspective and navigating to the Add page, and clicking our "Import application from cluster" card.
 
 ## Docker image
 
