@@ -9,6 +9,7 @@ import {
   dnsLabelNameSchema,
   getPipelineNameSchema,
   getSourceNamespaceSchema,
+  getTargetPVCNameSchema,
   yamlSchema,
 } from 'src/common/schema';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
@@ -19,6 +20,7 @@ import {
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
 import { isDefaultStorageClass, useWatchStorageClasses } from 'src/api/queries/storageClasses';
+import { useWatchPVCs } from 'src/api/queries/pvcs';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
@@ -181,10 +183,7 @@ export interface PVCEditRowFormValues {
 export const usePVCEditRowFormState = (existingValues: PVCEditRowFormValues) => {
   const { targetPvcName, storageClass, capacity, verifyCopy } = existingValues;
   return useFormState<PVCEditRowFormValues>({
-    targetPvcName: useFormField(
-      targetPvcName,
-      dnsLabelNameSchema.label('Target PVC name').required(),
-    ), // TODO validate that it doesn't exist (oops)
+    targetPvcName: useFormField(targetPvcName, getTargetPVCNameSchema(useWatchPVCs())),
     storageClass: useFormField(storageClass, dnsLabelNameSchema.label('Storage class').required()),
     capacity: useFormField(capacity, capacitySchema.label('Capacity').required()),
     verifyCopy: useFormField(verifyCopy, yup.boolean().label('Verify copy').required()),
