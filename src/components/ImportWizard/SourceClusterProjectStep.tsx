@@ -12,7 +12,7 @@ import formStyles from '@patternfly/react-styles/css/components/Form/form';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
-import { useConfigureProxyMutation } from 'src/api/queries/secrets';
+import { useConfigureSourceSecretMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
 import {
   useSourceApiRootQuery,
@@ -25,7 +25,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
 
-  const configureProxyMutation = useConfigureProxyMutation({
+  const configureSourceSecretMutation = useConfigureSourceSecretMutation({
     existingSecretFromState: form.values.sourceApiSecret,
     onSuccess: (newSecret: OAuthSecret) => {
       form.fields.sourceApiSecret.setValue(newSecret);
@@ -34,19 +34,20 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     },
   });
 
-  const configureProxy = () => {
+  const configureSourceSecret = () => {
     const { apiUrl, token } = form.fields;
     if ((apiUrl.isDirty || token.isDirty) && apiUrl.value && token.value) {
-      configureProxyMutation.mutate({ apiUrl: apiUrl.value, token: token.value });
+      configureSourceSecretMutation.mutate({ apiUrl: apiUrl.value, token: token.value });
     }
   };
 
   const sourceApiRootQuery = useSourceApiRootQuery(
     form.values.sourceApiSecret,
-    !configureProxyMutation.isLoading,
+    !configureSourceSecretMutation.isLoading,
   );
 
-  const credentialsValidating = configureProxyMutation.isLoading || sourceApiRootQuery.isLoading;
+  const credentialsValidating =
+    configureSourceSecretMutation.isLoading || sourceApiRootQuery.isLoading;
   const credentialsAreValid = areSourceCredentialsValid(
     form.fields.apiUrl,
     form.fields.token,
@@ -111,14 +112,14 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           field={form.fields.apiUrl}
           isRequired
           fieldId="api-url"
-          onBlur={configureProxy}
+          onBlur={configureSourceSecret}
           {...apiUrlFieldProps}
         />
         <ValidatedPasswordInput
           field={form.fields.token}
           isRequired
           fieldId="token"
-          onBlur={configureProxy}
+          onBlur={configureSourceSecret}
           {...sourceTokenFieldProps}
         />
         <ValidatedTextInput
@@ -132,7 +133,10 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
         <ResolvedQueries
           spinnerMode="none"
           resultsWithErrorTitles={[
-            { result: configureProxyMutation, errorTitle: 'Cannot configure crane-proxy' },
+            {
+              result: configureSourceSecretMutation,
+              errorTitle: 'Cannot configure crane-reverse-proxy',
+            },
             { result: sourceApiRootQuery, errorTitle: 'Cannot load cluster API versions' },
           ]}
         />

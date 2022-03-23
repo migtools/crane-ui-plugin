@@ -1,14 +1,15 @@
+import { CoreNamespacedResource } from '@konveyor/lib-ui';
 import {
   K8sGroupVersionKind,
   useK8sModel,
   k8sList,
   k8sCreate,
-  k8sPatch,
   k8sDelete,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation } from 'react-query';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { getSecretServiceK8sClient } from '../proxyHelpers';
 import { OAuthSecret, Secret } from '../types/Secret';
 
 export const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
@@ -17,18 +18,18 @@ interface UseConfigureSecretMutationArgs {
   existingSecretFromState: OAuthSecret | null;
   onSuccess: (newSecret: OAuthSecret) => void;
 }
-interface ConfigureProxyMutationParams {
+interface ConfigureSourceSecretMutationParams {
   apiUrl: string;
   token: string;
 }
 
-export const useConfigureProxyMutation = ({
+export const useConfigureSourceSecretMutation = ({
   existingSecretFromState,
   onSuccess,
 }: UseConfigureSecretMutationArgs) => {
   const [secretModel] = useK8sModel(secretGVK);
   const namespace = useNamespaceContext();
-  return useMutation<OAuthSecret, Error, ConfigureProxyMutationParams>(
+  return useMutation<OAuthSecret, Error, ConfigureSourceSecretMutationParams>(
     async ({ apiUrl, token }) => {
       // If we already have a secret in state, use that instead of looking for one to replace.
       let existingSecret = existingSecretFromState;
@@ -49,14 +50,13 @@ export const useConfigureProxyMutation = ({
 
       return await k8sCreate<OAuthSecret>({
         model: secretModel,
-        data: getNewSecret('source', namespace, apiUrl, token),
+        data: getNewSecretWithData('source', namespace, apiUrl, token),
       });
     },
     { onSuccess },
   );
 };
 
-// TODO use a backend service to generate this using the session token instead of k8sPatch/k8sCreate
 export const useConfigureDestinationSecretMutation = ({
   existingSecretFromState,
   onSuccess,
@@ -66,25 +66,24 @@ export const useConfigureDestinationSecretMutation = ({
   const apiUrl = 'https://kubernetes.default.svc';
   return useMutation<OAuthSecret, Error>(
     async () => {
-      const token = ''; // TODO remove me
-      // If we have a secret in state, use that instead of looking for one to update.
+      // If we have a secret in state, replace that instead of looking for one to replace.
       let existingSecret = existingSecretFromState;
       if (!existingSecret) {
         // See if we have an existing secret for this cluster URL that isn't associated with a pipeline.
         existingSecret =
           (await findExistingSecret(secretModel, namespace, apiUrl, 'destination')) || null;
       }
-      const updatedSecret = existingSecret
-        ? await k8sPatch({
-            model: secretModel,
-            resource: existingSecret,
-            data: [{ op: 'replace', path: '/data/token', value: btoa(token) }],
-          })
-        : await k8sCreate({
-            model: secretModel,
-            data: getNewSecret('destination', namespace, apiUrl, token),
-          });
-      return updatedSecret;
+      if (existingSecret) {
+        await k8sDelete({ model: secretModel, resource: existingSecret });
+      }
+
+      const secretServiceClient = getSecretServiceK8sClient();
+      const secretResource = new CoreNamespacedResource('secrets', namespace);
+      const { data: newSecret } = await secretServiceClient.create<OAuthSecret>(
+        secretResource,
+        getNewPartialSecret('destination', namespace),
+      );
+      return newSecret;
     },
     { onSuccess },
   );
@@ -109,12 +108,10 @@ const findExistingSecret = async (
   ) as OAuthSecret | undefined;
 };
 
-const getNewSecret = (
+const getNewPartialSecret = (
   sourceOrDestination: 'source' | 'destination',
   namespace: string,
-  apiUrl: string,
-  token: string,
-): OAuthSecret => ({
+): Omit<OAuthSecret, 'data'> => ({
   apiVersion: 'v1',
   kind: 'Secret',
   metadata: {
@@ -124,11 +121,20 @@ const getNewSecret = (
       'konveyor.io/crane-ui-plugin': `${sourceOrDestination}-cluster-oauth`,
     },
   },
+  type: 'Opaque',
+});
+
+const getNewSecretWithData = (
+  sourceOrDestination: 'source' | 'destination',
+  namespace: string,
+  apiUrl: string,
+  token: string,
+): OAuthSecret => ({
+  ...getNewPartialSecret(sourceOrDestination, namespace),
   data: {
     url: btoa(apiUrl),
     token: btoa(token),
   },
-  type: 'Opaque',
 });
 
 export const secretMatchesCredentials = (secret: OAuthSecret, apiUrl: string, token: string) =>

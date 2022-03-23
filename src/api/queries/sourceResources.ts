@@ -1,7 +1,11 @@
 import { useQuery } from 'react-query';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
 import { CoreNamespacedResource } from '@konveyor/lib-ui';
-import { getProxyApiUrl, namespaceResource, useProxyK8sClient } from '../proxyHelpers';
+import {
+  getSourceClusterApiUrl,
+  namespaceResource,
+  getSourceClusterK8sClient,
+} from '../proxyHelpers';
 import { ApiRootQueryResponse } from '../types/APIVersions';
 import { OAuthSecret } from '../types/Secret';
 import { Pod } from '../types/Pod';
@@ -9,7 +13,7 @@ import { PersistentVolumeClaim } from '../types/PersistentVolume';
 import { Service } from '../types/Service';
 
 export const useSourceApiRootQuery = (sourceApiSecret: OAuthSecret | null, isEnabled = true) => {
-  const apiRootUrl = `${getProxyApiUrl(sourceApiSecret)}/api`;
+  const apiRootUrl = `${getSourceClusterApiUrl(sourceApiSecret)}/api`;
   return useQuery<ApiRootQueryResponse>(['api-root', sourceApiSecret?.metadata.name], {
     queryFn: async () =>
       (
@@ -26,7 +30,7 @@ export const useValidateSourceNamespaceQuery = (
   namespace: string,
   isEnabled = true,
 ) => {
-  const client = useProxyK8sClient(sourceApiSecret);
+  const client = getSourceClusterK8sClient(sourceApiSecret);
   return useQuery(['namespace', namespace, sourceApiSecret?.metadata.name], {
     queryFn: () => client?.get(namespaceResource, namespace),
     enabled: !!sourceApiSecret && !!namespace && isEnabled,
@@ -43,7 +47,7 @@ const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
   { sourceApiSecret, sourceNamespace }: UseSourceNamespacedQueryArgs,
   kindPlural: string,
 ) => {
-  const client = useProxyK8sClient(sourceApiSecret);
+  const client = getSourceClusterK8sClient(sourceApiSecret);
   const resource = new CoreNamespacedResource(kindPlural, sourceNamespace);
   return useQuery([kindPlural, sourceApiSecret?.metadata.name, sourceNamespace], {
     queryFn: () => client?.list<T>(resource),

@@ -9,6 +9,7 @@ import {
 import { OAuthSecret } from './types/Secret';
 import { useSourceApiRootQuery } from './queries/sourceResources';
 import { secretMatchesCredentials } from './queries/secrets';
+import { PROXY_SERVICE_URL, SECRET_SERVICE_URL } from 'src/common/constants';
 
 export interface IProxyK8sResponse<T = unknown> {
   data: T;
@@ -40,21 +41,9 @@ export interface IProxyK8sStatus extends K8sResourceCommon {
   };
 }
 
-export const getProxyApiUrl = (clusterSecret: OAuthSecret | null) => {
-  const proxyRootUrl = `/api/proxy/plugin/crane-ui-plugin/remote-cluster`;
-  return `${proxyRootUrl}/${clusterSecret?.metadata.namespace}/${clusterSecret?.metadata.name}`;
-};
-
-export interface OAuthUser {
-  access_token: string;
-  expiry_time?: number;
-}
-
-export const useProxyK8sClient = (clusterSecret: OAuthSecret | null) => {
-  if (!clusterSecret) return null;
-  const clusterApiUrl = getProxyApiUrl(clusterSecret);
+const getProxyK8sClient = (clusterApiUrl: string, clusterSecret: OAuthSecret | null) => {
   const client = ClientFactory.cluster(
-    { access_token: atob(clusterSecret.data.token), expiry_time: 0 },
+    { access_token: clusterSecret ? atob(clusterSecret.data.token) : '', expiry_time: 0 },
     clusterApiUrl,
   );
   // TODO we could just return `client` if we added generics support to kube-client in lib-ui
@@ -81,6 +70,16 @@ export const useProxyK8sClient = (clusterSecret: OAuthSecret | null) => {
     ) => client.put(resource, name, object, params) as Promise<IProxyK8sResponse<T>>,
   };
 };
+
+export const getSourceClusterApiUrl = (clusterSecret: OAuthSecret | null) =>
+  `${PROXY_SERVICE_URL}/${clusterSecret?.metadata.namespace}/${clusterSecret?.metadata.name}`;
+
+export const getSourceClusterK8sClient = (clusterSecret: OAuthSecret | null) => {
+  if (!clusterSecret) return null;
+  return getProxyK8sClient(getSourceClusterApiUrl(clusterSecret), clusterSecret);
+};
+
+export const getSecretServiceK8sClient = () => getProxyK8sClient(SECRET_SERVICE_URL, null);
 
 export const areSourceCredentialsValid = (
   apiUrlField: IFormField<string>,
