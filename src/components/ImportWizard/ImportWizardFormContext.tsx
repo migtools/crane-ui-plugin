@@ -115,7 +115,7 @@ export const useImportWizardFormState = () => {
     ? `${pipelineNameField.value}-cutover`
     : pipelineNameField.value;
 
-  return {
+  const forms = {
     sourceClusterProject: useFormState(
       {
         apiUrl: apiUrlField,
@@ -157,6 +157,11 @@ export const useImportWizardFormState = () => {
         yamlSchema.label(`PipelineRun (${cutoverPipelineName})`).required(),
       ),
     }),
+  };
+
+  return {
+    ...forms,
+    isSomeFormDirty: Object.values(forms).some((form) => form.isDirty),
   };
 };
 
