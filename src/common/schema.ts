@@ -2,6 +2,7 @@ import * as yup from 'yup';
 import * as yaml from 'js-yaml';
 import { useWatchPipelines } from 'src/api/queries/pipelines';
 import { useValidateSourceNamespaceQuery } from 'src/api/queries/sourceResources';
+import { useWatchPVCs } from 'src/api/queries/pvcs';
 
 export const dnsLabelNameSchema = yup
   .string()
@@ -84,3 +85,13 @@ export const getPipelineNameSchema = (
         ),
     );
 };
+
+export const getTargetPVCNameSchema = (pvcsWatch: ReturnType<typeof useWatchPVCs>) =>
+  dnsLabelNameSchema
+    .label('Target PVC name')
+    .required()
+    .test(
+      'unique-name',
+      'A PVC with this name already exists',
+      (value) => !pvcsWatch.loaded || !pvcsWatch.data?.find((pvc) => pvc.metadata?.name === value),
+    );
