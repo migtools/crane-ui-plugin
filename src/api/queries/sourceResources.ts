@@ -27,7 +27,7 @@ export const useValidateSourceNamespaceQuery = (
   isEnabled = true,
 ) => {
   const client = useProxyK8sClient(sourceApiSecret);
-  return useQuery(['namespace', namespace], {
+  return useQuery(['namespace', namespace, sourceApiSecret?.metadata.name], {
     queryFn: () => client?.get(namespaceResource, namespace),
     enabled: !!sourceApiSecret && !!namespace && isEnabled,
     retry: false,
