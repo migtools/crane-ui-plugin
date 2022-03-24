@@ -13,6 +13,7 @@ You can run the plugin using a local development environment or build an image t
 You'll need:
 
 - Node.js 16+ and Yarn 1.x installed
+- Python and [jq](https://stedolan.github.io/jq/download/) installed (for the start-console.sh setup script)
 - An OpenShift 4.10+ cluster (the Console UI will run locally, but it needs a real cluster on the backend)
 
 ### To set up for local development:
@@ -66,7 +67,10 @@ You'll need:
    yarn start-console ../console
    ```
 
-3. Open the Console in your browser at http://localhost:9000/
+   This script will configure an OAuth client and run the console with auth enabled.
+
+3. Open the Console in your browser at http://localhost:9000/ and log in.
+
 4. Find our UI by using the Developer perspective and navigating to the Add page, and clicking our "Import application from cluster" card.
 
 ## Docker image
