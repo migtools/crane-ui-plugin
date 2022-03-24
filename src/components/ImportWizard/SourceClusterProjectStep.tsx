@@ -146,7 +146,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           className={spacing.mtXl}
           variant="info"
           isInline
-          title={`By proceeding, your current session's OAuth token will be stored in a secret in the ${namespace} namespace.`}
+          title={`If you proceed, your current session's OAuth token will be stored in a secret in the ${namespace} namespace.`}
         >
           This allows the migration pipeline tasks to be performed with the required permissions.
         </Alert>
