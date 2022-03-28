@@ -1,15 +1,15 @@
-import { CoreNamespacedResource } from '@konveyor/lib-ui';
 import {
   K8sGroupVersionKind,
   useK8sModel,
   k8sList,
   k8sCreate,
   k8sDelete,
+  consoleFetch,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation } from 'react-query';
+import { SECRET_SERVICE_URL } from 'src/common/constants';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-import { getSecretServiceK8sClient } from '../proxyHelpers';
 import { OAuthSecret, Secret } from '../types/Secret';
 
 export const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
@@ -66,23 +66,29 @@ export const useConfigureDestinationSecretMutation = ({
   const apiUrl = 'https://kubernetes.default.svc';
   return useMutation<OAuthSecret, Error>(
     async () => {
-      // If we have a secret in state, replace that instead of looking for one to replace.
+      // If we have a secret in state, use that instead of looking for another one to reuse.
       let existingSecret = existingSecretFromState;
       if (!existingSecret) {
         // See if we have an existing secret for this cluster URL that isn't associated with a pipeline.
         existingSecret =
           (await findExistingSecret(secretModel, namespace, apiUrl, 'destination')) || null;
       }
-      if (existingSecret) {
-        await k8sDelete({ model: secretModel, resource: existingSecret });
-      }
-
-      const secretServiceClient = getSecretServiceK8sClient();
-      const secretResource = new CoreNamespacedResource('secrets', namespace);
-      const { data: newSecret } = await secretServiceClient.create<OAuthSecret>(
-        secretResource,
-        getNewPartialSecret('destination', namespace),
-      );
+      // Refresh the token on an existing secret or create a new one.
+      const newSecretResponse = existingSecret
+        ? await consoleFetch(
+            `${SECRET_SERVICE_URL}/api/v1/namespaces/${namespace}/secrets/${existingSecret.metadata.name}`,
+            {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/strategic-merge-patch+json' },
+              body: JSON.stringify({ ...existingSecret, data: undefined }),
+            },
+          )
+        : await consoleFetch(`${SECRET_SERVICE_URL}/api/v1/namespaces/${namespace}/secrets`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(getNewPartialSecret('destination', namespace)),
+          });
+      const newSecret: OAuthSecret = await newSecretResponse.json();
       return newSecret;
     },
     { onSuccess },
