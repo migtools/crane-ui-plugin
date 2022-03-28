@@ -152,6 +152,6 @@ objects:
         - type: Service
           alias: secret-service
           service:
-            name: proxy
+            name: secret-service
             namespace: openshift-migration
             port: 8443
