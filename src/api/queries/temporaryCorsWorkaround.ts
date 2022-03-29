@@ -11,24 +11,19 @@ type Route = K8sResourceCommon & { spec: { host: string } };
 
 export const useTemporaryCORSProxyUrlQuery = () => {
   const [routeModel] = useK8sModel(routeGVK);
-  return useQuery('temp-cors-proxy-url', async () => {
+  return useQuery<{ url: string; hasCertError: boolean }>('temp-cors-proxy-url', async () => {
     const route = await k8sGet<Route>({
       model: routeModel,
       name: 'proxy',
       ns: 'openshift-migration',
     });
 
-    console.log({ route });
-
     const url = `https://${route.spec.host}`;
     try {
-      // TODO identify if it's a cert error, pop the modal
-      const testResponse = await fetch(url);
-      console.log({ testResponse });
+      await fetch(url);
     } catch (e) {
-      console.log({ e });
+      return { url, hasCertError: true };
     }
-
-    return url;
+    return { url, hasCertError: false };
   });
 };

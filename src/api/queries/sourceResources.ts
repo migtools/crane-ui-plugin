@@ -11,13 +11,13 @@ import { OAuthSecret } from '../types/Secret';
 import { Pod } from '../types/Pod';
 import { PersistentVolumeClaim } from '../types/PersistentVolume';
 import { Service } from '../types/Service';
-import { useTemporaryCORSProxyUrlQuery } from './corsWorkaround';
+import { useTemporaryCORSProxyUrlQuery } from './temporaryCorsWorkaround';
 
 // TODO at top level, mount useTemporaryCORSProxyUrlQuery and handle errors by displaying a modal to ask user to navigate to accept the cert (what URL?)
 // or do the errors come from this source api root query???
 
 export const useSourceApiRootQuery = (sourceApiSecret: OAuthSecret | null, isEnabled = true) => {
-  const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data || '';
+  const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data?.url || '';
   const apiRootUrl = `${getSourceClusterApiUrl(sourceApiSecret, temporaryProxyServiceCORSUrl)}/api`;
   return useQuery<ApiRootQueryResponse>(['api-root', sourceApiSecret?.metadata.name], {
     queryFn: async () =>
@@ -35,7 +35,7 @@ export const useValidateSourceNamespaceQuery = (
   namespace: string,
   isEnabled = true,
 ) => {
-  const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data || '';
+  const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data?.url || '';
   const client = getSourceClusterK8sClient(sourceApiSecret, temporaryProxyServiceCORSUrl);
   return useQuery(['namespace', namespace, sourceApiSecret?.metadata.name], {
     queryFn: () => client?.get(namespaceResource, namespace),
@@ -53,7 +53,7 @@ const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
   { sourceApiSecret, sourceNamespace }: UseSourceNamespacedQueryArgs,
   kindPlural: string,
 ) => {
-  const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data || '';
+  const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data?.url || '';
   const client = getSourceClusterK8sClient(sourceApiSecret, temporaryProxyServiceCORSUrl);
   const resource = new CoreNamespacedResource(kindPlural, sourceNamespace);
   return useQuery([kindPlural, sourceApiSecret?.metadata.name, sourceNamespace], {
