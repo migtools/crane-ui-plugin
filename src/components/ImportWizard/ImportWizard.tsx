@@ -32,6 +32,7 @@ import './ImportWizard.css';
 import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
+import { useTemporaryCORSProxyUrlQuery } from 'src/api/queries/corsWorkaround';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -43,6 +44,8 @@ enum StepId {
 }
 
 export const ImportWizard: React.FunctionComponent = () => {
+  useTemporaryCORSProxyUrlQuery();
+
   const history = useHistory();
 
   const forms = useImportWizardFormState();
