@@ -32,10 +32,9 @@ You'll need:
    - Deploy [crane-secret-service](https://github.com/konveyor/crane-secret-service) including its dev-only route:
 
      ```sh
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/deployment.yml
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/service.yml
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/rbac.yml
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/dev/route.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/deployment.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/default/service.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-secret-service/main/config/dev/route.yaml
      ```
 
 2. Clone and build the [openshift/console](https://github.com/openshift/console) repository in a separate directory.
