@@ -46,7 +46,7 @@ export const useValidateSourceNamespaceQuery = (
 
 interface UseSourceNamespacedQueryArgs {
   sourceApiSecret: OAuthSecret | null;
-  sourceNamespace: string;
+  sourceNamespace?: string;
 }
 
 const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
@@ -55,10 +55,10 @@ const useSourceNamespacedListQuery = <T extends K8sResourceCommon>(
 ) => {
   const temporaryProxyServiceCORSUrl = useTemporaryCORSProxyUrlQuery().data?.url || '';
   const client = getSourceClusterK8sClient(sourceApiSecret, temporaryProxyServiceCORSUrl);
-  const resource = new CoreNamespacedResource(kindPlural, sourceNamespace);
+  const resource = sourceNamespace ? new CoreNamespacedResource(kindPlural, sourceNamespace) : null;
   return useQuery([kindPlural, sourceApiSecret?.metadata.name, sourceNamespace], {
-    queryFn: () => client?.list<T>(resource),
-    enabled: !!sourceApiSecret,
+    queryFn: () => client?.list<T>(resource as CoreNamespacedResource),
+    enabled: !!sourceApiSecret && !!sourceNamespace,
     refetchInterval: 15_000,
   });
 };

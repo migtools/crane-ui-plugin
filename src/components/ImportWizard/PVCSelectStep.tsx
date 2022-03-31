@@ -18,12 +18,27 @@ import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { TableEmptyState } from 'src/common/components/TableEmptyState';
 
+const EMPTY_PVCS: PersistentVolumeClaim[] = [];
+
 export const PVCSelectStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
   const form = forms.pvcSelect;
 
+  // Start with all PVCs selected once they are loaded, but be sure to only do this once
   const sourcePVCsQuery = useSourcePVCsQuery(forms.sourceClusterProject.values);
-  const pvcs = sourcePVCsQuery.data?.data.items || [];
+  const pvcs = sourcePVCsQuery.data?.data.items || EMPTY_PVCS;
+  const hasPreselectedPVCsRef = React.useRef(false);
+  React.useEffect(() => {
+    if (
+      !hasPreselectedPVCsRef.current &&
+      pvcs.length > 0 &&
+      forms.pvcSelect.fields.selectedPVCs.value.length === 0 &&
+      !forms.pvcSelect.fields.selectedPVCs.isTouched
+    ) {
+      forms.pvcSelect.fields.selectedPVCs.setValue(pvcs);
+      hasPreselectedPVCsRef.current = true;
+    }
+  }, [pvcs, forms.pvcSelect.fields.selectedPVCs]);
 
   const rowFilters: RowFilter<PersistentVolumeClaim>[] = []; // TODO do we need to add one here for storage classes, by the available ones in the source?
   const [data, filteredData, onFilterChange] = useListPageFilter(pvcs, rowFilters);
@@ -35,7 +50,13 @@ export const PVCSelectStep: React.FunctionComponent = () => {
   const { isItemSelected, toggleItemSelected, areAllSelected, selectAll } = useSelectionState({
     items: pvcs,
     isEqual: (a, b) => isSameResource(a.metadata, b.metadata),
-    externalState: [form.fields.selectedPVCs.value, form.fields.selectedPVCs.setValue],
+    externalState: [
+      form.fields.selectedPVCs.value,
+      (value) => {
+        form.fields.selectedPVCs.setValue(value);
+        form.fields.selectedPVCs.setIsTouched(true);
+      },
+    ],
   });
 
   const columnNames = {
