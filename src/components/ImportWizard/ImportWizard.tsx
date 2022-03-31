@@ -33,6 +33,7 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { TemporaryCertErrorModal } from './TemporaryCertErrorModal';
+import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -118,6 +119,11 @@ export const ImportWizard: React.FunctionComponent = () => {
       forms.review.fields.cutoverPipelineRunYaml.reinitialize('');
     }
   };
+
+  const sourcePVCsQuery = useSourcePVCsQuery(forms.sourceClusterProject.values);
+  const availablePVCs = sourcePVCsQuery.data?.data.items || [];
+  const [isProceedWithoutPVCsConfirmModalOpen, setIsProceedWithoutPVCsConfirmModalOpen] =
+    React.useState(false);
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
     // On success, navigate to the Tekton UI!
@@ -254,6 +260,18 @@ export const ImportWizard: React.FunctionComponent = () => {
                   }
                 };
 
+                const onNextClick = () => {
+                  if (
+                    activeStep.id === StepId.PVCSelect &&
+                    availablePVCs.length > 0 &&
+                    forms.pvcSelect.values.selectedPVCs.length === 0
+                  ) {
+                    setIsProceedWithoutPVCsConfirmModalOpen(true);
+                  } else {
+                    onNext();
+                  }
+                };
+
                 return (
                   <>
                     <Tooltip
@@ -263,7 +281,7 @@ export const ImportWizard: React.FunctionComponent = () => {
                       <Button
                         variant="primary"
                         type="submit"
-                        onClick={onNext}
+                        onClick={onNextClick}
                         isAriaDisabled={isNextDisabled}
                       >
                         {onFinalStep ? 'Finish' : 'Next'}
@@ -298,6 +316,21 @@ export const ImportWizard: React.FunctionComponent = () => {
                       }}
                       confirmButtonText="Discard"
                       body="Moving back through the wizard will discard the changes you have made to the YAML on this step."
+                    />
+                    <ConfirmModal
+                      title="Proceed with no PVCs?"
+                      isOpen={isProceedWithoutPVCsConfirmModalOpen}
+                      toggleOpen={() => {
+                        setIsProceedWithoutPVCsConfirmModalOpen(
+                          !isProceedWithoutPVCsConfirmModalOpen,
+                        );
+                      }}
+                      mutateFn={() => {
+                        setIsProceedWithoutPVCsConfirmModalOpen(false);
+                        onNext();
+                      }}
+                      confirmButtonText="Proceed"
+                      body="You have no persistent volume claims selected for migration. If you proceed, only workloads will be migrated."
                     />
                   </>
                 );
