@@ -109,7 +109,6 @@ export const formsToTektonResources = (
                   'quiesce-jobs',
                 ],
               })),
-              tasks.chownTask,
             ]
           : []),
         tasks.craneTransformTask,
@@ -118,7 +117,7 @@ export const formsToTektonResources = (
         isStatefulMigration
           ? {
               ...tasks.kubectlApplyKustomizeTask,
-              runAfter: ['chown', 'kustomize-init'],
+              runAfter: ['kustomize-init'],
             }
           : tasks.kubectlApplyKustomizeTask,
       ],
