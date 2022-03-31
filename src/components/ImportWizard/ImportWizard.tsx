@@ -32,6 +32,7 @@ import './ImportWizard.css';
 import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
+import { TemporaryCertErrorModal } from './TemporaryCertErrorModal';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -153,6 +154,7 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   return (
     <ImportWizardFormContext.Provider value={forms}>
+      <TemporaryCertErrorModal />
       <RouteGuard
         when={forms.isSomeFormDirty && createTektonResourcesMutation.status === 'idle'}
         title="Leave this page?"
