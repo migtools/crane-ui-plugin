@@ -8,6 +8,14 @@
     }
   },
   {
+    "type": "console.page/route",
+    "properties": {
+      "exact": true,
+      "path": "/k8s/all-namespaces/import-application",
+      "component": { "$codeRef": "ImportPageAllNamespaces" }
+    }
+  },
+  {
     "type": "dev-console.add/action-group",
     "properties": {
       "id": "import-application-group",

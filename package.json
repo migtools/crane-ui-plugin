@@ -77,6 +77,7 @@
     "description": "Provides a UI for constructing container migration pipelines within the OpenShift console",
     "exposedModules": {
       "ImportPage": "./components/ImportPage",
+      "ImportPageAllNamespaces": "./components/ImportPageAllNamespaces",
       "icons": "./utils/icons.tsx",
       "actions": "./utils/actions.ts"
     },
