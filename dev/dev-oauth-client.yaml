@@ -3,6 +3,9 @@ kind: Template
 metadata:
   name: crane-ui-plugin-dev-oauth-client
 parameters:
+  - name: NAME_SUFFIX
+    generate: expression
+    from: '[a-z]{20}'
   - name: OAUTH_SECRET
     generate: expression
     from: '[a-zA-Z0-9]{40}'
@@ -13,7 +16,7 @@ objects:
   - apiVersion: oauth.openshift.io/v1
     kind: OAuthClient
     metadata:
-      name: crane-ui-plugin-dev-oauth-client
+      name: crane-ui-plugin-dev-oauth-client-${NAME_SUFFIX}
     grantMethod: auto
     secret: ${OAUTH_SECRET}
     redirectURIs:

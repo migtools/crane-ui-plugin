@@ -35,13 +35,21 @@ echo
 # OAuth setup for running bridge with auth enabled (see https://github.com/openshift/console#openshift-with-authentication)
 
 mkdir -p ./dev/tmp
+if [ ! -f "./dev/tmp/console-client-name" ]; then
+    oc process -f ./dev/dev-oauth-client.yaml | oc apply -f - -o jsonpath='{.metadata.name}' > ./dev/tmp/console-client-name
+    oc get oauthclient "$(cat ./dev/tmp/console-client-name)" -o jsonpath='{.secret}' > ./dev/tmp/console-client-secret
+    echo "Configured new OAuthClient $(cat ./dev/tmp/console-client-name)"
+else
+    echo "Reusing existing OAuthClient $(cat ./dev/tmp/console-client-name)"
+fi
 
-oc process -f ./dev/dev-oauth-client.yaml | oc apply -f -
-oc get oauthclient crane-ui-plugin-dev-oauth-client -o jsonpath='{.secret}' > ./dev/tmp/console-client-secret
-
-oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
-    jq '.items[0].data."ca.crt"' -r | python -m base64 -d > ./dev/tmp/ca.crt
-
+if [ ! -f "./dev/tmp/ca.crt" ]; then
+    oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
+        jq '.items[0].data."ca.crt"' -r | python -m base64 -d > ./dev/tmp/ca.crt
+    echo "Stored CA certificate in ./dev/tmp/ca.crt"
+else
+    echo "Reusing existing CA certificate from ./dev/tmp/ca.crt"
+fi
 
 # Wrangle the JSON for the --plugin-proxy argument
 
@@ -81,7 +89,7 @@ source ./contrib/oc-environment.sh
     --listen=http://127.0.0.1:9000 \
     --public-dir=./frontend/public/dist \
     --user-auth=openshift \
-    --user-auth-oidc-client-id=crane-ui-plugin-dev-oauth-client \
+    --user-auth-oidc-client-id="$(cat $WD/dev/tmp/console-client-name)" \
     --user-auth-oidc-client-secret-file="$WD/dev/tmp/console-client-secret" \
     --user-auth-oidc-ca-file="$WD/dev/tmp/ca.crt" \
     --k8s-mode-off-cluster-alertmanager="$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}')" \
