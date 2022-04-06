@@ -145,12 +145,14 @@ objects:
       proxy:
         - type: Service
           alias: remote-cluster
+          authorize: false
           service:
             name: proxy
             namespace: openshift-migration
             port: 8443
         - type: Service
           alias: secret-service
+          authorize: true
           service:
             name: secret-service
             namespace: openshift-migration
