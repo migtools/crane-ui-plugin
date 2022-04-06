@@ -9,4 +9,5 @@ RUN dnf config-manager --add-repo https://dl.yarnpkg.com/rpm/yarn.repo \
 
 FROM registry.access.redhat.com/ubi8/nginx-120:latest
 COPY --from=build /usr/src/app/dist /opt/app-root/src
+COPY deploy.yaml /deploy.yaml
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
