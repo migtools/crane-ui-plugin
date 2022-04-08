@@ -130,9 +130,9 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
       >
         <button
           type="button"
-          aria-label="More info for api url field"
+          aria-label="More info for oauth token field"
           onClick={(e) => e.preventDefault()}
-          aria-describedby="api-url"
+          aria-describedby="token"
           className="pf-c-form__group-label-help"
         >
           <HelpIcon noVerticalAlign />
