@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   TextContent,
+  Popover,
   Text,
   Form,
   TextInputProps,
@@ -14,6 +15,7 @@ import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@ko
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureSourceSecretMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import {
   useSourceApiRootQuery,
   useValidateSourceNamespaceQuery,
@@ -64,43 +66,76 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   // Override validation styles based on connection check.
   // Can't use greenWhenValid prop of ValidatedTextInput because fields can be valid before connection test passes.
   // This way we don't show the connection failed message when you just haven't finished entering credentials.
-  const getAsyncValidationFieldProps = (
-    validating: boolean,
-    valid: boolean,
-    helperText: React.ReactNode = null,
-  ) => {
+  type validationFieldPropsType = {
+    validating: boolean;
+    valid: boolean;
+    helperText?: React.ReactNode;
+    labelIcon?: React.ReactElement;
+  }
+
+  const getAsyncValidationFieldProps = ({
+    valid,
+    validating,
+    helperText,
+    labelIcon
+  }: validationFieldPropsType) => {
     const inputProps: Pick<TextInputProps, 'validated'> = {
       ...(validating ? { validated: 'default' } : {}),
       ...(valid ? { validated: 'success' } : {}),
     };
-    const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText'> = {
+    const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText' | 'labelIcon'> = {
       ...inputProps,
       helperText: validating ? 'Validating...' : helperText,
+      labelIcon: labelIcon
     };
     return { inputProps, formGroupProps };
   };
 
-  const apiUrlFieldProps = getAsyncValidationFieldProps(
-    credentialsValidating,
-    credentialsAreValid,
-    <div className={formStyles.formHelperText}>
-      API URL of the source cluster, e.g. <code>https://api.example.cluster:6443</code>
-    </div>,
-  );
+  const apiUrlFieldProps = getAsyncValidationFieldProps({
+    validating: credentialsValidating,
+    valid: credentialsAreValid,
+    labelIcon:
+      <Popover
+        headerContent={`API URL of the source cluster`}
+        bodyContent={<span>e.g. <code>https://api.example.cluster:6443</code></span>}
+      >
+        <button
+          type="button"
+          aria-label="More info for api url field"
+          onClick={e => e.preventDefault()}
+          aria-describedby="api-url"
+          className="pf-c-form__group-label-help"
+        >
+          <HelpIcon noVerticalAlign />
+        </button>
+      </Popover>
+  });
 
-  const sourceTokenFieldProps = getAsyncValidationFieldProps(
-    credentialsValidating,
-    credentialsAreValid,
-    <div className={formStyles.formHelperText}>
-      OAuth token of the source cluster. Can be found via <code>oc whoami -t</code>
-    </div>,
-  );
+  const sourceTokenFieldProps = getAsyncValidationFieldProps({
+    validating: credentialsValidating,
+    valid: credentialsAreValid,
+    labelIcon:
+      <Popover
+        headerContent={`OAuth token of the source cluster`}
+        bodyContent={<span>Can be found via <code>oc whoami -t</code></span>}
+      >
+        <button
+          type="button"
+          aria-label="More info for api url field"
+          onClick={e => e.preventDefault()}
+          aria-describedby="api-url"
+          className="pf-c-form__group-label-help"
+        >
+          <HelpIcon noVerticalAlign />
+        </button>
+      </Popover>
+  });
 
-  const sourceNamespaceFieldProps = getAsyncValidationFieldProps(
-    validateSourceNamespaceQuery.isLoading,
-    validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
-    <div className={formStyles.formHelperText}>Name of the project to be migrated</div>,
-  );
+  const sourceNamespaceFieldProps = getAsyncValidationFieldProps({
+    validating: validateSourceNamespaceQuery.isLoading,
+    valid: validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
+    helperText: <div className={formStyles.formHelperText}>Name of the project to be migrated</div>,
+  });
 
   return (
     <>
