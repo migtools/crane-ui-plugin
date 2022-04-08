@@ -71,13 +71,13 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     valid: boolean;
     helperText?: React.ReactNode;
     labelIcon?: React.ReactElement;
-  }
+  };
 
   const getAsyncValidationFieldProps = ({
     valid,
     validating,
     helperText,
-    labelIcon
+    labelIcon,
   }: validationFieldPropsType) => {
     const inputProps: Pick<TextInputProps, 'validated'> = {
       ...(validating ? { validated: 'default' } : {}),
@@ -86,7 +86,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText' | 'labelIcon'> = {
       ...inputProps,
       helperText: validating ? 'Validating...' : helperText,
-      labelIcon: labelIcon
+      labelIcon: labelIcon,
     };
     return { inputProps, formGroupProps };
   };
@@ -94,41 +94,51 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const apiUrlFieldProps = getAsyncValidationFieldProps({
     validating: credentialsValidating,
     valid: credentialsAreValid,
-    labelIcon:
+    labelIcon: (
       <Popover
         headerContent={`API URL of the source cluster`}
-        bodyContent={<span>e.g. <code>https://api.example.cluster:6443</code></span>}
+        bodyContent={
+          <span>
+            e.g. <code>https://api.example.cluster:6443</code>
+          </span>
+        }
       >
         <button
           type="button"
           aria-label="More info for api url field"
-          onClick={e => e.preventDefault()}
+          onClick={(e) => e.preventDefault()}
           aria-describedby="api-url"
           className="pf-c-form__group-label-help"
         >
           <HelpIcon noVerticalAlign />
         </button>
       </Popover>
+    ),
   });
 
   const sourceTokenFieldProps = getAsyncValidationFieldProps({
     validating: credentialsValidating,
     valid: credentialsAreValid,
-    labelIcon:
+    labelIcon: (
       <Popover
         headerContent={`OAuth token of the source cluster`}
-        bodyContent={<span>Can be found via <code>oc whoami -t</code></span>}
+        bodyContent={
+          <span>
+            Can be found via <code>oc whoami -t</code>
+          </span>
+        }
       >
         <button
           type="button"
           aria-label="More info for api url field"
-          onClick={e => e.preventDefault()}
+          onClick={(e) => e.preventDefault()}
           aria-describedby="api-url"
           className="pf-c-form__group-label-help"
         >
           <HelpIcon noVerticalAlign />
         </button>
       </Popover>
+    ),
   });
 
   const sourceNamespaceFieldProps = getAsyncValidationFieldProps({
