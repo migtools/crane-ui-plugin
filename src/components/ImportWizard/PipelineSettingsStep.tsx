@@ -12,11 +12,11 @@ export const PipelineSettingsStep: React.FunctionComponent = () => {
   return (
     <>
       <TextContent className={spacing.mbMd}>
-        <Text component="h2">Migration pipeline settings</Text>
+        <Text component="h2">Import pipeline settings</Text>
         <Text component="p">
           {isStatefulMigration
-            ? 'Enter a name prefix for the OpenShift pipelines that will drive the tasks required to migrate your application.'
-            : 'Enter a name for the OpenShift pipeline that will drive the tasks required to migrate your application.'}
+            ? 'Enter a name prefix for the OpenShift pipelines that will drive the tasks required to import your application.'
+            : 'Enter a name for the OpenShift pipeline that will drive the tasks required to import your application.'}
         </Text>
       </TextContent>
       <Form isWidthLimited>

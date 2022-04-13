@@ -10,10 +10,14 @@ import {
   Switch,
   Button,
   Popover,
+  Title,
+  List,
+  ListItem,
 } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import QuestionCircle from '@patternfly/react-icons/dist/esm/icons/question-circle-icon';
 
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -66,7 +70,9 @@ export const ReviewStep: React.FunctionComponent = () => {
   return (
     <div className={spacing.pbLg}>
       <TextContent className={spacing.mbMd}>
-        <Text component="h2">Review</Text>
+        <Title headingLevel="h2" size="2xl">
+          Review
+        </Title>
         <Text component="p">
           Review the settings for the OpenShift {isStatefulMigration ? 'pipelines' : 'pipeline'}{' '}
           that will be created when you select Finish.
@@ -152,13 +158,77 @@ export const ReviewStep: React.FunctionComponent = () => {
       {isStatefulMigration ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Text component="h3">{stagePipelineName}</Text>
+            <Title headingLevel="h3" size="2xl">
+              {stagePipelineName}
+
+              <Popover
+                bodyContent={
+                  <TextContent>
+                    <Text>This shows the pipeline tasks for a staged import</Text>
+                    <List>
+                      <ListItem>During a stage import:</ListItem>
+                      <ListItem>PVC data is synchronized into the active project.</ListItem>
+                      <ListItem>
+                        Workloads are not migrated and remain running in the source cluster.
+                      </ListItem>
+                      <ListItem>
+                        A stage pipeListItemne can be re-run multiple times to lower the downtime of
+                        a subsequent cutover import.
+                      </ListItem>
+                    </List>
+                  </TextContent>
+                }
+              >
+                <Button
+                  aria-label="More info for visualization pipeline field"
+                  variant="link"
+                  isInline
+                  className="pf-u-ml-sm"
+                  style={{ color: 'var(--pf-global--palette--white)' }}
+                >
+                  <QuestionCircle />
+                </Button>
+              </Popover>
+            </Title>
           </TextContent>
           <PipelineVisualizationWrapper pipeline={stagePipeline} onUpdate={onVisualizationUpdate} />
         </>
       ) : null}
       <TextContent className={spacing.mbSm}>
-        <Text component="h3">{cutoverPipelineName}</Text>
+        <Title headingLevel="h3" size="xl">
+          {cutoverPipelineName}
+
+          <Popover
+            bodyContent={
+              !isStatefulMigration ? (
+                <TextContent>
+                  <Text>This shows the pipeline tasks for a cutover import</Text>
+                  <List>
+                    <ListItem>During a cutover import:</ListItem>
+                    <ListItem>All applications on the source namespace are halted.</ListItem>
+                    <ListItem>PVC data is migrated into the active project.</ListItem>
+                    <ListItem>Workloads are migrated into the active project.</ListItem>
+                    <ListItem>The cutover pipeline is the final step in a import.</ListItem>
+                  </List>
+                </TextContent>
+              ) : (
+                <TextContent>
+                  <Text>This shows the pipeline tasks for the application import</Text>
+                </TextContent>
+              )
+            }
+          >
+            <Button
+              aria-label="More info for visualization pipeline field"
+              variant="link"
+              isInline
+              className="pf-u-ml-sm"
+              style={{ color: 'var(--pf-global--palette--white)' }}
+            >
+              <QuestionCircle />
+            </Button>
+          </Popover>
+        </Title>
       </TextContent>
       <PipelineVisualizationWrapper pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       <Switch

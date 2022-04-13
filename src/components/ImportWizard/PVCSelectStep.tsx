@@ -108,7 +108,7 @@ export const PVCSelectStep: React.FunctionComponent = () => {
                     titleText="No results found"
                     bodyText={
                       pvcs.length === 0
-                        ? 'No PVCs were found in the selected project on the source cluster. If you proceed, only workloads will be migrated.'
+                        ? 'No PVCs were found in the selected project on the source cluster. If you proceed, only workloads will be imported.'
                         : 'Adjust your filters and try again.'
                     }
                   />

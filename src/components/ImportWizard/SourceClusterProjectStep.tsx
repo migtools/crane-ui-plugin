@@ -114,6 +114,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
         </button>
       </Popover>
     ),
+    helperText: <>&nbsp;</>,
   });
 
   const sourceTokenFieldProps = getAsyncValidationFieldProps({
@@ -139,12 +140,13 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
         </button>
       </Popover>
     ),
+    helperText: <>&nbsp;</>,
   });
 
   const sourceNamespaceFieldProps = getAsyncValidationFieldProps({
     validating: validateSourceNamespaceQuery.isLoading,
     valid: validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
-    helperText: <div className={formStyles.formHelperText}>Name of the project to be migrated</div>,
+    helperText: <div className={formStyles.formHelperText}>Name of the project to be imported</div>,
   });
 
   return (
@@ -191,9 +193,10 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           className={spacing.mtXl}
           variant="info"
           isInline
+          isLiveRegion
           title={`If you proceed, your current session's OAuth token will be stored in a secret in the ${namespace} namespace.`}
         >
-          This allows the migration pipeline tasks to be performed with the required permissions.
+          This allows the import pipeline tasks to be performed with the required permissions.
         </Alert>
       ) : null}
     </>
