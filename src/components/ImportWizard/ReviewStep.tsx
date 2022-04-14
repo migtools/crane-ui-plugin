@@ -164,16 +164,17 @@ export const ReviewStep: React.FunctionComponent = () => {
               <Popover
                 bodyContent={
                   <TextContent>
-                    <Text>This shows the pipeline tasks for a staged import</Text>
+                    <Text>
+                      This shows the pipeline tasks for a stage import. During a stage import:
+                    </Text>
                     <List>
-                      <ListItem>During a stage import:</ListItem>
                       <ListItem>PVC data is synchronized into the active project.</ListItem>
                       <ListItem>
                         Workloads are not migrated and remain running in the source cluster.
                       </ListItem>
                       <ListItem>
-                        A stage pipeListItemne can be re-run multiple times to lower the downtime of
-                        a subsequent cutover import.
+                        A stage pipeline can be re-run multiple times to lower the downtime of a
+                        subsequent cutover import.
                       </ListItem>
                     </List>
                   </TextContent>
@@ -200,15 +201,16 @@ export const ReviewStep: React.FunctionComponent = () => {
 
           <Popover
             bodyContent={
-              !isStatefulMigration ? (
+              isStatefulMigration ? (
                 <TextContent>
-                  <Text>This shows the pipeline tasks for a cutover import</Text>
+                  <Text>
+                    This shows the pipeline tasks for a cutover import. During a cutover import:
+                  </Text>
                   <List>
-                    <ListItem>During a cutover import:</ListItem>
                     <ListItem>All applications on the source namespace are halted.</ListItem>
                     <ListItem>PVC data is migrated into the active project.</ListItem>
                     <ListItem>Workloads are migrated into the active project.</ListItem>
-                    <ListItem>The cutover pipeline is the final step in a import.</ListItem>
+                    <ListItem>The cutover pipeline is the final step in an import.</ListItem>
                   </List>
                 </TextContent>
               ) : (
