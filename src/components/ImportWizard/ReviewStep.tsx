@@ -172,11 +172,11 @@ export const ReviewStep: React.FunctionComponent = () => {
                       <ListItem>
                         Workloads are not migrated and remain running in the source cluster.
                       </ListItem>
-                      <ListItem>
-                        A stage pipeline can be re-run multiple times to lower the downtime of a
-                        subsequent cutover import.
-                      </ListItem>
                     </List>
+                    <Text>
+                      A stage pipeline can be re-run multiple times to lower the downtime of a
+                      subsequent cutover import.
+                    </Text>
                   </TextContent>
                 }
               >
@@ -210,8 +210,8 @@ export const ReviewStep: React.FunctionComponent = () => {
                     <ListItem>All applications on the source namespace are halted.</ListItem>
                     <ListItem>PVC data is migrated into the active project.</ListItem>
                     <ListItem>Workloads are migrated into the active project.</ListItem>
-                    <ListItem>The cutover pipeline is the final step in an import.</ListItem>
                   </List>
+                  <Text>The cutover pipeline is the final step in a migration project.</Text>
                 </TextContent>
               ) : (
                 <TextContent>
