@@ -9,7 +9,6 @@ import {
   Alert,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import formStyles from '@patternfly/react-styles/css/components/Form/form';
 import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -146,7 +145,26 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const sourceNamespaceFieldProps = getAsyncValidationFieldProps({
     validating: validateSourceNamespaceQuery.isLoading,
     valid: validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
-    helperText: <div className={formStyles.formHelperText}>Name of the project to be imported</div>,
+    labelIcon: (
+      <Popover
+        headerContent={`Name of the project to be imported`}
+        bodyContent={
+          <span>
+            Can be found via <code>oc project</code>
+          </span>
+        }
+      >
+        <button
+          type="button"
+          aria-label="More info for project name field"
+          onClick={(e) => e.preventDefault()}
+          aria-describedby="project-name"
+          className="pf-c-form__group-label-help"
+        >
+          <HelpIcon noVerticalAlign />
+        </button>
+      </Popover>
+    ),
   });
 
   return (
