@@ -65,8 +65,6 @@ export const ReviewStep: React.FunctionComponent = () => {
   const stagePipelineName = `${pipelineName}-stage`;
   const cutoverPipelineName = isStatefulMigration ? `${pipelineName}-cutover` : pipelineName;
 
-  const summaryThPadding = `${spacing.prXl} ${spacing.pl_0}`;
-
   return (
     <div className={spacing.pbLg}>
       <TextContent className={spacing.mbMd}>
@@ -78,36 +76,63 @@ export const ReviewStep: React.FunctionComponent = () => {
           that will be created when you select Finish.
         </Text>
       </TextContent>
-      <TableComposable variant="compact" borders={false} className={spacing.mbLg}>
+      <TableComposable
+        gridBreakPoint="grid"
+        aria-label="Application import review"
+        variant="compact"
+        borders={false}
+        className={spacing.mbLg}
+      >
+        <Thead>
+          <Tr>
+            <Th modifier="nowrap" id="pipeline-name">
+              Pipeline names
+            </Th>
+            <Th modifier="nowrap" id="source-cluster-api-url">
+              Source cluster API URL
+            </Th>
+            <Th modifier="nowrap" id="source-project-name">
+              Source project name
+            </Th>
+            <Th modifier="nowrap" id="persistent-volume-claims">
+              Persistent volume claims
+            </Th>
+          </Tr>
+        </Thead>
         <Tbody>
           <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Pipeline names</strong>
-            </Th>
-            <Td dataLabel="Pipeline names">
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="pipeline-name"
+              dataLabel="Pipeline names"
+            >
               {(isStatefulMigration
                 ? [stagePipelineName, cutoverPipelineName]
                 : [cutoverPipelineName]
               ).join(', ')}
             </Td>
-          </Tr>
-          <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Source cluster API URL</strong>
-            </Th>
-            <Td>{forms.sourceClusterProject.values.apiUrl}</Td>
-          </Tr>
-          <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Source project name</strong>
-            </Th>
-            <Td>{forms.sourceClusterProject.values.sourceNamespace}</Td>
-          </Tr>
-          <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Persistent volume claims</strong>
-            </Th>
-            <Td>
+
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="source-cluster-api-url"
+              dataLabel="Source cluster API URL"
+            >
+              {forms.sourceClusterProject.values.apiUrl}
+            </Td>
+
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="source-project-name"
+              dataLabel="Source project name"
+            >
+              {forms.sourceClusterProject.values.sourceNamespace}
+            </Td>
+
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="persistent-volume-claims"
+              dataLabel="Persistent volume claims"
+            >
               {forms.pvcSelect.values.selectedPVCs.length > 0 ? (
                 <Popover
                   aria-label="Persistent volume claim details"
@@ -144,7 +169,11 @@ export const ReviewStep: React.FunctionComponent = () => {
                     </TableComposable>
                   }
                 >
-                  <Button variant="link" isInline>
+                  <Button
+                    aria-label={`${forms.pvcSelect.values.selectedPVCs.length} persistent volume claims`}
+                    variant="link"
+                    isInline
+                  >
                     {forms.pvcSelect.values.selectedPVCs.length}
                   </Button>
                 </Popover>
