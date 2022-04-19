@@ -7,7 +7,7 @@ if [ $? -eq 1 ]; then
     echo "You must be logged into a cluster via oc as a cluster admin."
     PREREQS_MET=0
 fi
-which python > /dev/null 2>&1
+which python3 > /dev/null 2>&1
 if [ $? -eq 1 ]; then
     echo "You must have python installed and on your path to run this script."
     PREREQS_MET=0
@@ -16,7 +16,7 @@ which jq > /dev/null 2>&1
 if [ $? -eq 1 ]; then
     echo "You must have jq installed and on your path to run this script."
     PREREQS_MET=0
-fi 
+fi
 if [ ! -f "./dev/dev-oauth-client.yaml" ]; then
     echo "You must run this script from the root of your crane-ui-plugin directory."
     PREREQS_MET=0

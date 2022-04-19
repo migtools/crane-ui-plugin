@@ -8,6 +8,14 @@
     }
   },
   {
+    "type": "console.page/route",
+    "properties": {
+      "exact": true,
+      "path": "/application-imports/ns/:namespace",
+      "component": { "$codeRef": "AppImportsPage" }
+    }
+  },
+  {
     "type": "dev-console.add/action-group",
     "properties": {
       "id": "import-application-group",
@@ -24,6 +32,17 @@
       "description": "Import a manually deployed application on another cluster to an automated GitOps workflow.",
       "href": "/import-application/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
+    }
+  },
+  {
+    "type": "dev-console.add/action",
+    "properties": {
+      "id": "application-imports",
+      "groupId": "import-application-group",
+      "label": "Application imports",
+      "description": "View imported applications.",
+      "href": "/application-imports/ns/:namespace",
+      "icon": { "$codeRef": "icons.applicationsIconElement" }
     }
   },
   {
