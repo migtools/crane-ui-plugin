@@ -330,7 +330,7 @@ export const ImportWizard: React.FunctionComponent = () => {
                         onNext();
                       }}
                       confirmButtonText="Proceed"
-                      body="You have no persistent volume claims selected for migration. If you proceed, only workloads will be migrated."
+                      body="You have no persistent volume claims selected for migration. If you proceed, only workloads will be imported."
                     />
                   </>
                 );

@@ -10,10 +10,14 @@ import {
   Switch,
   Button,
   Popover,
+  Title,
+  List,
+  ListItem,
 } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import QuestionCircle from '@patternfly/react-icons/dist/esm/icons/question-circle-icon';
 
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -61,47 +65,74 @@ export const ReviewStep: React.FunctionComponent = () => {
   const stagePipelineName = `${pipelineName}-stage`;
   const cutoverPipelineName = isStatefulMigration ? `${pipelineName}-cutover` : pipelineName;
 
-  const summaryThPadding = `${spacing.prXl} ${spacing.pl_0}`;
-
   return (
     <div className={spacing.pbLg}>
       <TextContent className={spacing.mbMd}>
-        <Text component="h2">Review</Text>
+        <Title headingLevel="h2" size="2xl">
+          Review
+        </Title>
         <Text component="p">
           Review the settings for the OpenShift {isStatefulMigration ? 'pipelines' : 'pipeline'}{' '}
           that will be created when you select Finish.
         </Text>
       </TextContent>
-      <TableComposable variant="compact" borders={false} className={spacing.mbLg}>
+      <TableComposable
+        gridBreakPoint="grid"
+        aria-label="Application import review"
+        variant="compact"
+        borders={false}
+        className={spacing.mbLg}
+      >
+        <Thead>
+          <Tr>
+            <Th modifier="nowrap" id="pipeline-name">
+              Pipeline names
+            </Th>
+            <Th modifier="nowrap" id="source-cluster-api-url">
+              Source cluster API URL
+            </Th>
+            <Th modifier="nowrap" id="source-project-name">
+              Source project name
+            </Th>
+            <Th modifier="nowrap" id="persistent-volume-claims">
+              Persistent volume claims
+            </Th>
+          </Tr>
+        </Thead>
         <Tbody>
           <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Pipeline names</strong>
-            </Th>
-            <Td dataLabel="Pipeline names">
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="pipeline-name"
+              dataLabel="Pipeline names"
+            >
               {(isStatefulMigration
                 ? [stagePipelineName, cutoverPipelineName]
                 : [cutoverPipelineName]
               ).join(', ')}
             </Td>
-          </Tr>
-          <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Source cluster API URL</strong>
-            </Th>
-            <Td>{forms.sourceClusterProject.values.apiUrl}</Td>
-          </Tr>
-          <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Source project name</strong>
-            </Th>
-            <Td>{forms.sourceClusterProject.values.sourceNamespace}</Td>
-          </Tr>
-          <Tr>
-            <Th modifier="fitContent" className={summaryThPadding}>
-              <strong>Persistent volume claims</strong>
-            </Th>
-            <Td>
+
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="source-cluster-api-url"
+              dataLabel="Source cluster API URL"
+            >
+              {forms.sourceClusterProject.values.apiUrl}
+            </Td>
+
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="source-project-name"
+              dataLabel="Source project name"
+            >
+              {forms.sourceClusterProject.values.sourceNamespace}
+            </Td>
+
+            <Td
+              className="pf-m-truncate"
+              aria-labelledby="persistent-volume-claims"
+              dataLabel="Persistent volume claims"
+            >
               {forms.pvcSelect.values.selectedPVCs.length > 0 ? (
                 <Popover
                   aria-label="Persistent volume claim details"
@@ -138,7 +169,11 @@ export const ReviewStep: React.FunctionComponent = () => {
                     </TableComposable>
                   }
                 >
-                  <Button variant="link" isInline>
+                  <Button
+                    aria-label={`${forms.pvcSelect.values.selectedPVCs.length} persistent volume claims`}
+                    variant="link"
+                    isInline
+                  >
                     {forms.pvcSelect.values.selectedPVCs.length}
                   </Button>
                 </Popover>
@@ -152,13 +187,79 @@ export const ReviewStep: React.FunctionComponent = () => {
       {isStatefulMigration ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Text component="h3">{stagePipelineName}</Text>
+            <Title headingLevel="h3" size="2xl">
+              {stagePipelineName}
+
+              <Popover
+                bodyContent={
+                  <TextContent>
+                    <Text>
+                      This shows the pipeline tasks for a stage import. During a stage import:
+                    </Text>
+                    <List>
+                      <ListItem>PVC data is synchronized into the active project.</ListItem>
+                      <ListItem>
+                        Workloads are not migrated and remain running in the source cluster.
+                      </ListItem>
+                    </List>
+                    <Text>
+                      A stage pipeline can be re-run multiple times to lower the downtime of a
+                      subsequent cutover import.
+                    </Text>
+                  </TextContent>
+                }
+              >
+                <Button
+                  aria-label="More info for visualization pipeline field"
+                  variant="link"
+                  isInline
+                  className="pf-u-ml-sm"
+                  style={{ color: 'var(--pf-global--palette--white)' }}
+                >
+                  <QuestionCircle />
+                </Button>
+              </Popover>
+            </Title>
           </TextContent>
           <PipelineVisualizationWrapper pipeline={stagePipeline} onUpdate={onVisualizationUpdate} />
         </>
       ) : null}
       <TextContent className={spacing.mbSm}>
-        <Text component="h3">{cutoverPipelineName}</Text>
+        <Title headingLevel="h3" size="xl">
+          {cutoverPipelineName}
+
+          <Popover
+            bodyContent={
+              isStatefulMigration ? (
+                <TextContent>
+                  <Text>
+                    This shows the pipeline tasks for a cutover import. During a cutover import:
+                  </Text>
+                  <List>
+                    <ListItem>All applications on the source namespace are halted.</ListItem>
+                    <ListItem>PVC data is migrated into the active project.</ListItem>
+                    <ListItem>Workloads are migrated into the active project.</ListItem>
+                  </List>
+                  <Text>The cutover pipeline is the final step in a migration project.</Text>
+                </TextContent>
+              ) : (
+                <TextContent>
+                  <Text>This shows the pipeline tasks for the application import</Text>
+                </TextContent>
+              )
+            }
+          >
+            <Button
+              aria-label="More info for visualization pipeline field"
+              variant="link"
+              isInline
+              className="pf-u-ml-sm"
+              style={{ color: 'var(--pf-global--palette--white)' }}
+            >
+              <QuestionCircle />
+            </Button>
+          </Popover>
+        </Title>
       </TextContent>
       <PipelineVisualizationWrapper pipeline={cutoverPipeline} onUpdate={onVisualizationUpdate} />
       <Switch
