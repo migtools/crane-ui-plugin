@@ -27,7 +27,9 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
           <PageSection variant="light">
             <TextContent>
               <Title headingLevel="h1">Application Imports</Title>
-              <Text>Select a "pipeline" to import an application from another cluster.</Text>
+              <Text>
+                Select a &quot;pipeline&quot; to import an application from another cluster.
+              </Text>
             </TextContent>
           </PageSection>
           <AppImports />
