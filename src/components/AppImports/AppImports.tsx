@@ -12,14 +12,18 @@ import {
   KebabToggle,
   DropdownItem,
   Toolbar,
-  // ToolbarItem
+  ToolbarContent,
+  ToolbarItem
 } from '@patternfly/react-core';
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import { useWatchPipelines } from 'src/api/queries/pipelines';
 
 export const AppImports: React.FunctionComponent = () => {
-  // const history = useHistory();
+
   const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
+
+  const pipelines = useWatchPipelines();
 
   const handleTabClick = (event: React.MouseEvent<HTMLElement, MouseEvent>, eventKey: string | number) => {
     setActiveTabKey(eventKey);
@@ -57,8 +61,8 @@ export const AppImports: React.FunctionComponent = () => {
               </GridItem>
 
               <GridItem span={6}>
-                <Button>Copy PVC data</Button>
-                <Button>Cutover</Button>
+                <Button variant="secondary" className="pf-u-mr-sm">Copy PVC data</Button>
+                <Button variant="secondary">Cutover</Button>
                 <Dropdown
                   onSelect={onKebabSelect}
                   toggle={<KebabToggle onToggle={toggleKebabOpen} id="toggle-id-0" />}
@@ -89,7 +93,7 @@ export const AppImports: React.FunctionComponent = () => {
 
           </Tab>
 
-          <Tab eventKey={1} title={<TabTitleText>application-1</TabTitleText>}>
+          <Tab isDisabled eventKey={1} title={<TabTitleText>application-1</TabTitleText>}>
             stub
           </Tab>
 
@@ -98,16 +102,52 @@ export const AppImports: React.FunctionComponent = () => {
       </PageSection>
 
       <PageSection variant="light" type="default" className={spacing.pMd}>
-        <Grid>
+        <Grid hasGutter>
           <GridItem>
             <Title headingLevel="h3">"Pipeline" history</Title>
           </GridItem>
+
           <GridItem>
             <Toolbar>
-              {/* toolbar items */}
+              <ToolbarContent>
+                <ToolbarItem>filter 1</ToolbarItem>
+                <ToolbarItem>filter 2</ToolbarItem>
+                <ToolbarItem>button</ToolbarItem>
+                <ToolbarItem>button</ToolbarItem>
+                <ToolbarItem>kebab-dropdown</ToolbarItem>
+              </ToolbarContent>
             </Toolbar>
-            <div>sortable table here</div>
           </GridItem>
+
+          <GridItem>
+            <TableComposable aria-label="Pipeline history" variant="compact" borders={false} gridBreakPoint="grid-md">
+              <Thead>
+                <Th modifier="nowrap" id="pipeline-run-heading">Pipeline run</Th>
+                <Th modifier="nowrap" id="executed-heading">Executed</Th>
+                <Th modifier="nowrap" id="result-heading">Result</Th>
+                <Th modifier="nowrap" id="delete-heading"></Th>
+              </Thead>
+              <Tbody>
+
+                {pipelines && pipelines.data && pipelines.data.map((el) => {
+                  console.log(el);
+                  return (
+                    <Tr>
+                      <Td className="pf-m-truncate" dataLabel="Pipeline run" aria-labelledby="pipeline-run-heading">{el.metadata?.name}</Td>
+                      <Td className="pf-m-truncate" dataLabel="Executed" aria-labelledby="executed-heading">{el.metadata?.creationTimestamp}</Td>
+                      <Td className="pf-m-truncate" dataLabel="Result" aria-labelledby="result-heading">todo</Td>
+                      <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
+                        <Button variant="secondary" onClick={() => alert('todo')}>Delete</Button>
+                      </Td>
+                    </Tr>
+                  )
+                })}
+
+              </Tbody>
+            </TableComposable>
+
+          </GridItem>
+
         </Grid>
       </PageSection>
     </>
