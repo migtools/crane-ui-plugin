@@ -11,6 +11,23 @@ export interface WizardTektonResources {
   cutoverPipelineRun: PipelineRunKind;
 }
 
+const workspaceVolumeClaimTemplate = {
+  spec: { accessModes: ['ReadWriteOnce'], resources: { requests: { storage: '10Mi' } } },
+};
+
+const pipelineCommon: PipelineKind = {
+  apiVersion: 'tekton.dev/v1beta1',
+  kind: 'Pipeline',
+  spec: {
+    params: [
+      { name: 'source-cluster-secret', type: 'string' },
+      { name: 'source-namespace', type: 'string' },
+      { name: 'destination-cluster-secret', type: 'string' },
+    ],
+    tasks: [],
+  },
+};
+
 export const formsToTektonResources = (
   forms: ImportWizardFormState,
   destinationApiSecret: OAuthSecret,
@@ -20,19 +37,6 @@ export const formsToTektonResources = (
   const { pipelineName } = forms.pipelineSettings.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const isStatefulMigration = selectedPVCs.length > 0;
-
-  const pipelineCommon: PipelineKind = {
-    apiVersion: 'tekton.dev/v1beta1',
-    kind: 'Pipeline',
-    spec: {
-      params: [
-        { name: 'source-cluster-secret', type: 'string' },
-        { name: 'source-namespace', type: 'string' },
-        { name: 'destination-cluster-secret', type: 'string' },
-      ],
-      tasks: [],
-    },
-  };
 
   const pipelineRunCommon: PipelineRunKind = {
     apiVersion: 'tekton.dev/v1beta1',
@@ -45,10 +49,6 @@ export const formsToTektonResources = (
         { name: 'source-namespace', value: sourceNamespace },
       ],
     },
-  };
-
-  const workspaceVolumeClaimTemplate = {
-    spec: { accessModes: ['ReadWriteOnce'], resources: { requests: { storage: '10Mi' } } },
   };
 
   const tasks = getAllPipelineTasks(forms, namespace);
