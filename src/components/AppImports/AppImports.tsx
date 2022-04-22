@@ -19,12 +19,40 @@ import {
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import CaretDownIcon from '@patternfly/react-icons/dist/esm/icons/caret-down-icon';
-import { useWatchPipelines } from 'src/api/queries/pipelines';
+import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
+// import { secretGVK } from 'src/api/queries/secrets';
+// import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
+// import { useCopyPVCDataMutation } from 'src/api/queries/pipelines';
+// import { useNamespaceContext } from 'src/context/NamespaceContext';
+// import { } from 'src/api/pipelineHelpers';
 
-export const AppImports: React.FunctionComponent = () => {
-  const [activeTabKey, setActiveTabKey] = React.useState<string | number>(0);
+interface IAppImportsProps {
+  pipelines: {
+    data: PipelineKind[];
+    loaded: boolean;
+    error: any;
+  };
+  pipelineRuns: {
+    data: PipelineRunKind[];
+    loaded: boolean;
+    error: any;
+  };
+}
 
-  const pipelines = useWatchPipelines();
+export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
+  pipelines,
+  pipelineRuns,
+}: IAppImportsProps) => {
+  // const [pipelineRunSecret, setPipelineRunSecret] = React.useState(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
+
+  // React.useEffect(() => {
+  //   // not this kinda secret, huh?
+  //   setPipelineRunSecret(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
+  // }, [pipelineRuns]);
+
+  // const namespace = useNamespaceContext();
+
+  const [activeTabKey, setActiveTabKey] = React.useState<string | number>('rocket-chat-cutover');
 
   const handleTabClick = (
     event: React.MouseEvent<HTMLElement, MouseEvent>,
@@ -88,85 +116,114 @@ export const AppImports: React.FunctionComponent = () => {
     </DropdownItem>,
   ];
 
+  // const [secretModel] = useK8sModel(secretGVK);
+
+  // const copyPvcData = useCopyPVCDataMutation(() => {
+  //   console.log('started cutover!');
+  // });
+
   return (
     <>
       <PageSection variant="light" type="tabs" className={spacing.pMd}>
         <Tabs activeKey={activeTabKey} onSelect={handleTabClick} isBox>
-          <Tab eventKey={0} title={<TabTitleText>application-0</TabTitleText>}>
-            <Grid hasGutter className={spacing.ptMd}>
-              <GridItem span={6}>
-                <Title headingLevel="h3">application-0</Title>
-              </GridItem>
+          {pipelines.data &&
+            pipelines.data
+              .filter((pipeline) => pipeline.metadata?.name?.includes('-cutover'))
+              .map((pipeline) => {
+                console.log('first ', pipeline);
+                return (
+                  pipeline.metadata?.name && (
+                    <Tab
+                      eventKey={pipeline.metadata.name}
+                      title={<TabTitleText>{pipeline.metadata.name}</TabTitleText>}
+                    >
+                      <Grid hasGutter className={spacing.ptMd}>
+                        <GridItem span={6}>
+                          <Title headingLevel="h3">{pipeline.metadata.name}</Title>
+                        </GridItem>
 
-              <GridItem span={6}>
-                <Button
-                  onClick={() => alert('todo copy pvc data')}
-                  variant="secondary"
-                  className="pf-u-mr-sm"
-                >
-                  Copy PVC data
-                </Button>
-                <Button onClick={() => alert('todo start cutover')} variant="secondary">
-                  Cutover
-                </Button>
-                <Dropdown
-                  onSelect={onAppKebabSelect}
-                  toggle={<KebabToggle onToggle={toggleAppKebabOpen} id="toggle-id-app-kebab" />}
-                  isOpen={isAppKebabOpen}
-                  isPlain
-                  dropdownItems={appDropdownItems}
-                />
-              </GridItem>
+                        <GridItem span={6}>
+                          <Button
+                            onClick={() => {
+                              // const hasPendingRun = pipelineRuns.data.some(run => run.spec.status === 'PipelineRunPending');
+                              // copyPvcData.mutate({hasPendingRun, secrets: [pipelineRunSecret]});
+                            }}
+                            variant="secondary"
+                            className="pf-u-mr-sm"
+                          >
+                            Copy PVC data
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              alert(`todo start cutover for ${pipeline.metadata?.name}`)
+                            }
+                            variant="secondary"
+                          >
+                            Cutover
+                          </Button>
+                          <Dropdown
+                            onSelect={onAppKebabSelect}
+                            toggle={
+                              <KebabToggle onToggle={toggleAppKebabOpen} id="toggle-id-app-kebab" />
+                            }
+                            isOpen={isAppKebabOpen}
+                            isPlain
+                            dropdownItems={appDropdownItems}
+                          />
+                        </GridItem>
 
-              <GridItem>
-                <TableComposable
-                  aria-label="Application import review"
-                  variant="compact"
-                  borders={false}
-                  gridBreakPoint="grid"
-                >
-                  <Thead>
-                    <Th modifier="nowrap" id="source-project-heading">
-                      Source project
-                    </Th>
-                    <Th modifier="nowrap" id="pvc-heading">
-                      Persistant volume claims
-                    </Th>
-                    <Th modifier="nowrap" id="status-heading">
-                      Status
-                    </Th>
-                  </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td
-                        className="pf-m-truncate"
-                        dataLabel="Source project"
-                        aria-labelledby="source-project-heading"
-                      >
-                        my-project
-                      </Td>
-                      <Td
-                        className="pf-m-truncate"
-                        dataLabel="Persistant volume claims"
-                        aria-labelledby="pvc-heading"
-                      >
-                        1
-                      </Td>
-                      <Td
-                        className="pf-m-truncate"
-                        dataLabel="Status"
-                        aria-labelledby="status-heading"
-                      >
-                        Ready
-                      </Td>
-                    </Tr>
-                  </Tbody>
-                </TableComposable>
-              </GridItem>
-            </Grid>
-          </Tab>
+                        <GridItem>
+                          <TableComposable
+                            aria-label="Pipeline import review"
+                            variant="compact"
+                            borders={false}
+                            gridBreakPoint="grid"
+                          >
+                            <Thead>
+                              <Th modifier="nowrap" id="source-project-heading">
+                                Source project
+                              </Th>
+                              <Th modifier="nowrap" id="pvc-heading">
+                                Persistant volume claims
+                              </Th>
+                              <Th modifier="nowrap" id="status-heading">
+                                Status
+                              </Th>
+                            </Thead>
+                            <Tbody>
+                              <Tr>
+                                <Td
+                                  className="pf-m-truncate"
+                                  dataLabel="Source project"
+                                  aria-labelledby="source-project-heading"
+                                >
+                                  my-project
+                                </Td>
+                                <Td
+                                  className="pf-m-truncate"
+                                  dataLabel="Persistant volume claims"
+                                  aria-labelledby="pvc-heading"
+                                >
+                                  1
+                                </Td>
+                                <Td
+                                  className="pf-m-truncate"
+                                  dataLabel="Status"
+                                  aria-labelledby="status-heading"
+                                >
+                                  Ready
+                                </Td>
+                              </Tr>
+                            </Tbody>
+                          </TableComposable>
+                        </GridItem>
+                      </Grid>
+                    </Tab>
+                  )
+                );
+              })}
 
-          <Tab isDisabled eventKey={1} title={<TabTitleText>application-1</TabTitleText>}>
+          <Tab eventKey={1} title={<TabTitleText>stub-application-1</TabTitleText>}>
             stub
           </Tab>
         </Tabs>
@@ -260,26 +317,27 @@ export const AppImports: React.FunctionComponent = () => {
                 <Th modifier="nowrap" id="delete-heading"></Th>
               </Thead>
               <Tbody>
-                {pipelines &&
-                  pipelines.data &&
-                  pipelines.data
-                    .filter((pipeline) => pipeline.metadata?.name?.includes('-stage')) // or filter -cutover?
-                    .map((el) => {
+                {pipelineRuns.data &&
+                  pipelineRuns.data
+                    .filter((pipeline) => pipeline.metadata?.name?.includes('-stage'))
+                    .map((pipeline) => {
+                      console.log('second ', pipeline);
+                      console.log(pipeline?.metadata?.ownerReferences?.[0].uid);
                       return (
-                        <Tr key={`${el.metadata?.name}`}>
+                        <Tr key={`${pipeline.metadata?.name}`}>
                           <Td
                             className="pf-m-truncate"
                             dataLabel="Pipeline run"
                             aria-labelledby="pipeline-run-heading"
                           >
-                            {el.metadata?.name}
+                            {pipeline.metadata?.name}
                           </Td>
                           <Td
                             className="pf-m-truncate"
                             dataLabel="Executed"
                             aria-labelledby="executed-heading"
                           >
-                            {el.metadata?.creationTimestamp}
+                            {pipeline.metadata?.creationTimestamp}
                           </Td>
                           <Td
                             className="pf-m-truncate"
@@ -296,7 +354,7 @@ export const AppImports: React.FunctionComponent = () => {
                             <Button
                               variant="secondary"
                               onClick={() =>
-                                alert(`todo implement delete for ${el.metadata?.name}`)
+                                alert(`todo implement delete for ${pipeline.metadata?.name}`)
                               }
                             >
                               Delete
@@ -306,6 +364,55 @@ export const AppImports: React.FunctionComponent = () => {
                       );
                     })}
               </Tbody>
+
+              {/* <Tbody>
+                {pipelines.data &&
+                  pipelines.data
+                    .filter((pipeline) => pipeline.metadata?.name?.includes('-stage'))
+                    .map((pipeline) => {
+                      console.log('second ', pipeline);
+                      console.log(pipeline?.metadata?.ownerReferences?.[0].uid);
+                      return (
+                        <Tr key={`${pipeline.metadata?.name}`}>
+                          <Td
+                            className="pf-m-truncate"
+                            dataLabel="Pipeline run"
+                            aria-labelledby="pipeline-run-heading"
+                          >
+                            {pipeline.metadata?.name}
+                          </Td>
+                          <Td
+                            className="pf-m-truncate"
+                            dataLabel="Executed"
+                            aria-labelledby="executed-heading"
+                          >
+                            {pipeline.metadata?.creationTimestamp}
+                          </Td>
+                          <Td
+                            className="pf-m-truncate"
+                            dataLabel="Result"
+                            aria-labelledby="result-heading"
+                          >
+                            todo
+                          </Td>
+                          <Td
+                            className="pf-m-truncate"
+                            dataLabel=""
+                            aria-labelledby="delete-heading"
+                          >
+                            <Button
+                              variant="secondary"
+                              onClick={() =>
+                                alert(`todo implement delete for ${pipeline.metadata?.name}`)
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </Td>
+                        </Tr>
+                      );
+                    })}
+              </Tbody> */}
             </TableComposable>
           </GridItem>
         </Grid>

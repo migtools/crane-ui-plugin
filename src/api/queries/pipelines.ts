@@ -11,7 +11,7 @@ import { useMutation } from 'react-query';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { attachOwnerReference, getObjectRef } from 'src/utils/helpers';
 import { WizardTektonResources } from '../pipelineHelpers';
-import { PipelineKind } from '../../reused/pipelines-plugin/src/types';
+import { PipelineKind, PipelineRunKind } from '../../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
 
@@ -36,6 +36,68 @@ export const useWatchPipelines = () => {
     namespace,
   });
   return { data, loaded, error };
+};
+
+export const useWatchPipelineRuns = () => {
+  const namespace = useNamespaceContext();
+  const [data, loaded, error] = useK8sWatchResource<PipelineRunKind[]>({
+    groupVersionKind: pipelineRunGVK,
+    isList: true,
+    namespaced: true,
+    namespace,
+  });
+  return { data, loaded, error };
+};
+
+interface CopyPVCDataParams {
+  hasPendingRun: boolean;
+  secrets: (OAuthSecret | null)[];
+}
+export const useCopyPVCDataMutation = (onSuccess: () => void) => {
+  // const [pipelineModel] = useK8sModel(pipelineGVK);
+  // const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
+
+  const [secretModel] = useK8sModel(secretGVK);
+  return useMutation<any, Error, CopyPVCDataParams>(
+    async ({ secrets, hasPendingRun }) => {
+      // const cutoverPipeline = await k8sCreate({
+      //   model: pipelineModel,
+      //   data: resources.cutoverPipeline,
+      // });
+      // const cutoverPipelineRef = getObjectRef(cutoverPipeline);
+
+      // const createOwnedResource = <T extends K8sResourceCommon>(model: K8sModel, data: T) =>
+      //   k8sCreate({ model, data: attachOwnerReference(data, cutoverPipelineRef) });
+
+      // const [cutoverPipelineRun, stagePipeline, stagePipelineRun] = await Promise.all([
+      //   createOwnedResource(pipelineRunModel, resources.cutoverPipelineRun),
+      //   resources.stagePipeline
+      //     ? createOwnedResource(pipelineModel, resources.stagePipeline)
+      //     : Promise.resolve(null),
+      //   resources.stagePipelineRun
+      //     ? createOwnedResource(pipelineRunModel, resources.stagePipelineRun)
+      //     : Promise.resolve(null),
+      // ]);
+
+      await Promise.all(
+        secrets.map((secret) => {
+          if (!secret) return Promise.resolve();
+          return k8sPatch({
+            model: secretModel,
+            resource: secret,
+            data: [{ op: 'remove', path: '/spec/status' }],
+            // data: [
+            //   !secret.metadata.ownerReferences
+            //     ? { op: 'add', path: '/metadata/ownerReferences', value: [cutoverPipelineRef] }
+            //     : { op: 'add', path: '/metadata/ownerReferences/-', value: cutoverPipelineRef },
+            // ],
+          });
+        }),
+      );
+      // return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
+    },
+    { onSuccess },
+  );
 };
 
 interface CreateTektonResourcesParams {
