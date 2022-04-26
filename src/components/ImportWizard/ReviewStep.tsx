@@ -25,11 +25,13 @@ import { yamlToTektonResources } from 'src/api/pipelineHelpers';
 import { PipelineVisualizationWrapper } from 'src/common/components/PipelineVisualizationWrapper';
 import { columnNames as pvcColumnNames } from './PVCEditStep';
 import { getYamlFieldKeys, YamlFieldKey } from './helpers';
+import { SINGLE_PIPELINE_MODE } from 'src/common/constants';
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
   const { pipelineName } = forms.pipelineSettings.values;
   const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
+  const hasMultiplePipelines = isStatefulMigration && !SINGLE_PIPELINE_MODE;
   const { stagePipeline, cutoverPipeline } = yamlToTektonResources(forms);
 
   // TODO warn somehow if the user is going to override their manual edits here when they go to another step (use isTouched)? not sure how to do that if they use canJumpTo
@@ -40,7 +42,7 @@ export const ReviewStep: React.FunctionComponent = () => {
 
   const [isAdvancedMode, setIsAdvancedMode] = React.useState(false);
 
-  const yamlFieldKeys = getYamlFieldKeys(isStatefulMigration);
+  const yamlFieldKeys = getYamlFieldKeys(hasMultiplePipelines);
 
   const [selectedEditorKey, setSelectedEditorKey] =
     React.useState<YamlFieldKey>('cutoverPipelineYaml');
@@ -63,7 +65,7 @@ export const ReviewStep: React.FunctionComponent = () => {
   };
 
   const stagePipelineName = `${pipelineName}-stage`;
-  const cutoverPipelineName = isStatefulMigration ? `${pipelineName}-cutover` : pipelineName;
+  const cutoverPipelineName = hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName;
 
   return (
     <div className={spacing.pbLg}>
@@ -72,7 +74,7 @@ export const ReviewStep: React.FunctionComponent = () => {
           Review
         </Title>
         <Text component="p">
-          Review the settings for the OpenShift {isStatefulMigration ? 'pipelines' : 'pipeline'}{' '}
+          Review the settings for the OpenShift {hasMultiplePipelines ? 'pipelines' : 'pipeline'}{' '}
           that will be created when you select Finish.
         </Text>
       </TextContent>
@@ -86,7 +88,7 @@ export const ReviewStep: React.FunctionComponent = () => {
         <Thead>
           <Tr>
             <Th modifier="nowrap" id="pipeline-name">
-              Pipeline names
+              Pipeline {hasMultiplePipelines ? 'names' : 'name'}
             </Th>
             <Th modifier="nowrap" id="source-cluster-api-url">
               Source cluster API URL
@@ -106,7 +108,7 @@ export const ReviewStep: React.FunctionComponent = () => {
               aria-labelledby="pipeline-name"
               dataLabel="Pipeline names"
             >
-              {(isStatefulMigration
+              {(hasMultiplePipelines
                 ? [stagePipelineName, cutoverPipelineName]
                 : [cutoverPipelineName]
               ).join(', ')}
@@ -184,7 +186,7 @@ export const ReviewStep: React.FunctionComponent = () => {
           </Tr>
         </Tbody>
       </TableComposable>
-      {isStatefulMigration ? (
+      {hasMultiplePipelines ? (
         <>
           <TextContent className={spacing.mbSm}>
             <Title headingLevel="h3" size="2xl">
@@ -240,7 +242,9 @@ export const ReviewStep: React.FunctionComponent = () => {
                     <ListItem>PVC data is migrated into the active project.</ListItem>
                     <ListItem>Workloads are migrated into the active project.</ListItem>
                   </List>
-                  <Text>The cutover pipeline is the final step in a migration project.</Text>
+                  {hasMultiplePipelines ? (
+                    <Text>The cutover pipeline is the final step in a migration project.</Text>
+                  ) : null}
                 </TextContent>
               ) : (
                 <TextContent>

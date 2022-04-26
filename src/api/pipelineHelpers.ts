@@ -3,6 +3,7 @@ import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardF
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
 import { PipelineKind, PipelineRunKind } from '../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from './types/Secret';
+import { SINGLE_PIPELINE_MODE } from 'src/common/constants';
 
 export interface WizardTektonResources {
   stagePipeline: PipelineKind | null;
@@ -140,6 +141,9 @@ export const formsToTektonResources = (
     },
   };
 
+  if (SINGLE_PIPELINE_MODE) {
+    return { stagePipeline: null, stagePipelineRun: null, cutoverPipeline, cutoverPipelineRun };
+  }
   return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
 };
 
@@ -152,16 +156,18 @@ export const yamlToTektonResources = (
   let stagePipelineRun: PipelineRunKind | null | undefined;
   let cutoverPipeline: PipelineKind | undefined;
   let cutoverPipelineRun: PipelineRunKind | undefined;
-  try {
-    stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as PipelineKind) : null;
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
-  try {
-    stagePipelineRun = stagePipelineRunYaml
-      ? (yaml.load(stagePipelineRunYaml) as PipelineRunKind)
-      : null;
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
+  if (!SINGLE_PIPELINE_MODE) {
+    try {
+      stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as PipelineKind) : null;
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+    try {
+      stagePipelineRun = stagePipelineRunYaml
+        ? (yaml.load(stagePipelineRunYaml) as PipelineRunKind)
+        : null;
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+  }
   try {
     cutoverPipeline = yaml.load(cutoverPipelineYaml) as PipelineKind;
     // eslint-disable-next-line no-empty
