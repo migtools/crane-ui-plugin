@@ -9,10 +9,10 @@
     "build-dev": "yarn clean && yarn ts-node node_modules/.bin/webpack",
     "start": "yarn ts-node node_modules/.bin/webpack serve",
     "start-console": "./dev/start-console.sh",
-    "i18n": "i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
-    "ts-node": "ts-node -O '{\"module\":\"commonjs\"}'",
-    "tsc": "tsc --noEmit",
-    "lint": "eslint ./src",
+    "i18n": "$(yarn bin)/i18next \"src/**/*.{js,jsx,ts,tsx}\" [-oc] -c i18next-parser.config.js",
+    "ts-node": "$(yarn bin)/ts-node -O '{\"module\":\"commonjs\"}'",
+    "tsc": "$(yarn bin)/tsc --noEmit",
+    "lint": "$(yarn bin)/eslint ./src",
     "lint:fix": "yarn lint --fix"
   },
   "devDependencies": {
