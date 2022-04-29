@@ -50,51 +50,37 @@ export const useWatchPipelineRuns = () => {
 };
 
 interface CopyPVCDataParams {
-  hasPendingRun: boolean;
-  secrets: (OAuthSecret | null)[];
+  stagePipelineRun: PipelineRunKind;
+  stagePipeline: PipelineKind;
 }
 export const useCopyPVCDataMutation = (onSuccess: () => void) => {
-  // const [pipelineModel] = useK8sModel(pipelineGVK);
-  // const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
+  const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
 
-  const [secretModel] = useK8sModel(secretGVK);
-  return useMutation<any, Error, CopyPVCDataParams>(
-    async ({ secrets, hasPendingRun }) => {
-      // const cutoverPipeline = await k8sCreate({
-      //   model: pipelineModel,
-      //   data: resources.cutoverPipeline,
-      // });
-      // const cutoverPipelineRef = getObjectRef(cutoverPipeline);
+  // const [secretModel] = useK8sModel(secretGVK);
+  return useMutation<unknown, Error, CopyPVCDataParams>(
+    async ({ stagePipelineRun }) => {
+      console.log(stagePipelineRun.spec.status);
 
-      // const createOwnedResource = <T extends K8sResourceCommon>(model: K8sModel, data: T) =>
-      //   k8sCreate({ model, data: attachOwnerReference(data, cutoverPipelineRef) });
-
-      // const [cutoverPipelineRun, stagePipeline, stagePipelineRun] = await Promise.all([
-      //   createOwnedResource(pipelineRunModel, resources.cutoverPipelineRun),
-      //   resources.stagePipeline
-      //     ? createOwnedResource(pipelineModel, resources.stagePipeline)
-      //     : Promise.resolve(null),
-      //   resources.stagePipelineRun
-      //     ? createOwnedResource(pipelineRunModel, resources.stagePipelineRun)
-      //     : Promise.resolve(null),
-      // ]);
-
-      await Promise.all(
-        secrets.map((secret) => {
-          if (!secret) return Promise.resolve();
-          return k8sPatch({
-            model: secretModel,
-            resource: secret,
-            data: [{ op: 'remove', path: '/spec/status' }],
-            // data: [
-            //   !secret.metadata.ownerReferences
-            //     ? { op: 'add', path: '/metadata/ownerReferences', value: [cutoverPipelineRef] }
-            //     : { op: 'add', path: '/metadata/ownerReferences/-', value: cutoverPipelineRef },
-            // ],
-          });
-        }),
-      );
-      // return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
+      if (stagePipelineRun.spec.status === 'PipelineRunPending') {
+        return k8sPatch({
+          model: pipelineRunModel,
+          resource: stagePipelineRun,
+          data: [{ op: 'remove', path: '/spec/status' }],
+        });
+      } else {
+        // const newPipelineRun = {
+        //   spec: stagePipelineRun.spec,
+        //   metadata: {
+        //     generateName: stagePipeline.metadata.name,
+        //     ownerReferences // same one from the stagePipelinerun.metadata.ornwerReferences
+        //   }
+        // }
+        // return k8sCreate({
+        //   model: pipelineRunModel,
+        //   resource: stagePipelineRun,
+        //   data: ,
+        // })
+      }
     },
     { onSuccess },
   );
