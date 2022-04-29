@@ -30,12 +30,12 @@ interface IAppImportsProps {
   pipelines: {
     data: PipelineKind[];
     loaded: boolean;
-    error: any;
+    error: Error;
   };
   pipelineRuns: {
     data: PipelineRunKind[];
     loaded: boolean;
-    error: any;
+    error: Error;
   };
 }
 
@@ -44,11 +44,6 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
   pipelineRuns,
 }: IAppImportsProps) => {
   // const [pipelineRunSecret, setPipelineRunSecret] = React.useState(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
-
-  // React.useEffect(() => {
-  //   // not this kinda secret, huh?
-  //   setPipelineRunSecret(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
-  // }, [pipelineRuns]);
 
   // const namespace = useNamespaceContext();
 
@@ -128,25 +123,27 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
         <Tabs activeKey={activeTabKey} onSelect={handleTabClick} isBox>
           {pipelines.data &&
             pipelines.data
-              .filter((pipeline) => pipeline.metadata?.name?.includes('-cutover'))
-              .map((pipeline) => {
-                console.log('first ', pipeline);
+              .filter((cutOverPipeline) => cutOverPipeline.metadata?.name?.includes('-cutover'))
+              .map((cutOverPipeline) => {
+                console.log('first ', cutOverPipeline);
                 return (
-                  pipeline.metadata?.name && (
+                  cutOverPipeline.metadata?.name && (
                     <Tab
-                      eventKey={pipeline.metadata.name}
-                      title={<TabTitleText>{pipeline.metadata.name}</TabTitleText>}
+                      eventKey={cutOverPipeline.metadata.name}
+                      title={<TabTitleText>{cutOverPipeline.metadata.name}</TabTitleText>}
                     >
                       <Grid hasGutter className={spacing.ptMd}>
                         <GridItem span={6}>
-                          <Title headingLevel="h3">{pipeline.metadata.name}</Title>
+                          <Title headingLevel="h3">{cutOverPipeline.metadata.name}</Title>
                         </GridItem>
 
                         <GridItem span={6}>
                           <Button
                             onClick={() => {
+                              // stagePipline
+                              // latest stagePipelineRun (filter on ownerReference & "-staged")
                               // const hasPendingRun = pipelineRuns.data.some(run => run.spec.status === 'PipelineRunPending');
-                              // copyPvcData.mutate({hasPendingRun, secrets: [pipelineRunSecret]});
+                              // copyPvcData.mutate({stagePipelineRun, stagePipeline: cutOverPipeline});
                             }}
                             variant="secondary"
                             className="pf-u-mr-sm"
@@ -154,9 +151,9 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
                             Copy PVC data
                           </Button>
                           <Button
-                            onClick={() =>
-                              alert(`todo start cutover for ${pipeline.metadata?.name}`)
-                            }
+                            onClick={() => {
+                              // alert(`todo start cutover for ${pipeline.metadata?.name}`)
+                            }}
                             variant="secondary"
                           >
                             Cutover
