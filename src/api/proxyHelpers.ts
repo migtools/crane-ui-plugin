@@ -9,7 +9,7 @@ import {
 import { OAuthSecret } from './types/Secret';
 import { useSourceApiRootQuery } from './queries/sourceResources';
 import { secretMatchesCredentials } from './queries/secrets';
-// import { PROXY_SERVICE_URL } from 'src/common/constants';
+import { PROXY_SERVICE_URL } from 'src/common/constants';
 
 export interface IProxyK8sResponse<T = unknown> {
   data: T;
@@ -41,20 +41,14 @@ export interface IProxyK8sStatus extends K8sResourceCommon {
   };
 }
 
-export const getSourceClusterApiUrl = (
-  clusterSecret: OAuthSecret | null,
-  temporaryProxyServiceCORSUrl: string, // TODO restore use of PROXY_SERVICE_URL instead of this arg
-) =>
-  `${temporaryProxyServiceCORSUrl}/${clusterSecret?.metadata.namespace}/${clusterSecret?.metadata.name}`;
+export const getSourceClusterApiUrl = (clusterSecret: OAuthSecret | null) =>
+  `${PROXY_SERVICE_URL}/${clusterSecret?.metadata.namespace}/${clusterSecret?.metadata.name}`;
 
-export const getSourceClusterK8sClient = (
-  clusterSecret: OAuthSecret | null,
-  temporaryProxyServiceCORSUrl: string,
-) => {
+export const getSourceClusterK8sClient = (clusterSecret: OAuthSecret | null) => {
   if (!clusterSecret) return null;
   const client = ClientFactory.cluster(
     { access_token: clusterSecret ? atob(clusterSecret.data.token) : '', expiry_time: 0 },
-    getSourceClusterApiUrl(clusterSecret, temporaryProxyServiceCORSUrl),
+    getSourceClusterApiUrl(clusterSecret),
   );
   // TODO we could just return `client` if we added generics support to kube-client in lib-ui
   return {
