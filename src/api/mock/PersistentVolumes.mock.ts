@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'development' || process.env.DATA_SOURCE === 'mock'
     kind: 'PersistentVolume',
     metadata: {
       name: `pv-${nameSuffix}`,
-      namespace: 'openshift-migration',
+      namespace: 'openshift-migration-toolkit',
     },
     spec: {
       capacity: {
@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'development' || process.env.DATA_SOURCE === 'mock'
       storageClassName: 'mock-storage-1',
       claimRef: {
         name: `pvc-${nameSuffix}`,
-        namespace: 'openshift-migration',
+        namespace: 'openshift-migration-toolkit',
       },
     },
     status: {
@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'development' || process.env.DATA_SOURCE === 'mock'
     kind: 'PersistentVolumeClaim',
     metadata: {
       name: `pvc-${nameSuffix}`,
-      namespace: 'openshift-migration',
+      namespace: 'openshift-migration-toolkit',
     },
     spec: {
       volumeMode: 'Filesystem',

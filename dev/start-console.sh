@@ -56,9 +56,9 @@ fi
 PLUGIN_PROXY_JSON=$(
   jq -n -c \
     --arg crane_proxy_api_path "/api/proxy/plugin/crane-ui-plugin/remote-cluster/" \
-    --arg crane_proxy_endpoint "https://$(oc get route -n openshift-migration proxy -o go-template='{{ .spec.host }}')" \
+    --arg crane_proxy_endpoint "https://$(oc get route -n openshift-migration-toolkit proxy -o go-template='{{ .spec.host }}')" \
     --arg secret_service_api_path "/api/proxy/plugin/crane-ui-plugin/secret-service/" \
-    --arg secret_service_endpoint "https://$(oc get route -n openshift-migration secret-service -o go-template='{{ .spec.host }}')" \
+    --arg secret_service_endpoint "https://$(oc get route -n openshift-migration-toolkit secret-service -o go-template='{{ .spec.host }}')" \
     '{
         "services": [
             { "consoleAPIPath": $crane_proxy_api_path, "endpoint": $crane_proxy_endpoint, "authorize": false },
