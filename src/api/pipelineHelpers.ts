@@ -21,6 +21,7 @@ export const formsToTektonResources = (
   const { pipelineName } = forms.pipelineSettings.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const isStatefulMigration = selectedPVCs.length > 0;
+  const hasMultiplePipelines = isStatefulMigration && !SINGLE_PIPELINE_MODE;
 
   const pipelineCommon: PipelineKind = {
     apiVersion: 'tekton.dev/v1beta1',
@@ -54,7 +55,7 @@ export const formsToTektonResources = (
 
   const tasks = getAllPipelineTasks(forms, namespace);
 
-  const stagePipeline: PipelineKind | null = isStatefulMigration
+  const stagePipeline: PipelineKind | null = hasMultiplePipelines
     ? {
         ...pipelineCommon,
         metadata: { name: `${pipelineName}-stage`, namespace },
@@ -73,7 +74,7 @@ export const formsToTektonResources = (
       }
     : null;
 
-  const stagePipelineRun: PipelineRunKind | null = isStatefulMigration
+  const stagePipelineRun: PipelineRunKind | null = hasMultiplePipelines
     ? {
         ...pipelineRunCommon,
         metadata: { generateName: `${pipelineName}-stage-`, namespace },
@@ -87,7 +88,7 @@ export const formsToTektonResources = (
 
   const cutoverPipeline: PipelineKind = {
     ...pipelineCommon,
-    metadata: { name: isStatefulMigration ? `${pipelineName}-cutover` : pipelineName, namespace },
+    metadata: { name: hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName, namespace },
     spec: {
       ...pipelineCommon.spec,
       workspaces: [{ name: 'shared-data' }, { name: 'kubeconfig' }],
@@ -128,12 +129,12 @@ export const formsToTektonResources = (
   const cutoverPipelineRun: PipelineRunKind = {
     ...pipelineRunCommon,
     metadata: {
-      generateName: isStatefulMigration ? `${pipelineName}-cutover-` : `${pipelineName}-`,
+      generateName: hasMultiplePipelines ? `${pipelineName}-cutover-` : `${pipelineName}-`,
       namespace,
     },
     spec: {
       ...pipelineRunCommon.spec,
-      pipelineRef: { name: isStatefulMigration ? `${pipelineName}-cutover` : pipelineName },
+      pipelineRef: { name: hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName },
       workspaces: [
         { name: 'shared-data', volumeClaimTemplate: workspaceVolumeClaimTemplate },
         { name: 'kubeconfig', volumeClaimTemplate: workspaceVolumeClaimTemplate },
