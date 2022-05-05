@@ -21,6 +21,7 @@ import {
 } from 'src/api/queries/sourceResources';
 import { isDefaultStorageClass, useWatchStorageClasses } from 'src/api/queries/storageClasses';
 import { useWatchPVCs } from 'src/api/queries/pvcs';
+import { SINGLE_PIPELINE_MODE } from 'src/common/constants';
 
 export const useImportWizardFormState = () => {
   // Some form field state objects are lifted out of the useFormState calls so they can reference each other
@@ -106,6 +107,7 @@ export const useImportWizardFormState = () => {
   });
 
   const isStatefulMigration = selectedPVCsField.value.length > 0;
+  const hasMultiplePipelines = isStatefulMigration && !SINGLE_PIPELINE_MODE;
 
   const pipelineNameField = useFormField(
     '',
@@ -113,7 +115,7 @@ export const useImportWizardFormState = () => {
   );
 
   const stagePipelineName = `${pipelineNameField.value}-stage`;
-  const cutoverPipelineName = isStatefulMigration
+  const cutoverPipelineName = hasMultiplePipelines
     ? `${pipelineNameField.value}-cutover`
     : pipelineNameField.value;
 
