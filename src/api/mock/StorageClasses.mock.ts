@@ -8,35 +8,35 @@ if (process.env.NODE_ENV === 'development' || process.env.DATA_SOURCE === 'mock'
       kind: 'StorageClass',
       metadata: {
         name: 'default',
-        namespace: 'openshift-migration',
+        namespace: 'openshift-migration-toolkit',
       },
     },
     {
       kind: 'StorageClass',
       metadata: {
         name: 'mock-storage-1',
-        namespace: 'openshift-migration',
+        namespace: 'openshift-migration-toolkit',
       },
     },
     {
       kind: 'StorageClass',
       metadata: {
         name: 'mock-storage-2',
-        namespace: 'openshift-migration',
+        namespace: 'openshift-migration-toolkit',
       },
     },
     {
       kind: 'StorageClass',
       metadata: {
         name: 'mock-storage-3',
-        namespace: 'openshift-migration',
+        namespace: 'openshift-migration-toolkit',
       },
     },
     {
       kind: 'StorageClass',
       metadata: {
         name: 'mock-storage-4',
-        namespace: 'openshift-migration',
+        namespace: 'openshift-migration-toolkit',
       },
     },
   ];

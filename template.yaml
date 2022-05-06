@@ -16,7 +16,7 @@ parameters:
     required: true
   - description: Namespace for your plugin. The namespace will be created by the template.
     name: NAMESPACE
-    value: openshift-migration
+    value: openshift-migration-toolkit
     required: true
   - description: Container image of the plugin.
     name: IMAGE
@@ -148,12 +148,12 @@ objects:
           authorize: false
           service:
             name: proxy
-            namespace: openshift-migration
+            namespace: openshift-migration-toolkit
             port: 8443
         - type: Service
           alias: secret-service
           authorize: true
           service:
             name: secret-service
-            namespace: openshift-migration
+            namespace: openshift-migration-toolkit
             port: 8443
