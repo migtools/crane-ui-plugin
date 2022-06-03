@@ -141,7 +141,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     const { targetPvcName, storageClass, capacity, verifyCopy } = editValues; // TODO where to put verifyCopy?
     console.log('TODO: use verifyCopy flag!', pvc.metadata?.name, verifyCopy);
     return {
-      name: 'transfer-pvc',
+      name: `transfer-pvc-${pvc.metadata?.name}`,
       params: [
         { name: 'source-context', value: 'source' },
         { name: 'source-namespace', value: sourceNamespace },
@@ -150,7 +150,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
         { name: 'dest-pvc-name', value: targetPvcName },
         { name: 'dest-namespace', value: namespace },
         { name: 'dest-storage-class-name', value: storageClass },
-        { name: 'dest-pvc-capacity', value: capacity },
+        { name: 'dest-storage-requests', value: capacity },
         { name: 'endpoint-type', value: 'route' },
       ],
       taskRef: { kind: 'ClusterTask', name: 'crane-transfer-pvc' },
