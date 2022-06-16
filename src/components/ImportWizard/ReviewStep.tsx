@@ -25,13 +25,12 @@ import { yamlToTektonResources } from 'src/api/pipelineHelpers';
 import { PipelineVisualizationWrapper } from 'src/common/components/PipelineVisualizationWrapper';
 import { columnNames as pvcColumnNames } from './PVCEditStep';
 import { getYamlFieldKeys, YamlFieldKey } from './helpers';
-import { SINGLE_PIPELINE_MODE } from 'src/common/constants';
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
   const { pipelineName } = forms.pipelineSettings.values;
   const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
-  const hasMultiplePipelines = isStatefulMigration && !SINGLE_PIPELINE_MODE;
+  const hasMultiplePipelines = isStatefulMigration;
   const { stagePipeline, cutoverPipeline } = yamlToTektonResources(forms);
 
   // TODO warn somehow if the user is going to override their manual edits here when they go to another step (use isTouched)? not sure how to do that if they use canJumpTo
