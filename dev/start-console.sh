@@ -9,7 +9,7 @@ if [ $? -eq 1 ]; then
 fi
 which python3 > /dev/null 2>&1
 if [ $? -eq 1 ]; then
-    echo "You must have python installed and on your path to run this script."
+    echo "You must have python3 installed and on your path to run this script."
     PREREQS_MET=0
 fi
 which jq > /dev/null 2>&1
@@ -45,7 +45,7 @@ fi
 
 if [ ! -f "./dev/tmp/ca.crt" ]; then
     oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
-        jq '.items[0].data."ca.crt"' -r | python -m base64 -d > ./dev/tmp/ca.crt
+        jq '.items[0].data."ca.crt"' -r | python3 -m base64 -d > ./dev/tmp/ca.crt
     echo "Stored CA certificate in ./dev/tmp/ca.crt"
 else
     echo "Reusing existing CA certificate from ./dev/tmp/ca.crt"
