@@ -9,7 +9,7 @@ if [ $? -eq 1 ]; then
 fi
 which python3 > /dev/null 2>&1
 if [ $? -eq 1 ]; then
-    echo "You must have python installed and on your path to run this script."
+    echo "You must have python3 installed and on your path to run this script."
     PREREQS_MET=0
 fi
 which jq > /dev/null 2>&1
@@ -34,21 +34,24 @@ echo
 
 # OAuth setup for running bridge with auth enabled (see https://github.com/openshift/console#openshift-with-authentication)
 
-mkdir -p ./dev/tmp
-if [ ! -f "./dev/tmp/console-client-name" ]; then
-    oc process -f ./dev/dev-oauth-client.yaml | oc apply -f - -o jsonpath='{.metadata.name}' > ./dev/tmp/console-client-name
-    oc get oauthclient "$(cat ./dev/tmp/console-client-name)" -o jsonpath='{.secret}' > ./dev/tmp/console-client-secret
-    echo "Configured new OAuthClient $(cat ./dev/tmp/console-client-name)"
+CONSOLE_ROUTE=$(oc get route -n openshift-console console -o go-template='{{ .spec.host }}')
+TMP_DIR="dev/tmp/$CONSOLE_ROUTE"
+
+mkdir -p "./$TMP_DIR"
+if [ ! -f "./$TMP_DIR/console-client-name" ]; then
+    oc process -f ./dev/dev-oauth-client.yaml | oc apply -f - -o jsonpath='{.metadata.name}' > "./$TMP_DIR/console-client-name"
+    oc get oauthclient "$(cat ./$TMP_DIR/console-client-name)" -o jsonpath='{.secret}' > "./$TMP_DIR/console-client-secret"
+    echo "Configured new OAuthClient $(cat ./$TMP_DIR/console-client-name)"
 else
-    echo "Reusing existing OAuthClient $(cat ./dev/tmp/console-client-name)"
+    echo "Reusing existing OAuthClient $(cat ./$TMP_DIR/console-client-name)"
 fi
 
-if [ ! -f "./dev/tmp/ca.crt" ]; then
+if [ ! -f "./$TMP_DIR/ca.crt" ]; then
     oc get secrets -n default --field-selector type=kubernetes.io/service-account-token -o json | \
-        jq '.items[0].data."ca.crt"' -r | python -m base64 -d > ./dev/tmp/ca.crt
-    echo "Stored CA certificate in ./dev/tmp/ca.crt"
+        jq '.items[0].data."ca.crt"' -r | python3 -m base64 -d > "./$TMP_DIR/ca.crt"
+    echo "Stored CA certificate in ./$TMP_DIR/ca.crt"
 else
-    echo "Reusing existing CA certificate from ./dev/tmp/ca.crt"
+    echo "Reusing existing CA certificate from ./$TMP_DIR/ca.crt"
 fi
 
 # Wrangle the JSON for the --plugin-proxy argument
@@ -81,7 +84,7 @@ source ./contrib/oc-environment.sh
     -plugins crane-ui-plugin=http://localhost:9001/ \
     --plugin-proxy="$PLUGIN_PROXY_JSON" \
     --base-address=http://localhost:9000 \
-    --ca-file="$WD/dev/tmp/ca.crt" \
+    --ca-file="$WD/$TMP_DIR/ca.crt" \
     --k8s-auth=openshift \
     --k8s-mode=off-cluster \
     --k8s-mode-off-cluster-endpoint="$(oc whoami --show-server)" \
@@ -89,9 +92,9 @@ source ./contrib/oc-environment.sh
     --listen=http://127.0.0.1:9000 \
     --public-dir=./frontend/public/dist \
     --user-auth=openshift \
-    --user-auth-oidc-client-id="$(cat $WD/dev/tmp/console-client-name)" \
-    --user-auth-oidc-client-secret-file="$WD/dev/tmp/console-client-secret" \
-    --user-auth-oidc-ca-file="$WD/dev/tmp/ca.crt" \
+    --user-auth-oidc-client-id="$(cat $WD/$TMP_DIR/console-client-name)" \
+    --user-auth-oidc-client-secret-file="$WD/$TMP_DIR/console-client-secret" \
+    --user-auth-oidc-ca-file="$WD/$TMP_DIR/ca.crt" \
     --k8s-mode-off-cluster-alertmanager="$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.alertmanagerPublicURL}')" \
     --k8s-mode-off-cluster-thanos="$(oc -n openshift-config-managed get configmap monitoring-shared-config -o jsonpath='{.data.thanosPublicURL}')"
 

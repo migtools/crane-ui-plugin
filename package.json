@@ -5,6 +5,7 @@
   "repository": "git@github.com:konveyor/crane-ui-plugin.git",
   "scripts": {
     "clean": "rm -rf dist",
+    "clean-dev": "rm -rf dev/tmp",
     "build": "yarn clean && NODE_ENV=production yarn ts-node node_modules/.bin/webpack",
     "build-dev": "yarn clean && yarn ts-node node_modules/.bin/webpack",
     "start": "yarn ts-node node_modules/.bin/webpack serve",
