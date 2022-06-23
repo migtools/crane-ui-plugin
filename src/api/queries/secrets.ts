@@ -1,7 +1,7 @@
 import {
   K8sGroupVersionKind,
   useK8sModel,
-  k8sList,
+  k8sListItems,
   k8sCreate,
   k8sDelete,
   consoleFetch,
@@ -101,7 +101,7 @@ const findExistingSecret = async (
   apiUrl: string,
   sourceOrDestination: 'source' | 'destination',
 ) => {
-  const nsSecrets = await k8sList<Secret>({
+  const nsSecrets = await k8sListItems<Secret>({
     model: secretModel,
     queryParams: { ns: namespace },
   });

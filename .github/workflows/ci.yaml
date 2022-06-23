@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: Typecheck and Lint
+    name: Typecheck, Lint, Build
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -23,3 +23,5 @@ jobs:
         run: yarn tsc
       - name: Run eslint
         run: yarn lint
+      - name: Attempt a build
+        run: yarn build
