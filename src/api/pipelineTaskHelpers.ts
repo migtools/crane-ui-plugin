@@ -1,10 +1,17 @@
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { PipelineTask } from 'src/reused/pipelines-plugin/src/types';
+import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
 export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: string) => {
   const { sourceNamespace } = forms.sourceClusterProject.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const { editValuesByPVC } = forms.pvcEdit.values;
+
+  const pvcRenameMap = function (pvc: PersistentVolumeClaim): string {
+    const editValues = editValuesByPVC[pvc.metadata?.name || ''];
+    const { targetPvcName } = editValues;
+    return `${pvc.metadata?.name}:${targetPvcName}`;
+  };
 
   const generateSourceKubeconfigTask: PipelineTask = {
     name: 'generate-source-kubeconfig',
@@ -44,7 +51,12 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
   const craneTransformTask: PipelineTask = {
     name: 'transform',
     runAfter: ['export'],
-    params: [],
+    params: [
+      {
+        name: 'optional-flags',
+        value: `pvc-rename-map=${selectedPVCs.map(pvcRenameMap).join(',')}`,
+      },
+    ],
     taskRef: { name: 'crane-transform', kind: 'ClusterTask' },
     workspaces: [
       { name: 'export', workspace: 'shared-data', subPath: 'export' },
