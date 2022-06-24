@@ -118,7 +118,7 @@ export const formsToTektonResources = (
         isStatefulMigration
           ? {
               ...tasks.kubectlApplyKustomizeTask,
-              runAfter: ['kustomize-init'],
+              runAfter: ['kustomize-init', ...tasks.transferPvcTasks.map((task) => task.name)],
             }
           : tasks.kubectlApplyKustomizeTask,
       ],
