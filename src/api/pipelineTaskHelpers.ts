@@ -148,12 +148,12 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     workspaces: [{ name: 'kubeconfig', workspace: 'kubeconfig' }],
   };
 
-  const transferPvcTasks: PipelineTask[] = selectedPVCs.map((pvc) => {
+  const transferPvcTasks: PipelineTask[] = selectedPVCs.map((pvc, index) => {
     const editValues = editValuesByPVC[pvc.metadata?.name || ''];
     const { targetPvcName, storageClass, capacity, verifyCopy } = editValues; // TODO where to put verifyCopy?
     console.log('TODO: use verifyCopy flag!', pvc.metadata?.name, verifyCopy);
     return {
-      name: `transfer-pvc-${pvc.metadata?.name}`,
+      name: `transfer-pvc-${index}`,
       params: [
         { name: 'source-context', value: 'source' },
         { name: 'source-namespace', value: sourceNamespace },
