@@ -56,31 +56,27 @@ interface RunStageMutationParams {
 export const useRunStageMutation = (onSuccess: () => void) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
 
-  // const [secretModel] = useK8sModel(secretGVK);
   return useMutation<unknown, Error, RunStageMutationParams>(
-    async ({ stagePipelineRun }) => {
-      console.log(stagePipelineRun.spec.status);
-
+    async ({ stagePipelineRun, stagePipeline }) => {
       if (stagePipelineRun.spec.status === 'PipelineRunPending') {
         return k8sPatch({
           model: pipelineRunModel,
           resource: stagePipelineRun,
           data: [{ op: 'remove', path: '/spec/status' }],
         });
-      } else {
-        // const newPipelineRun = {
-        //   spec: stagePipelineRun.spec,
-        //   metadata: {
-        //     generateName: stagePipeline.metadata.name,
-        //     ownerReferences // same one from the stagePipelinerun.metadata.ornwerReferences
-        //   }
-        // }
-        // return k8sCreate({
-        //   model: pipelineRunModel,
-        //   resource: stagePipelineRun,
-        //   data: ,
-        // })
       }
+      const newPipelineRun: PipelineRunKind = {
+        spec: { ...stagePipelineRun.spec },
+        metadata: {
+          generateName: stagePipeline.metadata?.name || '',
+          ownerReferences: stagePipelineRun.metadata?.ownerReferences,
+        },
+      };
+      delete newPipelineRun.spec.status;
+      return k8sCreate({
+        model: pipelineRunModel,
+        data: newPipelineRun,
+      });
     },
     { onSuccess },
   );
