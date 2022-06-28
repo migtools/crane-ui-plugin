@@ -49,39 +49,6 @@ export const useWatchPipelineRuns = () => {
   return { data, loaded, error };
 };
 
-interface RunStageMutationParams {
-  stagePipelineRun: PipelineRunKind;
-  stagePipeline: PipelineKind;
-}
-export const useRunStageMutation = (onSuccess: () => void) => {
-  const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
-
-  return useMutation<unknown, Error, RunStageMutationParams>(
-    async ({ stagePipelineRun, stagePipeline }) => {
-      if (stagePipelineRun.spec.status === 'PipelineRunPending') {
-        return k8sPatch({
-          model: pipelineRunModel,
-          resource: stagePipelineRun,
-          data: [{ op: 'remove', path: '/spec/status' }],
-        });
-      }
-      const newPipelineRun: PipelineRunKind = {
-        spec: { ...stagePipelineRun.spec },
-        metadata: {
-          generateName: stagePipeline.metadata?.name || '',
-          ownerReferences: stagePipelineRun.metadata?.ownerReferences,
-        },
-      };
-      delete newPipelineRun.spec.status;
-      return k8sCreate({
-        model: pipelineRunModel,
-        data: newPipelineRun,
-      });
-    },
-    { onSuccess },
-  );
-};
-
 interface CreateTektonResourcesParams {
   resources: WizardTektonResources;
   secrets: (OAuthSecret | null)[];
@@ -128,6 +95,39 @@ export const useCreateTektonResourcesMutation = (
         }),
       );
       return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
+    },
+    { onSuccess },
+  );
+};
+
+interface StartPipelineRunParams {
+  pipeline: PipelineKind;
+  latestPipelineRun: PipelineRunKind;
+}
+export const useStartPipelineRunMutation = (onSuccess: () => void) => {
+  const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
+
+  return useMutation<unknown, Error, StartPipelineRunParams>(
+    async ({ pipeline, latestPipelineRun }) => {
+      if (latestPipelineRun.spec.status === 'PipelineRunPending') {
+        return k8sPatch({
+          model: pipelineRunModel,
+          resource: latestPipelineRun,
+          data: [{ op: 'remove', path: '/spec/status' }],
+        });
+      }
+      const newPipelineRun: PipelineRunKind = {
+        spec: { ...latestPipelineRun.spec },
+        metadata: {
+          generateName: pipeline.metadata?.name || '',
+          ownerReferences: latestPipelineRun.metadata?.ownerReferences,
+        },
+      };
+      delete newPipelineRun.spec.status;
+      return k8sCreate({
+        model: pipelineRunModel,
+        data: newPipelineRun,
+      });
     },
     { onSuccess },
   );
