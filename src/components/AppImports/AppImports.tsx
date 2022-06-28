@@ -26,6 +26,14 @@ import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/t
 // import { useRunStageMutation } from 'src/api/queries/pipelines';
 // import { } from 'src/api/pipelineHelpers';
 
+// TODO remove unnecessary toolbar stuff, strip layout down
+// TODO move history stuff under the tabs
+// TODO load pipelines and pipelineruns and group them by all resources owned by each cutover pipeline (runs sorted by latest first?)
+// TODO render a trivial row for each group with buttons for stage and cutover
+// TODO wire up useStartPipelineRunMutation for each button
+// TODO remaining layout, text, stub out progress/status
+// TODO progress/status
+
 interface IAppImportsProps {
   pipelines: {
     data: PipelineKind[];
