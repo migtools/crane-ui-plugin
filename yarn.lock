@@ -150,6 +150,23 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@openshift-console/dynamic-plugin-sdk-internal@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-internal/-/dynamic-plugin-sdk-internal-0.0.10.tgz#59f1e34531c1d759a10d471e875042b87e437b1b"
+  integrity sha512-sKMBt9UOk2SCAJBF7WmOXzGz7maGtTLD5AluMmek0ib9o1/Vb6iYQdOfo6rBPn3uXZhIDe+ZXDbJeNz3jmNHQA==
+  dependencies:
+    "@patternfly/quickstarts" "2.0.1"
+    "@patternfly/react-core" "4.221.3"
+    "@patternfly/react-table" "4.90.3"
+    react "^17.0.1"
+    react-helmet "^6.1.0"
+    react-i18next "^11.7.3"
+    react-redux "7.2.2"
+    react-router "5.2.0"
+    react-router-dom "5.2.0"
+    redux "4.0.1"
+    redux-thunk "2.4.0"
+
 "@openshift-console/dynamic-plugin-sdk-webpack@0.0.7":
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@openshift-console/dynamic-plugin-sdk-webpack/-/dynamic-plugin-sdk-webpack-0.0.7.tgz#9e412fedf4fcb13a030ff93b06fe225a5753ed6d"
@@ -237,7 +254,7 @@
     tippy.js "5.1.2"
     tslib "^2.0.0"
 
-"@patternfly/react-core@^4.135.15", "@patternfly/react-core@^4.214.1", "@patternfly/react-core@^4.221.3":
+"@patternfly/react-core@4.221.3", "@patternfly/react-core@^4.135.15", "@patternfly/react-core@^4.214.1", "@patternfly/react-core@^4.221.3":
   version "4.221.3"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.221.3.tgz#7007be54b37a044ac78ba4243614043e8da7be24"
   integrity sha512-I33TnX5Xn8ypXYjHc7G5kIVsYjB4PnDxxmJG6rBLqFslrnGUBzvb0sflnP43QlI0camamVIoaBRjedj8WXqaRg==
@@ -272,7 +289,7 @@
     lodash "^4.17.19"
     tslib "^2.0.0"
 
-"@patternfly/react-table@^4.90.3":
+"@patternfly/react-table@4.90.3", "@patternfly/react-table@^4.90.3":
   version "4.90.3"
   resolved "https://registry.yarnpkg.com/@patternfly/react-table/-/react-table-4.90.3.tgz#6c4510abf881e19d133add69790f7c49fcdce214"
   integrity sha512-RsSvs1IdvzOFcWgNc42COHfPJ/Dhl8gCHgwnC0ER/yD+IXOOdP+0u7+ZHGfF9+anAHZhQRJ2lGlQnp2HZM8b3A==

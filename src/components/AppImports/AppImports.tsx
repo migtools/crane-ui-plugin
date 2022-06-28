@@ -20,10 +20,10 @@ import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-tab
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import CaretDownIcon from '@patternfly/react-icons/dist/esm/icons/caret-down-icon';
 import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
+// import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 // import { secretGVK } from 'src/api/queries/secrets';
 // import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
 // import { useCopyPVCDataMutation } from 'src/api/queries/pipelines';
-// import { useNamespaceContext } from 'src/context/NamespaceContext';
 // import { } from 'src/api/pipelineHelpers';
 
 interface IAppImportsProps {
@@ -45,7 +45,7 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
 }: IAppImportsProps) => {
   // const [pipelineRunSecret, setPipelineRunSecret] = React.useState(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
 
-  // const namespace = useNamespaceContext();
+  // const [namespace] = useActiveNamespace();
 
   const [activeTabKey, setActiveTabKey] = React.useState<string | number>('rocket-chat-cutover');
 

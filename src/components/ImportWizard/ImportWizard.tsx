@@ -12,7 +12,6 @@ import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard'
 import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
 import { useHistory } from 'react-router-dom';
 
-import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
 import { PVCSelectStep } from './PVCSelectStep';
@@ -33,6 +32,7 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -45,6 +45,7 @@ enum StepId {
 
 export const ImportWizard: React.FunctionComponent = () => {
   const history = useHistory();
+  const [namespace] = useActiveNamespace();
 
   const forms = useImportWizardFormState();
 
@@ -83,8 +84,6 @@ export const ImportWizard: React.FunctionComponent = () => {
     : null;
   const canMoveToStep = (stepId: StepId) =>
     !allNavDisabled && stepId >= 0 && stepIdReached >= stepId;
-
-  const namespace = useNamespaceContext();
 
   const configureDestinationSecretMutation = useConfigureDestinationSecretMutation({
     existingSecretFromState: forms.review.values.destinationApiSecret,
