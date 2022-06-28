@@ -23,7 +23,7 @@ import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/t
 // import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 // import { secretGVK } from 'src/api/queries/secrets';
 // import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
-// import { useCopyPVCDataMutation } from 'src/api/queries/pipelines';
+// import { useRunStageMutation } from 'src/api/queries/pipelines';
 // import { } from 'src/api/pipelineHelpers';
 
 interface IAppImportsProps {
@@ -113,7 +113,7 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
 
   // const [secretModel] = useK8sModel(secretGVK);
 
-  // const copyPvcData = useCopyPVCDataMutation(() => {
+  // const runStageMutation = useRunStageMutation(() => {
   //   console.log('started cutover!');
   // });
 
@@ -143,7 +143,7 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
                               // stagePipline
                               // latest stagePipelineRun (filter on ownerReference & "-staged")
                               // const hasPendingRun = pipelineRuns.data.some(run => run.spec.status === 'PipelineRunPending');
-                              // copyPvcData.mutate({stagePipelineRun, stagePipeline: cutOverPipeline});
+                              // runStageMutation.mutate({stagePipelineRun, stagePipeline: cutOverPipeline});
                             }}
                             variant="secondary"
                             className="pf-u-mr-sm"

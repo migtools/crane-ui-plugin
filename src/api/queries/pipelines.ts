@@ -49,15 +49,15 @@ export const useWatchPipelineRuns = () => {
   return { data, loaded, error };
 };
 
-interface CopyPVCDataParams {
+interface RunStageMutationParams {
   stagePipelineRun: PipelineRunKind;
   stagePipeline: PipelineKind;
 }
-export const useCopyPVCDataMutation = (onSuccess: () => void) => {
+export const useRunStageMutation = (onSuccess: () => void) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
 
   // const [secretModel] = useK8sModel(secretGVK);
-  return useMutation<unknown, Error, CopyPVCDataParams>(
+  return useMutation<unknown, Error, RunStageMutationParams>(
     async ({ stagePipelineRun }) => {
       console.log(stagePipelineRun.spec.status);
 
