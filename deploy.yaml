@@ -20,29 +20,38 @@ spec:
         app: crane-ui-plugin
     spec:
       containers:
-        - name: crane-ui-plugin
-          image: quay.io/konveyor/crane-ui-plugin
-          ports:
-            - containerPort: 9443
-              protocol: TCP
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: plugin-serving-cert
-              readOnly: true
-              mountPath: /var/serving-cert
-            - name: nginx-conf
-              readOnly: true
-              mountPath: /etc/nginx/nginx.conf
-              subPath: nginx.conf
-      volumes:
+      - name: crane-ui-plugin
+        image: quay.io/konveyor/crane-ui-plugin
+        ports:
+        - containerPort: 9443
+          protocol: TCP
+        imagePullPolicy: Always
+        volumeMounts:
         - name: plugin-serving-cert
-          secret:
-            secretName: plugin-serving-cert
-            defaultMode: 420
+          readOnly: true
+          mountPath: /var/serving-cert
         - name: nginx-conf
-          configMap:
-            name: nginx-conf
-            defaultMode: 420
+          readOnly: true
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - name: plugin-serving-cert
+        secret:
+          secretName: plugin-serving-cert
+          defaultMode: 420
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+          defaultMode: 420
       restartPolicy: Always
       dnsPolicy: ClusterFirst
   strategy:
