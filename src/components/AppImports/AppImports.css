@@ -1,0 +1,7 @@
+.pf-m-grid.pf-c-table.summary-table tbody:first-of-type {
+  border-top: 0;
+}
+
+.pf-m-grid.pf-c-table.summary-table tr:last-child {
+  border-bottom: 0;
+}
