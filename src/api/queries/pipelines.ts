@@ -60,6 +60,7 @@ export const useWatchCranePipelineGroups = () => {
     (action: CraneAnnotations['crane-ui-plugin.konveyor.io/action']) =>
     (resource: CranePipeline | CranePipelineRun) =>
       resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] === action;
+  // TODO maybe just go byGroup here? does that create uniqueness problems?
   const byAssociatedCutover =
     (cutoverPipeline: CranePipeline) => (resource: CranePipeline | CranePipelineRun) =>
       resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/associated-cutover-pipeline'] ===
