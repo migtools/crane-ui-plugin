@@ -8,12 +8,13 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-intern
 
 const queryClient = new QueryClient();
 
-// TODO proper spinner / loading state?
+// TODO proper looking loading / empty states
 
 const AppImportsPage: React.FunctionComponent = () => {
   const pipelines = useWatchPipelines();
   const pipelineRuns = useWatchPipelineRuns();
-  const isLoading = !pipelines?.data.length || !pipelineRuns?.data.length;
+  const isLoading = !pipelines.loaded || !pipelineRuns.loaded;
+  const isEmpty = !isLoading && (pipelines?.data.length === 0 || pipelineRuns?.data.length === 0);
 
   const [namespace] = useActiveNamespace();
 
@@ -35,6 +36,8 @@ const AppImportsPage: React.FunctionComponent = () => {
             <h1>TODO: handle all-namespaces case</h1>
           ) : isLoading ? (
             <h1>TODO: spinner</h1>
+          ) : isEmpty ? (
+            <h1>TODO: empty state</h1>
           ) : (
             <AppImports pipelineRuns={pipelineRuns} pipelines={pipelines} />
           )}
