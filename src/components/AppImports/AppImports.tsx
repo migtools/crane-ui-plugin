@@ -153,6 +153,7 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
               toggle={<KebabToggle onToggle={toggleAppKebabOpen} id="toggle-id-app-kebab" />}
               isOpen={isAppKebabOpen}
               isPlain
+              position="right"
               dropdownItems={appDropdownItems}
             />
           </LevelItem>
