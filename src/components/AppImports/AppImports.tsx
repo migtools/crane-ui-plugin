@@ -14,9 +14,9 @@ import {
 } from '@patternfly/react-core';
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
 
 import './AppImports.css';
+import { CranePipeline, CranePipelineRun } from 'src/api/types/Pipeline';
 
 // import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 // import { secretGVK } from 'src/api/queries/secrets';
@@ -36,12 +36,12 @@ import './AppImports.css';
 
 interface IAppImportsProps {
   pipelines: {
-    data: PipelineKind[];
+    data: CranePipeline[];
     loaded: boolean;
     error: Error;
   };
   pipelineRuns: {
-    data: PipelineRunKind[];
+    data: CranePipelineRun[];
     loaded: boolean;
     error: Error;
   };

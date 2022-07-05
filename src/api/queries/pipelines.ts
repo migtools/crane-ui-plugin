@@ -11,9 +11,9 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-intern
 import { useMutation } from 'react-query';
 import { attachOwnerReference, getObjectRef } from 'src/utils/helpers';
 import { WizardTektonResources } from '../pipelineHelpers';
-import { PipelineKind, PipelineRunKind } from '../../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
+import { CranePipeline, CranePipelineRun } from '../types/Pipeline';
 
 export const pipelineGVK: K8sGroupVersionKind = {
   group: 'tekton.dev',
@@ -29,24 +29,36 @@ export const pipelineRunGVK: K8sGroupVersionKind = {
 
 export const useWatchPipelines = () => {
   const [namespace] = useActiveNamespace();
-  const [data, loaded, error] = useK8sWatchResource<PipelineKind[]>({
+  const [data, loaded, error] = useK8sWatchResource<CranePipeline[]>({
     groupVersionKind: pipelineGVK,
     isList: true,
     namespaced: true,
     namespace,
   });
-  return { data, loaded, error };
+  return {
+    data: data.filter(
+      (pipeline) => !!pipeline.metadata.annotations['crane-ui-plugin.konveyor.io/action'],
+    ),
+    loaded,
+    error,
+  };
 };
 
 export const useWatchPipelineRuns = () => {
   const [namespace] = useActiveNamespace();
-  const [data, loaded, error] = useK8sWatchResource<PipelineRunKind[]>({
+  const [data, loaded, error] = useK8sWatchResource<CranePipelineRun[]>({
     groupVersionKind: pipelineRunGVK,
     isList: true,
     namespaced: true,
     namespace,
   });
-  return { data, loaded, error };
+  return {
+    data: data.filter(
+      (pipelineRun) => !!pipelineRun.metadata.annotations['crane-ui-plugin.konveyor.io/action'],
+    ),
+    loaded,
+    error,
+  };
 };
 
 interface CreateTektonResourcesParams {
@@ -101,8 +113,8 @@ export const useCreateTektonResourcesMutation = (
 };
 
 interface StartPipelineRunParams {
-  pipeline: PipelineKind;
-  latestPipelineRun: PipelineRunKind;
+  pipeline: CranePipeline;
+  latestPipelineRun: CranePipelineRun;
 }
 export const useStartPipelineRunMutation = (onSuccess: () => void) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
@@ -116,11 +128,12 @@ export const useStartPipelineRunMutation = (onSuccess: () => void) => {
           data: [{ op: 'remove', path: '/spec/status' }],
         });
       }
-      const newPipelineRun: PipelineRunKind = {
+      const newPipelineRun: CranePipelineRun = {
         spec: { ...latestPipelineRun.spec },
         metadata: {
           generateName: pipeline.metadata?.name || '',
           ownerReferences: latestPipelineRun.metadata?.ownerReferences,
+          annotations: pipeline.metadata.annotations,
         },
       };
       delete newPipelineRun.spec.status;
