@@ -15,8 +15,9 @@ import {
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
+import { CranePipelineGroup } from 'src/api/types/CranePipeline';
+
 import './AppImports.css';
-import { CranePipeline, CranePipelineRun } from 'src/api/types/Pipeline';
 
 // import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 // import { secretGVK } from 'src/api/queries/secrets';
@@ -35,22 +36,10 @@ import { CranePipeline, CranePipelineRun } from 'src/api/types/Pipeline';
 // TODO add a header button for starting a new import / take you to the wizard
 
 interface IAppImportsProps {
-  pipelines: {
-    data: CranePipeline[];
-    loaded: boolean;
-    error: Error;
-  };
-  pipelineRuns: {
-    data: CranePipelineRun[];
-    loaded: boolean;
-    error: Error;
-  };
+  pipelineGroups: CranePipelineGroup[];
 }
 
-export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
-  pipelines,
-  pipelineRuns,
-}: IAppImportsProps) => {
+export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipelineGroups }) => {
   // TODO filter pipelines by cutover and stage - stateless pipelines don't have -cutover suffix, we need an annotation or label to distinguish cutover and stage pipelines
 
   // const [pipelineRunSecret, setPipelineRunSecret] = React.useState(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
@@ -58,7 +47,7 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
   // const [namespace] = useActiveNamespace();
 
   const [activeCutoverPipelineName, setActiveCutoverPipelineName] = React.useState<string | number>(
-    pipelines.data[0].metadata?.name || '', // TODO this needs to come from filtered cutover pipelines
+    pipelineGroups[0].pipelines.cutover.metadata?.name || '', // TODO this needs to come from filtered cutover pipelines
   );
 
   // TODO is this working? does the element exist when focus is attempted? (renders when kebab opens)
@@ -93,10 +82,10 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
   //   console.log('started cutover!');
   // });
 
-  const activeCutoverPipeline = pipelines.data.find(
-    (pipeline) => pipeline.metadata?.name === activeCutoverPipelineName,
+  const activePipelineGroup = pipelineGroups.find(
+    (group) => group.pipelines.cutover.metadata.name === activeCutoverPipelineName,
   );
-  const areTabsVisible = pipelines.data.length > 1;
+  const areTabsVisible = pipelineGroups.length > 1;
 
   return (
     <>
@@ -107,26 +96,20 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
             onSelect={(_event, tabKey) => setActiveCutoverPipelineName(tabKey)}
             className={spacing.pxLg}
           >
-            {pipelines.data &&
-              pipelines.data
-                .filter(() => true) // TODO stateless pipelines don't have -cutover suffix, we need an annotation or label to distinguish cutover and stage pipelines
-                .map((cutoverPipeline) => {
-                  console.log('first ', cutoverPipeline);
-                  return (
-                    cutoverPipeline.metadata?.name && (
-                      <Tab
-                        eventKey={cutoverPipeline.metadata.name}
-                        title={<TabTitleText>{cutoverPipeline.metadata.name}</TabTitleText>}
-                      />
-                    )
-                  );
-                })}
+            {pipelineGroups.map((group) => (
+              <Tab
+                key={group.pipelines.cutover.metadata.name}
+                eventKey={group.pipelines.cutover.metadata.name || ''}
+                title={<TabTitleText>{group.pipelines.cutover.metadata.name}</TabTitleText>}
+              />
+            ))}
           </Tabs>
         </PageSection>
       ) : null}
       <PageSection variant="light" className={spacing.pt_0}>
         <Level hasGutter className={spacing.mbMd}>
-          <Title headingLevel="h3">{activeCutoverPipeline?.metadata?.name}</Title>
+          <Title headingLevel="h3">{activePipelineGroup?.pipelines.cutover.metadata.name}</Title>
+          {/* TODO this will result in '-cutover' being in the tab itself... do we need an annotation for the name prefix / group name? */}
           <LevelItem>
             <Button
               onClick={() => {
@@ -221,48 +204,39 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({
           </Thead>
           {/* TODO - empty-state here? */}
           <Tbody>
-            {pipelineRuns.data &&
-              pipelineRuns.data
-                .filter((pipeline) => pipeline.metadata?.name?.includes('-stage'))
-                .map((pipeline) => {
-                  console.log('second ', pipeline);
-                  console.log(pipeline?.metadata?.ownerReferences?.[0].uid);
-                  return (
-                    <Tr key={`${pipeline.metadata?.name}`}>
-                      <Td
-                        className="pf-m-truncate"
-                        dataLabel="Pipeline run"
-                        aria-labelledby="pipeline-run-heading"
-                      >
-                        {pipeline.metadata?.name}
-                      </Td>
-                      <Td
-                        className="pf-m-truncate"
-                        dataLabel="Executed"
-                        aria-labelledby="executed-heading"
-                      >
-                        {pipeline.metadata?.creationTimestamp}
-                      </Td>
-                      <Td
-                        className="pf-m-truncate"
-                        dataLabel="Result"
-                        aria-labelledby="result-heading"
-                      >
-                        todo
-                      </Td>
-                      <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
-                        <Button
-                          variant="secondary"
-                          onClick={() =>
-                            alert(`todo implement delete for ${pipeline.metadata?.name}`)
-                          }
-                        >
-                          Delete
-                        </Button>
-                      </Td>
-                    </Tr>
-                  );
-                })}
+            {activePipelineGroup?.pipelineRuns.all.map((pipeline) => {
+              console.log('second ', pipeline);
+              console.log(pipeline?.metadata?.ownerReferences?.[0].uid);
+              return (
+                <Tr key={`${pipeline.metadata?.name}`}>
+                  <Td
+                    className="pf-m-truncate"
+                    dataLabel="Pipeline run"
+                    aria-labelledby="pipeline-run-heading"
+                  >
+                    {pipeline.metadata?.name}
+                  </Td>
+                  <Td
+                    className="pf-m-truncate"
+                    dataLabel="Executed"
+                    aria-labelledby="executed-heading"
+                  >
+                    {pipeline.metadata?.creationTimestamp}
+                  </Td>
+                  <Td className="pf-m-truncate" dataLabel="Result" aria-labelledby="result-heading">
+                    todo
+                  </Td>
+                  <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
+                    <Button
+                      variant="secondary"
+                      onClick={() => alert(`todo implement delete for ${pipeline.metadata?.name}`)}
+                    >
+                      Delete
+                    </Button>
+                  </Td>
+                </Tr>
+              );
+            })}
           </Tbody>
 
           {/* <Tbody>

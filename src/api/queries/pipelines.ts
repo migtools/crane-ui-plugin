@@ -13,7 +13,12 @@ import { attachOwnerReference, getObjectRef } from 'src/utils/helpers';
 import { WizardTektonResources } from '../pipelineHelpers';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
-import { CranePipeline, CranePipelineRun } from '../types/Pipeline';
+import {
+  CraneAnnotations,
+  CranePipeline,
+  CranePipelineGroup,
+  CranePipelineRun,
+} from '../types/CranePipeline';
 
 export const pipelineGVK: K8sGroupVersionKind = {
   group: 'tekton.dev',
@@ -29,35 +34,58 @@ export const pipelineRunGVK: K8sGroupVersionKind = {
 
 export const useWatchPipelines = () => {
   const [namespace] = useActiveNamespace();
-  const [data, loaded, error] = useK8sWatchResource<CranePipeline[]>({
+  return useK8sWatchResource<CranePipeline[]>({
     groupVersionKind: pipelineGVK,
     isList: true,
     namespaced: true,
     namespace,
   });
-  return {
-    data: data.filter(
-      (pipeline) => !!pipeline.metadata.annotations['crane-ui-plugin.konveyor.io/action'],
-    ),
-    loaded,
-    error,
-  };
 };
 
 export const useWatchPipelineRuns = () => {
   const [namespace] = useActiveNamespace();
-  const [data, loaded, error] = useK8sWatchResource<CranePipelineRun[]>({
+  return useK8sWatchResource<CranePipelineRun[]>({
     groupVersionKind: pipelineRunGVK,
     isList: true,
     namespaced: true,
     namespace,
   });
+};
+
+export const useWatchCranePipelineGroups = () => {
+  const [pipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
+  const [pipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
+
+  const byAction =
+    (action: CraneAnnotations['crane-ui-plugin.konveyor.io/action']) =>
+    (resource: CranePipeline | CranePipelineRun) =>
+      resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] === action;
+  const byAssociatedCutover =
+    (cutoverPipeline: CranePipeline) => (resource: CranePipeline | CranePipelineRun) =>
+      resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/associated-cutover-pipeline'] ===
+      cutoverPipeline.metadata.name;
+
+  const allStagePipelines = pipelines.filter(byAction('stage'));
+  const allStagePipelineRuns = pipelineRuns.filter(byAction('stage'));
+  const allCutoverPipelines = pipelines.filter(byAction('cutover'));
+  const allCutoverPipelineRuns = pipelineRuns.filter(byAction('cutover'));
+
+  const pipelineGroups: CranePipelineGroup[] = allCutoverPipelines.map((cutoverPipeline) => ({
+    pipelines: {
+      stage: allStagePipelines.find(byAssociatedCutover(cutoverPipeline)) || null,
+      cutover: cutoverPipeline,
+    },
+    pipelineRuns: {
+      stage: allStagePipelineRuns.filter(byAssociatedCutover(cutoverPipeline)),
+      cutover: allCutoverPipelineRuns.filter(byAssociatedCutover(cutoverPipeline)),
+      all: pipelineRuns.filter(byAssociatedCutover(cutoverPipeline)),
+    },
+  }));
+
   return {
-    data: data.filter(
-      (pipelineRun) => !!pipelineRun.metadata.annotations['crane-ui-plugin.konveyor.io/action'],
-    ),
-    loaded,
-    error,
+    pipelineGroups,
+    loaded: pipelinesLoaded && pipelineRunsLoaded,
+    error: pipelinesError || pipelineRunsError,
   };
 };
 

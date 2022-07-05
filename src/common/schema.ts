@@ -65,6 +65,7 @@ export const getPipelineNameSchema = (
   pipelinesWatch: ReturnType<typeof useWatchPipelines>,
   isStatefulMigration: boolean,
 ) => {
+  const [pipelines, pipelinesLoaded] = pipelinesWatch;
   // k8s resource name length is limited to 63 characters.
   let maxLength = 63 - 6; // We will use it as a prefix for generateName, which will add 6 characters.
   if (isStatefulMigration) maxLength -= 8; // We also add a suffix "-stage" or "-cutover", which adds up to 8 characters.
@@ -76,8 +77,8 @@ export const getPipelineNameSchema = (
       'unique-name',
       'A pipeline with this name already exists',
       (value) =>
-        !pipelinesWatch.loaded ||
-        !pipelinesWatch.data?.find(
+        !pipelinesLoaded ||
+        !pipelines?.find(
           (pipeline) =>
             pipeline.metadata?.name === value ||
             (isStatefulMigration &&

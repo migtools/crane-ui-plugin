@@ -2,7 +2,7 @@ import * as yaml from 'js-yaml';
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
 import { OAuthSecret } from './types/Secret';
-import { CranePipeline, CranePipelineRun } from './types/Pipeline';
+import { CranePipeline, CranePipelineRun } from './types/CranePipeline';
 
 export interface WizardTektonResources {
   stagePipeline: CranePipeline | null;
