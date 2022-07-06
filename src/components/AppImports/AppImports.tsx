@@ -19,17 +19,12 @@ import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 
 import './AppImports.css';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
+import { useHistory } from 'react-router-dom';
 
-// import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
-// import { secretGVK } from 'src/api/queries/secrets';
-// import { useK8sModel } from '@openshift-console/dynamic-plugin-sdk';
-// import { useRunStageMutation } from 'src/api/queries/pipelines';
-// import { } from 'src/api/pipelineHelpers';
+import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
 
-// TODO load pipelines and pipelineruns and group them by all resources owned by each cutover pipeline (runs sorted by latest first?)
-// TODO render a tab for each group, buttons for stage/cutover
 // TODO wire up useStartPipelineRunMutation for each button
-// TODO remaining layout, text, stub out progress/status
 // TODO progress/status
 
 // TODO features: stage, cutover, refresh secrets, delete, ???
@@ -41,11 +36,8 @@ interface IAppImportsProps {
 }
 
 export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipelineGroups }) => {
-  // TODO filter pipelines by cutover and stage - stateless pipelines don't have -cutover suffix, we need an annotation or label to distinguish cutover and stage pipelines
-
-  // const [pipelineRunSecret, setPipelineRunSecret] = React.useState(pipelineRuns?.data[0]?.spec?.params?.find(param => param.name === 'source-cluster-secret')?.name);
-
-  // const [namespace] = useActiveNamespace();
+  const [namespace] = useActiveNamespace();
+  const history = useHistory();
 
   const [activeCutoverPipelineName, setActiveCutoverPipelineName] = React.useState<string | number>(
     pipelineGroups[0].pipelines.cutover.metadata?.name || '', // TODO this needs to come from filtered cutover pipelines
@@ -74,6 +66,8 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
   const nonPendingPipelineRuns = activePipelineGroup?.pipelineRuns.all.filter(
     (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
   );
+
+  const deletePipelineMutation = useDeletePipelineMutation();
 
   return (
     <>
@@ -135,17 +129,18 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
                   key="app-delete"
                   component="button"
                   onClick={() =>
-                    alert(
-                      'todo confirm delete cutover pipeline, let ownerReferences handle the others',
-                    )
+                    // TODO add a confirmation dialog!
+                    activePipelineGroup &&
+                    deletePipelineMutation.mutate(activePipelineGroup?.pipelines.cutover)
                   }
+                  isDisabled={deletePipelineMutation.isLoading} // TODO do we maybe want to put the whole page in a loading state while a delete happens?
                 >
                   Delete
                 </DropdownItem>,
                 <DropdownItem
                   key="app-view-pipelies"
                   component="button"
-                  onClick={() => alert('todo navigate to all pipelines in namespace')}
+                  onClick={() => history.push(`/dev-pipelines/ns/${namespace}`)}
                 >
                   View pipelines
                 </DropdownItem>,

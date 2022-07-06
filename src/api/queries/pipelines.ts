@@ -1,5 +1,6 @@
 import {
   k8sCreate,
+  k8sDelete,
   K8sGroupVersionKind,
   k8sPatch,
   K8sResourceCommon,
@@ -177,4 +178,11 @@ export const useStartPipelineRunMutation = (onSuccess: () => void) => {
     },
     { onSuccess },
   );
+};
+
+export const useDeletePipelineMutation = (onSuccess?: () => void) => {
+  const [model] = useK8sModel(pipelineGVK);
+  return useMutation<unknown, Error, CranePipeline>((resource) => k8sDelete({ model, resource }), {
+    onSuccess,
+  });
 };
