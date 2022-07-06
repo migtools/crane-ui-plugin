@@ -42,3 +42,14 @@ export const attachOwnerReference = <T extends K8sResourceCommon>(
     ownerReferences: [...(resource.metadata?.ownerReferences || []), ownerRef as OwnerReference],
   },
 });
+
+export const sortByCreationTimestamp = <T extends K8sResourceCommon>(
+  resources: T[],
+  direction: 'asc' | 'desc',
+) =>
+  [...resources].sort((a, b) => {
+    const [aTimestamp, bTimestamp] = [a, b].map((plr) => plr.metadata?.creationTimestamp || 0);
+    if (aTimestamp < bTimestamp) return direction === 'asc' ? 1 : -1;
+    if (aTimestamp > bTimestamp) return direction === 'asc' ? -1 : 1;
+    return 0;
+  });

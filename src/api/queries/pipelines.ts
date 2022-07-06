@@ -9,7 +9,7 @@ import {
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useMutation } from 'react-query';
-import { attachOwnerReference, getObjectRef } from 'src/utils/helpers';
+import { attachOwnerReference, getObjectRef, sortByCreationTimestamp } from 'src/utils/helpers';
 import { WizardTektonResources } from '../pipelineHelpers';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
@@ -56,6 +56,10 @@ export const useWatchCranePipelineGroups = () => {
   const [pipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
   const [pipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
 
+  // Pipeline tabs show up in creation order, PipelineRun history shows up latest first
+  const sortedPipelines = sortByCreationTimestamp(pipelines, 'asc');
+  const sortedPipelineRuns = sortByCreationTimestamp(pipelineRuns, 'desc');
+
   const byAction =
     (action: CraneAnnotations['crane-ui-plugin.konveyor.io/action']) =>
     (resource: CranePipeline | CranePipelineRun) =>
@@ -66,10 +70,10 @@ export const useWatchCranePipelineGroups = () => {
       resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/associated-cutover-pipeline'] ===
       cutoverPipeline.metadata.name;
 
-  const allStagePipelines = pipelines.filter(byAction('stage'));
-  const allStagePipelineRuns = pipelineRuns.filter(byAction('stage'));
-  const allCutoverPipelines = pipelines.filter(byAction('cutover'));
-  const allCutoverPipelineRuns = pipelineRuns.filter(byAction('cutover'));
+  const allStagePipelines = sortedPipelines.filter(byAction('stage'));
+  const allStagePipelineRuns = sortedPipelineRuns.filter(byAction('stage'));
+  const allCutoverPipelines = sortedPipelines.filter(byAction('cutover'));
+  const allCutoverPipelineRuns = sortedPipelineRuns.filter(byAction('cutover'));
 
   const pipelineGroups: CranePipelineGroup[] = allCutoverPipelines.map((cutoverPipeline) => ({
     pipelines: {

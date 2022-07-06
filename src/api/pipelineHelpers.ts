@@ -2,7 +2,7 @@ import * as yaml from 'js-yaml';
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
 import { OAuthSecret } from './types/Secret';
-import { CranePipeline, CranePipelineRun } from './types/CranePipeline';
+import { CranePipeline, CranePipelineGroup, CranePipelineRun } from './types/CranePipeline';
 
 export interface WizardTektonResources {
   stagePipeline: CranePipeline | null;
@@ -199,3 +199,7 @@ export const yamlToTektonResources = (
   } catch (e) {}
   return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
 };
+
+export const getPipelineGroupSourceNamespace = (group?: CranePipelineGroup) =>
+  (group?.pipelineRuns.all[0].spec.params?.find((param) => param.name === 'source-namespace')
+    ?.value as string) || '';

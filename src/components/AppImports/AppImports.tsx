@@ -18,6 +18,7 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 
 import './AppImports.css';
+import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
 
 // import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 // import { secretGVK } from 'src/api/queries/secrets';
@@ -76,16 +77,16 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
     </DropdownItem>,
   ];
 
-  // const [secretModel] = useK8sModel(secretGVK);
-
-  // const runStageMutation = useRunStageMutation(() => {
-  //   console.log('started cutover!');
-  // });
-
   const activePipelineGroup = pipelineGroups.find(
     (group) => group.pipelines.cutover.metadata.name === activeCutoverPipelineName,
   );
   const areTabsVisible = pipelineGroups.length > 1;
+
+  console.log({ activePipelineGroup });
+
+  const nonPendingPipelineRuns = activePipelineGroup?.pipelineRuns.all.filter(
+    (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
+  );
 
   return (
     <>
@@ -113,19 +114,21 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
           <LevelItem>
             <Button
               onClick={() => {
-                // stagePipline
-                // latest stagePipelineRun (filter on ownerReference & "-staged")
-                // const hasPendingRun = pipelineRuns.data.some(run => run.spec.status === 'PipelineRunPending');
-                // runStageMutation.mutate({stagePipelineRun, stagePipeline: cutoverPipeline});
+                alert(
+                  `todo start stage for ${activePipelineGroup?.pipelines.stage?.metadata?.name}`,
+                );
               }}
               variant="secondary"
               className="pf-u-mr-sm"
+              isAriaDisabled={!activePipelineGroup?.pipelines.stage}
             >
               Stage
             </Button>
             <Button
               onClick={() => {
-                // alert(`todo start cutover for ${pipeline.metadata?.name}`)
+                alert(
+                  `todo start cutover for ${activePipelineGroup?.pipelines.cutover.metadata?.name}`,
+                );
               }}
               variant="secondary"
             >
@@ -149,15 +152,17 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
           className={`summary-table ${spacing.mbLg}`}
         >
           <Thead>
-            <Th modifier="nowrap" id="source-project-heading">
-              Source project
-            </Th>
-            <Th modifier="nowrap" id="pvc-heading">
-              Persistant volume claims
-            </Th>
-            <Th modifier="nowrap" id="status-heading">
-              Status
-            </Th>
+            <Tr>
+              <Th modifier="nowrap" id="source-project-heading">
+                Source project
+              </Th>
+              <Th modifier="nowrap" id="pvc-heading">
+                Persistant volume claims
+              </Th>
+              <Th modifier="nowrap" id="status-heading">
+                Status
+              </Th>
+            </Tr>
           </Thead>
           <Tbody>
             <Tr className={spacing.pl_0}>
@@ -166,128 +171,84 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
                 dataLabel="Source project"
                 aria-labelledby="source-project-heading"
               >
-                my-project
+                {getPipelineGroupSourceNamespace(activePipelineGroup)}
               </Td>
               <Td
                 className="pf-m-truncate"
                 dataLabel="Persistant volume claims"
                 aria-labelledby="pvc-heading"
               >
-                1
+                TODO
               </Td>
               <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="status-heading">
-                Ready
+                TODO
               </Td>
             </Tr>
           </Tbody>
         </TableComposable>
         <Title headingLevel="h3" className={spacing.mbMd}>
-          &quot;Pipeline&quot; history
+          Import pipeline history
         </Title>
-        <TableComposable
-          aria-label="Pipeline history"
-          variant="compact"
-          borders={false}
-          gridBreakPoint="grid-md"
-        >
-          <Thead>
-            <Th modifier="nowrap" id="pipeline-run-heading">
-              Pipeline run
-            </Th>
-            <Th modifier="nowrap" id="executed-heading">
-              Executed
-            </Th>
-            <Th modifier="nowrap" id="result-heading">
-              Result
-            </Th>
-            <Th modifier="nowrap" id="delete-heading"></Th>
-          </Thead>
-          {/* TODO - empty-state here? */}
-          <Tbody>
-            {activePipelineGroup?.pipelineRuns.all.map((pipeline) => {
-              console.log('second ', pipeline);
-              console.log(pipeline?.metadata?.ownerReferences?.[0].uid);
-              return (
-                <Tr key={`${pipeline.metadata?.name}`}>
-                  <Td
-                    className="pf-m-truncate"
-                    dataLabel="Pipeline run"
-                    aria-labelledby="pipeline-run-heading"
-                  >
-                    {pipeline.metadata?.name}
-                  </Td>
-                  <Td
-                    className="pf-m-truncate"
-                    dataLabel="Executed"
-                    aria-labelledby="executed-heading"
-                  >
-                    {pipeline.metadata?.creationTimestamp}
-                  </Td>
-                  <Td className="pf-m-truncate" dataLabel="Result" aria-labelledby="result-heading">
-                    todo
-                  </Td>
-                  <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
-                    <Button
-                      variant="secondary"
-                      onClick={() => alert(`todo implement delete for ${pipeline.metadata?.name}`)}
+        {nonPendingPipelineRuns?.length === 0 ? (
+          <h1>TODO: empty state</h1>
+        ) : (
+          <TableComposable aria-label="Pipeline history" variant="compact">
+            <Thead>
+              <Tr>
+                <Th modifier="nowrap" id="pipeline-run-heading">
+                  Pipeline run
+                </Th>
+                <Th modifier="nowrap" id="executed-heading">
+                  Executed
+                </Th>
+                <Th modifier="nowrap" id="result-heading">
+                  Result
+                </Th>
+                <Th modifier="nowrap" id="delete-heading"></Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {activePipelineGroup?.pipelineRuns.all
+                .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
+                .map((pipelineRun) => (
+                  <Tr key={`${pipelineRun.metadata?.name}`}>
+                    <Td
+                      className="pf-m-truncate"
+                      dataLabel="Pipeline run"
+                      aria-labelledby="pipeline-run-heading"
                     >
-                      Delete
-                    </Button>
-                  </Td>
-                </Tr>
-              );
-            })}
-          </Tbody>
-
-          {/* <Tbody>
-                            {pipelines.data &&
-                              pipelines.data
-                                .filter((pipeline) => pipeline.metadata?.name?.includes('-stage'))
-                                .map((pipeline) => {
-                                  console.log('second ', pipeline);
-                                  console.log(pipeline?.metadata?.ownerReferences?.[0].uid);
-                                  return (
-                                    <Tr key={`${pipeline.metadata?.name}`}>
-                                      <Td
-                                        className="pf-m-truncate"
-                                        dataLabel="Pipeline run"
-                                        aria-labelledby="pipeline-run-heading"
-                                      >
-                                        {pipeline.metadata?.name}
-                                      </Td>
-                                      <Td
-                                        className="pf-m-truncate"
-                                        dataLabel="Executed"
-                                        aria-labelledby="executed-heading"
-                                      >
-                                        {pipeline.metadata?.creationTimestamp}
-                                      </Td>
-                                      <Td
-                                        className="pf-m-truncate"
-                                        dataLabel="Result"
-                                        aria-labelledby="result-heading"
-                                      >
-                                        todo
-                                      </Td>
-                                      <Td
-                                        className="pf-m-truncate"
-                                        dataLabel=""
-                                        aria-labelledby="delete-heading"
-                                      >
-                                        <Button
-                                          variant="secondary"
-                                          onClick={() =>
-                                            alert(`todo implement delete for ${pipeline.metadata?.name}`)
-                                          }
-                                        >
-                                          Delete
-                                        </Button>
-                                      </Td>
-                                    </Tr>
-                                  );
-                                })}
-                          </Tbody> */}
-        </TableComposable>
+                      {pipelineRun.metadata?.name}
+                    </Td>
+                    <Td
+                      className="pf-m-truncate"
+                      dataLabel="Executed"
+                      aria-labelledby="executed-heading"
+                    >
+                      TODO this needs to be time it was removed from pending?
+                      {pipelineRun.metadata?.creationTimestamp}
+                    </Td>
+                    <Td
+                      className="pf-m-truncate"
+                      dataLabel="Result"
+                      aria-labelledby="result-heading"
+                    >
+                      todo
+                    </Td>
+                    <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
+                      <Button
+                        variant="secondary"
+                        onClick={() =>
+                          alert(`todo implement delete for ${pipelineRun.metadata?.name}`)
+                        }
+                      >
+                        Delete
+                      </Button>
+                    </Td>
+                  </Tr>
+                ))}
+            </Tbody>
+          </TableComposable>
+        )}
       </PageSection>
     </>
   );

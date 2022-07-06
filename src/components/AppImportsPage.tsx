@@ -18,13 +18,13 @@ const AppImportsPage: React.FunctionComponent = () => {
   return (
     <>
       <Helmet>
-        <title>Crane - Pipeline Imports</title>
+        <title>Application Imports</title>
       </Helmet>
       <QueryClientProvider client={queryClient}>
         <Page>
           <PageSection variant="light">
             <TextContent>
-              <Title headingLevel="h1">Pipeline Imports</Title>
+              <Title headingLevel="h1">Application Imports</Title>
               {/* TODO does this subheading make sense when we only have one pipeline group / no tabs? */}
               <Text>Select a &quot;pipeline&quot; to import from another cluster.</Text>
             </TextContent>

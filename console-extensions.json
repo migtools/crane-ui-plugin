@@ -22,7 +22,7 @@
       "perspective": "dev",
       "section": "resources",
       "insertAfter": "pipelines",
-      "name": "Import Applications",
+      "name": "Application Imports",
       "href": "/application-imports",
       "namespaced": true
     }
