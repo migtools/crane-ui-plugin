@@ -6,6 +6,7 @@ import { AppImports } from './AppImports/AppImports';
 import { useWatchCranePipelineGroups } from 'src/api/queries/pipelines';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import { useHistory } from 'react-router-dom';
 
 const queryClient = new QueryClient();
 
@@ -13,9 +14,8 @@ const queryClient = new QueryClient();
 
 const AppImportsPage: React.FunctionComponent = () => {
   const { pipelineGroups, loaded, error } = useWatchCranePipelineGroups();
-
   const [namespace] = useActiveNamespace();
-
+  const history = useHistory();
   return (
     <>
       <Helmet>
@@ -30,9 +30,14 @@ const AppImportsPage: React.FunctionComponent = () => {
                 {/* TODO does this subheading make sense when we only have one pipeline group / no tabs? */}
                 <Text>Select a &quot;pipeline&quot; to import from another cluster.</Text>
               </TextContent>
-              <Button className={spacing.mxMd} onClick={() => alert('TODO navigate to wizard')}>
-                Start a new import
-              </Button>
+              {namespace !== '#ALL_NS#' ? (
+                <Button
+                  className={spacing.mxMd}
+                  onClick={() => history.push(`/import-application/ns/${namespace}`)}
+                >
+                  Start a new import
+                </Button>
+              ) : null}
             </Level>
           </PageSection>
           {namespace === '#ALL_NS#' ? (
