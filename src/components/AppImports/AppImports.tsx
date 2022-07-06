@@ -64,19 +64,6 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
     onFocus('toggle-id-app-kebab');
   };
 
-  const appDropdownItems = [
-    <DropdownItem key="app-delete" component="button" onClick={() => alert('todo confirm delete')}>
-      Delete
-    </DropdownItem>,
-    <DropdownItem
-      key="app-view-pipelies"
-      component="button"
-      onClick={() => alert('todo view pipelines')}
-    >
-      View pipelines
-    </DropdownItem>,
-  ];
-
   const activePipelineGroup = pipelineGroups.find(
     (group) => group.pipelines.cutover.metadata.name === activeCutoverPipelineName,
   );
@@ -112,8 +99,10 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
           <Title headingLevel="h3">{activePipelineGroup?.pipelines.cutover.metadata.name}</Title>
           {/* TODO this will result in '-cutover' being in the tab itself... do we need an annotation for the name prefix / group name? */}
           <LevelItem>
+            {/* TODO add tooltip on disabled stage when there are no PVCs */}
             <Button
               onClick={() => {
+                // TODO add a confirm modal here, call mutation, then redirect to PLR page
                 alert(
                   `todo start stage for ${activePipelineGroup?.pipelines.stage?.metadata?.name}`,
                 );
@@ -126,6 +115,7 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
             </Button>
             <Button
               onClick={() => {
+                // TODO add a confirm modal here, call mutation, then redirect to PLR page
                 alert(
                   `todo start cutover for ${activePipelineGroup?.pipelines.cutover.metadata?.name}`,
                 );
@@ -140,7 +130,26 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
               isOpen={isAppKebabOpen}
               isPlain
               position="right"
-              dropdownItems={appDropdownItems}
+              dropdownItems={[
+                <DropdownItem
+                  key="app-delete"
+                  component="button"
+                  onClick={() =>
+                    alert(
+                      'todo confirm delete cutover pipeline, let ownerReferences handle the others',
+                    )
+                  }
+                >
+                  Delete
+                </DropdownItem>,
+                <DropdownItem
+                  key="app-view-pipelies"
+                  component="button"
+                  onClick={() => alert('todo navigate to all pipelines in namespace')}
+                >
+                  View pipelines
+                </DropdownItem>,
+              ]}
             />
           </LevelItem>
         </Level>
@@ -178,10 +187,10 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
                 dataLabel="Persistant volume claims"
                 aria-labelledby="pvc-heading"
               >
-                TODO
+                TODO (number of PVCs)
               </Td>
               <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="status-heading">
-                TODO
+                TODO (status -- basic text, or maybe try to reuse status from pipelines UI)
               </Td>
             </Tr>
           </Tbody>
