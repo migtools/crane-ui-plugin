@@ -19,7 +19,7 @@ import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 
 import './AppImports.css';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
-import { useHistory } from 'react-router-dom';
+import { useRouteMatch, useHistory } from 'react-router-dom';
 
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
@@ -37,11 +37,24 @@ interface IAppImportsProps {
 
 export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipelineGroups }) => {
   const [namespace] = useActiveNamespace();
+  const {
+    params: { importName: activeCutoverPipelineName },
+  } = useRouteMatch<{ importName: string }>();
   const history = useHistory();
 
-  const [activeCutoverPipelineName, setActiveCutoverPipelineName] = React.useState<string | number>(
-    pipelineGroups[0].pipelines.cutover.metadata?.name || '', // TODO this needs to come from filtered cutover pipelines
+  const setActiveCutoverPipelineName = React.useCallback(
+    (name: string, op: 'replace' | 'push' = 'push') =>
+      history[op](`/application-imports/ns/${namespace}/${name}`),
+    [history, namespace],
   );
+
+  console.log({ activeCutoverPipelineName });
+
+  React.useEffect(() => {
+    if (!activeCutoverPipelineName && pipelineGroups[0].pipelines.cutover.metadata?.name) {
+      setActiveCutoverPipelineName(pipelineGroups[0].pipelines.cutover.metadata?.name, 'replace');
+    }
+  }, [activeCutoverPipelineName, pipelineGroups, setActiveCutoverPipelineName]);
 
   // TODO is this working? does the element exist when focus is attempted? (renders when kebab opens)
   const onFocus = (id: string) => {
@@ -69,13 +82,15 @@ export const AppImports: React.FunctionComponent<IAppImportsProps> = ({ pipeline
 
   const deletePipelineMutation = useDeletePipelineMutation();
 
+  if (!activeCutoverPipelineName) return null; // TODO do we want to lift the tabs out to AppImportsPage and have this be part of the spinner case?
+
   return (
     <>
       {areTabsVisible ? (
         <PageSection variant="light" type="tabs" className={`${spacing.pt_0} ${spacing.pbLg}`}>
           <Tabs
             activeKey={activeCutoverPipelineName}
-            onSelect={(_event, tabKey) => setActiveCutoverPipelineName(tabKey)}
+            onSelect={(_event, tabKey) => setActiveCutoverPipelineName(tabKey as string)}
             className={spacing.pxLg}
           >
             {pipelineGroups.map((group) => (

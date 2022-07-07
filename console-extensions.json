@@ -11,7 +11,11 @@
     "type": "console.page/route",
     "properties": {
       "exact": true,
-      "path": ["/application-imports/ns/:namespace", "/application-imports/all-namespaces"],
+      "path": [
+        "/application-imports/ns/:namespace",
+        "/application-imports/ns/:namespace/:importName",
+        "/application-imports/all-namespaces"
+      ],
       "component": { "$codeRef": "AppImportsPage" }
     }
   },
