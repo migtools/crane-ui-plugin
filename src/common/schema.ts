@@ -74,7 +74,7 @@ export const getPipelineGroupNameSchema = (
     .max(maxLength) // So it can be used as the generateName for a PipelineRun, which will add 6 characters
     .test(
       'unique-name',
-      'Pipeline(s) with this group name already exist',
+      'This name has already been used',
       (value) =>
         !pipelinesLoaded ||
         !pipelines?.find(
