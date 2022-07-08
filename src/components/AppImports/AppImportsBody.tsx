@@ -16,7 +16,11 @@ import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-intern
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
-import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
+import {
+  isPipelineRunStarting,
+  useDeletePipelineMutation,
+  useStartPipelineRunMutation,
+} from 'src/api/queries/pipelines';
 
 // TODO confirm modals on all the destructive buttons
 // TODO wire up useStartPipelineRunMutation for each button
@@ -54,6 +58,12 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
     (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
   );
 
+  const startStageMutation = useStartPipelineRunMutation(pipelineGroup, 'stage');
+  const isStageStarting = isPipelineRunStarting(pipelineGroup, startStageMutation);
+  const startCutoverMutation = useStartPipelineRunMutation(pipelineGroup, 'cutover');
+  const isCutoverStarting = isPipelineRunStarting(pipelineGroup, startCutoverMutation);
+  const isSomePipelineRunStarting = isStageStarting || isCutoverStarting;
+
   return (
     <PageSection variant="light" className={spacing.pt_0}>
       <Level hasGutter className={spacing.mbMd}>
@@ -61,22 +71,39 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
         <LevelItem>
           {/* TODO add tooltip on disabled stage when there are no PVCs */}
           <Button
+            id="start-stage-button"
             onClick={() => {
-              // TODO add a confirm modal here, call mutation, then redirect to PLR page maybe?
-              alert(`todo start stage for ${pipelineGroup.pipelines.stage?.metadata?.name}`);
+              // TODO add a confirm modal here
+              startStageMutation.mutate();
             }}
             variant="secondary"
-            className="pf-u-mr-sm"
-            isAriaDisabled={!pipelineGroup.pipelines.stage}
+            className={spacing.mrSm}
+            isAriaDisabled={!pipelineGroup.pipelines.stage || isSomePipelineRunStarting}
+            {...(isStageStarting
+              ? {
+                  spinnerAriaValueText: 'Starting',
+                  spinnerAriaLabelledBy: 'start-stage-button',
+                  isLoading: true,
+                }
+              : {})}
           >
             Stage
           </Button>
           <Button
+            id="start-cutover-button"
             onClick={() => {
-              // TODO add a confirm modal here, call mutation, then redirect to PLR page maybe?
-              alert(`todo start cutover for ${pipelineGroup.pipelines.cutover.metadata?.name}`);
+              // TODO add a confirm modal here
+              startCutoverMutation.mutate();
             }}
             variant="secondary"
+            isAriaDisabled={isSomePipelineRunStarting}
+            {...(isCutoverStarting
+              ? {
+                  spinnerAriaValueText: 'Starting',
+                  spinnerAriaLabelledBy: 'start-stage-button',
+                  isLoading: true,
+                }
+              : {})}
           >
             Cutover
           </Button>

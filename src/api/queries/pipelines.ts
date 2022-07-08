@@ -147,38 +147,39 @@ export const useCreateTektonResourcesMutation = (
   );
 };
 
-interface StartPipelineRunParams {
-  pipeline: CranePipeline;
-  latestPipelineRun: CranePipelineRun;
-}
-export const useStartPipelineRunMutation = (onSuccess: () => void) => {
+export const useStartPipelineRunMutation = (
+  pipelineGroup: CranePipelineGroup,
+  action: 'stage' | 'cutover',
+) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
-
-  return useMutation<unknown, Error, StartPipelineRunParams>(
-    async ({ pipeline, latestPipelineRun }) => {
-      if (latestPipelineRun.spec.status === 'PipelineRunPending') {
-        return k8sPatch({
-          model: pipelineRunModel,
-          resource: latestPipelineRun,
-          data: [{ op: 'remove', path: '/spec/status' }],
-        });
-      }
-      const newPipelineRun: CranePipelineRun = {
-        spec: { ...latestPipelineRun.spec },
-        metadata: {
-          generateName: pipeline.metadata?.name || '',
-          ownerReferences: latestPipelineRun.metadata?.ownerReferences,
-          annotations: pipeline.metadata.annotations,
-        },
-      };
-      delete newPipelineRun.spec.status;
-      return k8sCreate({
+  return useMutation(() => {
+    const pipeline = pipelineGroup.pipelines[action];
+    const latestPipelineRun = pipelineGroup.pipelineRuns[action][0];
+    if (!pipeline || !latestPipelineRun) return Promise.reject('Pipeline or PipelineRun not found');
+    if (latestPipelineRun.spec.status === 'PipelineRunPending') {
+      return k8sPatch({
         model: pipelineRunModel,
-        data: newPipelineRun,
+        resource: latestPipelineRun,
+        data: [{ op: 'remove', path: '/spec/status' }],
       });
-    },
-    { onSuccess },
-  );
+    }
+    const newPipelineRun: CranePipelineRun = {
+      apiVersion: 'tekton.dev/v1beta1',
+      kind: 'PipelineRun',
+      spec: { ...latestPipelineRun.spec },
+      metadata: {
+        generateName: pipeline.metadata?.name || '',
+        namespace: pipeline.metadata.namespace,
+        ownerReferences: latestPipelineRun.metadata?.ownerReferences,
+        annotations: pipeline.metadata.annotations,
+      },
+    };
+    delete newPipelineRun.spec.status;
+    return k8sCreate({
+      model: pipelineRunModel,
+      data: newPipelineRun,
+    });
+  });
 };
 
 export const useDeletePipelineMutation = (onSuccess?: () => void) => {
@@ -187,3 +188,16 @@ export const useDeletePipelineMutation = (onSuccess?: () => void) => {
     onSuccess,
   });
 };
+
+// Until the new PipelineRun appears in the watched pipelineGroup, we still consider it loading/starting
+export const isPipelineRunStarting = (
+  pipelineGroup: CranePipelineGroup,
+  mutation: ReturnType<typeof useStartPipelineRunMutation>,
+) =>
+  mutation.isLoading ||
+  (mutation.isSuccess &&
+    !pipelineGroup.pipelineRuns.all.find(
+      (plr) =>
+        plr.metadata?.name === mutation.data?.metadata.name &&
+        plr.spec.status !== 'PipelineRunPending',
+    ));
