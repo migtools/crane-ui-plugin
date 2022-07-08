@@ -18,6 +18,7 @@ import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
 import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
 
+// TODO navigate to the right tab of the imports page when submitting wizard
 // TODO wire up useStartPipelineRunMutation for each button
 // TODO progress/status
 
@@ -92,8 +93,6 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
                 component="button"
                 onClick={() =>
                   // TODO add a confirmation dialog!
-                  // TODO put the whole page in spinner mode when this is happening?
-                  // TODO why is it causing a lockup?
                   deletePipelineMutation.mutate(pipelineGroup.pipelines.cutover)
                 }
                 isDisabled={deletePipelineMutation.isLoading} // TODO do we maybe want to put the whole page in a loading state while a delete happens?

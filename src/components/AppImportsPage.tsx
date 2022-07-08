@@ -68,6 +68,19 @@ const AppImportsPage: React.FunctionComponent = () => {
 
   const deletePipelineMutation = useDeletePipelineMutation();
 
+  // The onSuccess of deletePipelineMutation is not enough to know the data is gone, we have to wait for useWatchCranePipelineGroups to catch up.
+  // If we just deleted the current group and it no longer exists in the watched groups, reset the deletion state and navigate away from the deleted group's route.
+  React.useEffect(() => {
+    if (
+      deletePipelineMutation.isSuccess &&
+      deletePipelineMutation.variables?.metadata.name === activeCutoverPipelineName &&
+      !activePipelineGroup
+    ) {
+      deletePipelineMutation.reset();
+      history.replace(`/application-imports/ns/${namespace}`);
+    }
+  }, [activeCutoverPipelineName, activePipelineGroup, deletePipelineMutation, history, namespace]);
+
   return (
     <Page>
       <PageSection variant="light">
@@ -94,7 +107,7 @@ const AppImportsPage: React.FunctionComponent = () => {
         <h1>TODO: handle error case</h1>
       ) : loaded && pipelineGroups.length === 0 ? (
         <h1>TODO: empty state w/ button</h1>
-      ) : !loaded || !activePipelineGroup || deletePipelineMutation.isLoading ? (
+      ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
         <h1>TODO: spinner</h1>
       ) : (
         <>
