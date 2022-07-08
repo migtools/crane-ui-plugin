@@ -190,7 +190,7 @@ export const ReviewStep: React.FunctionComponent = () => {
       {hasMultiplePipelines ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Title headingLevel="h3" size="2xl">
+            <Title headingLevel="h3" size="xl">
               {stagePipelineName}
 
               <Popover
