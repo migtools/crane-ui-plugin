@@ -28,7 +28,7 @@ import { getYamlFieldKeys, YamlFieldKey } from './helpers';
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
-  const { pipelineName } = forms.pipelineSettings.values;
+  const { pipelineGroupName } = forms.pipelineSettings.values;
   const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
   const hasMultiplePipelines = isStatefulMigration;
   const { stagePipeline, cutoverPipeline } = yamlToTektonResources(forms);
@@ -63,8 +63,10 @@ export const ReviewStep: React.FunctionComponent = () => {
     if (hasTouchedEditor && isAdvancedMode) scrollToEditor();
   };
 
-  const stagePipelineName = `${pipelineName}-stage`;
-  const cutoverPipelineName = hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName;
+  const stagePipelineName = `${pipelineGroupName}-stage`;
+  const cutoverPipelineName = hasMultiplePipelines
+    ? `${pipelineGroupName}-cutover`
+    : pipelineGroupName;
 
   return (
     <div className={spacing.pbLg}>

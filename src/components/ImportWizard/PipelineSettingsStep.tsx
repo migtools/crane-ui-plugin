@@ -15,12 +15,16 @@ export const PipelineSettingsStep: React.FunctionComponent = () => {
         <Text component="h2">Import pipeline settings</Text>
         <Text component="p">
           {isStatefulMigration
-            ? 'Enter a name prefix for the OpenShift pipelines that will drive the tasks required to import your application.'
+            ? 'Enter a name for the group of OpenShift pipelines that will drive the tasks required to import your application.'
             : 'Enter a name for the OpenShift pipeline that will drive the tasks required to import your application.'}
         </Text>
       </TextContent>
       <Form isWidthLimited>
-        <ValidatedTextInput field={form.fields.pipelineName} isRequired fieldId="pipeline-name" />
+        <ValidatedTextInput
+          field={form.fields.pipelineGroupName}
+          isRequired
+          fieldId="pipeline-group-name"
+        />
       </Form>
     </>
   );

@@ -17,11 +17,13 @@ export const formsToTektonResources = (
   namespace: string,
 ): WizardTektonResources => {
   const { sourceNamespace, sourceApiSecret } = forms.sourceClusterProject.values;
-  const { pipelineName: namePrefix } = forms.pipelineSettings.values;
+  const { pipelineGroupName } = forms.pipelineSettings.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const isStatefulMigration = selectedPVCs.length > 0;
   const hasMultiplePipelines = isStatefulMigration;
-  const cutoverPipelineName = hasMultiplePipelines ? `${namePrefix}-cutover` : namePrefix;
+  const cutoverPipelineName = hasMultiplePipelines
+    ? `${pipelineGroupName}-cutover`
+    : pipelineGroupName;
 
   const pipelineCommon: Partial<CranePipeline> = {
     apiVersion: 'tekton.dev/v1beta1',
@@ -59,11 +61,11 @@ export const formsToTektonResources = (
     ? {
         ...pipelineCommon,
         metadata: {
-          name: `${namePrefix}-stage`,
+          name: `${pipelineGroupName}-stage`,
           namespace,
           annotations: {
             'crane-ui-plugin.konveyor.io/action': 'stage',
-            'crane-ui-plugin.konveyor.io/associated-cutover-pipeline': cutoverPipelineName,
+            'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
           },
         },
         spec: {
@@ -85,16 +87,16 @@ export const formsToTektonResources = (
     ? {
         ...pipelineRunCommon,
         metadata: {
-          generateName: `${namePrefix}-stage-`,
+          generateName: `${pipelineGroupName}-stage-`,
           namespace,
           annotations: {
             'crane-ui-plugin.konveyor.io/action': 'stage',
-            'crane-ui-plugin.konveyor.io/associated-cutover-pipeline': cutoverPipelineName,
+            'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
           },
         },
         spec: {
           ...pipelineRunCommon.spec,
-          pipelineRef: { name: `${namePrefix}-stage` },
+          pipelineRef: { name: `${pipelineGroupName}-stage` },
           workspaces: [{ name: 'kubeconfig', volumeClaimTemplate: workspaceVolumeClaimTemplate }],
         },
       }
@@ -107,7 +109,7 @@ export const formsToTektonResources = (
       namespace,
       annotations: {
         'crane-ui-plugin.konveyor.io/action': 'cutover',
-        'crane-ui-plugin.konveyor.io/associated-cutover-pipeline': cutoverPipelineName,
+        'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
       },
     },
     spec: {
@@ -150,11 +152,13 @@ export const formsToTektonResources = (
   const cutoverPipelineRun: CranePipelineRun = {
     ...pipelineRunCommon,
     metadata: {
-      generateName: hasMultiplePipelines ? `${namePrefix}-cutover-` : `${namePrefix}-`,
+      generateName: hasMultiplePipelines
+        ? `${pipelineGroupName}-cutover-`
+        : `${pipelineGroupName}-`,
       namespace,
       annotations: {
         'crane-ui-plugin.konveyor.io/action': 'cutover',
-        'crane-ui-plugin.konveyor.io/associated-cutover-pipeline': cutoverPipelineName,
+        'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
       },
     },
     spec: {

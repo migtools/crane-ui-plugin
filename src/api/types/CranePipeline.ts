@@ -2,7 +2,7 @@ import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/t
 
 export type CraneAnnotations = {
   'crane-ui-plugin.konveyor.io/action': 'stage' | 'cutover';
-  'crane-ui-plugin.konveyor.io/associated-cutover-pipeline': string; // TODO should we replace this with group name? just the prefix from the wizard? Maybe replace instances of namePrefix with groupName if we're doing that
+  'crane-ui-plugin.konveyor.io/group': string;
 };
 
 export type CranePipeline = PipelineKind & {
@@ -14,6 +14,7 @@ export type CranePipelineRun = PipelineRunKind & {
 };
 
 export interface CranePipelineGroup {
+  name: string;
   pipelines: {
     stage: CranePipeline | null;
     cutover: CranePipeline;

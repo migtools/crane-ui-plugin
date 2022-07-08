@@ -125,10 +125,9 @@ export const ImportWizard: React.FunctionComponent = () => {
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
     // On success, navigate to the app imports page!
-    // TODO use group name here instead of cutover pipeline name once we adjust those annotations
-    history.push(
-      `/application-imports/ns/${namespace}/${newResources.cutoverPipeline.metadata.name}`,
-    );
+    const newPipelineGroupName =
+      newResources.cutoverPipeline.metadata.annotations?.['crane-ui-plugin.konveyor.io/group'];
+    history.push(`/application-imports/ns/${namespace}/${newPipelineGroupName}`);
   });
 
   const onSubmitWizard = () => {

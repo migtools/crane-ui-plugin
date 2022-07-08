@@ -57,8 +57,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
   return (
     <PageSection variant="light" className={spacing.pt_0}>
       <Level hasGutter className={spacing.mbMd}>
-        <Title headingLevel="h3">{pipelineGroup.pipelines.cutover.metadata.name}</Title>
-        {/* TODO this will result in '-cutover' being in the tab itself... do we need an annotation for the name prefix / group name? */}
+        <Title headingLevel="h3">{pipelineGroup.name}</Title>
         <LevelItem>
           {/* TODO add tooltip on disabled stage when there are no PVCs */}
           <Button

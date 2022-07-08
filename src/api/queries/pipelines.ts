@@ -54,37 +54,38 @@ export const useWatchPipelineRuns = () => {
 };
 
 export const useWatchCranePipelineGroups = () => {
-  const [pipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
-  const [pipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
+  const [watchedPipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
+  const [watchedPipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
 
   // Pipeline tabs show up in creation order, PipelineRun history shows up latest first
-  const sortedPipelines = sortByCreationTimestamp(pipelines, 'asc');
-  const sortedPipelineRuns = sortByCreationTimestamp(pipelineRuns, 'desc');
+  const allPipelines = sortByCreationTimestamp(watchedPipelines, 'asc');
+  const allPipelineRuns = sortByCreationTimestamp(watchedPipelineRuns, 'desc');
 
   const byAction =
     (action: CraneAnnotations['crane-ui-plugin.konveyor.io/action']) =>
-    (resource: CranePipeline | CranePipelineRun) =>
-      resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] === action;
-  // TODO maybe just go byGroup here? does that create uniqueness problems?
-  const byAssociatedCutover =
-    (cutoverPipeline: CranePipeline) => (resource: CranePipeline | CranePipelineRun) =>
-      resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/associated-cutover-pipeline'] ===
-      cutoverPipeline.metadata.name;
+    (resourceBeingFiltered: CranePipeline | CranePipelineRun) =>
+      resourceBeingFiltered.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] === action;
+  const bySameGroup =
+    (resourceBeingCompared: CranePipeline | CranePipelineRun) =>
+    (resourceBeingFiltered: CranePipeline | CranePipelineRun) =>
+      resourceBeingFiltered.metadata.annotations?.['crane-ui-plugin.konveyor.io/group'] ===
+      resourceBeingCompared.metadata.annotations?.['crane-ui-plugin.konveyor.io/group'];
 
-  const allStagePipelines = sortedPipelines.filter(byAction('stage'));
-  const allStagePipelineRuns = sortedPipelineRuns.filter(byAction('stage'));
-  const allCutoverPipelines = sortedPipelines.filter(byAction('cutover'));
-  const allCutoverPipelineRuns = sortedPipelineRuns.filter(byAction('cutover'));
+  const allStagePipelines = allPipelines.filter(byAction('stage'));
+  const allStagePipelineRuns = allPipelineRuns.filter(byAction('stage'));
+  const allCutoverPipelines = allPipelines.filter(byAction('cutover'));
+  const allCutoverPipelineRuns = allPipelineRuns.filter(byAction('cutover'));
 
   const pipelineGroups: CranePipelineGroup[] = allCutoverPipelines.map((cutoverPipeline) => ({
+    name: cutoverPipeline.metadata?.annotations?.['crane-ui-plugin.konveyor.io/group'] || '',
     pipelines: {
-      stage: allStagePipelines.find(byAssociatedCutover(cutoverPipeline)) || null,
+      stage: allStagePipelines.find(bySameGroup(cutoverPipeline)) || null,
       cutover: cutoverPipeline,
     },
     pipelineRuns: {
-      stage: allStagePipelineRuns.filter(byAssociatedCutover(cutoverPipeline)),
-      cutover: allCutoverPipelineRuns.filter(byAssociatedCutover(cutoverPipeline)),
-      all: pipelineRuns.filter(byAssociatedCutover(cutoverPipeline)),
+      stage: allStagePipelineRuns.filter(bySameGroup(cutoverPipeline)),
+      cutover: allCutoverPipelineRuns.filter(bySameGroup(cutoverPipeline)),
+      all: allPipelineRuns.filter(bySameGroup(cutoverPipeline)),
     },
   }));
 

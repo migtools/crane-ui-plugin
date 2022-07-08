@@ -13,7 +13,7 @@
       "exact": true,
       "path": [
         "/application-imports/ns/:namespace",
-        "/application-imports/ns/:namespace/:importName",
+        "/application-imports/ns/:namespace/:pipelineGroupName",
         "/application-imports/all-namespaces"
       ],
       "component": { "$codeRef": "AppImportsPage" }

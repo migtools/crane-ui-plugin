@@ -7,7 +7,7 @@ import { getCapacity } from 'src/utils/helpers';
 import {
   capacitySchema,
   dnsLabelNameSchema,
-  getPipelineNameSchema,
+  getPipelineGroupNameSchema,
   getSourceNamespaceSchema,
   getTargetPVCNameSchema,
   yamlSchema,
@@ -108,15 +108,17 @@ export const useImportWizardFormState = () => {
   const isStatefulMigration = selectedPVCsField.value.length > 0;
   const hasMultiplePipelines = isStatefulMigration;
 
-  const pipelineNameField = useFormField(
+  const pipelineGroupNameField = useFormField(
     '',
-    getPipelineNameSchema(useWatchPipelines(), isStatefulMigration),
+    getPipelineGroupNameSchema(useWatchPipelines(), isStatefulMigration).label(
+      hasMultiplePipelines ? 'Pipeline group name' : 'Pipeline name',
+    ),
   );
 
-  const stagePipelineName = `${pipelineNameField.value}-stage`;
+  const stagePipelineName = `${pipelineGroupNameField.value}-stage`;
   const cutoverPipelineName = hasMultiplePipelines
-    ? `${pipelineNameField.value}-cutover`
-    : pipelineNameField.value;
+    ? `${pipelineGroupNameField.value}-cutover`
+    : pipelineGroupNameField.value;
 
   const forms = {
     sourceClusterProject: useFormState(
@@ -138,7 +140,7 @@ export const useImportWizardFormState = () => {
       editValuesByPVC: editValuesByPVCField,
     }),
     pipelineSettings: useFormState({
-      pipelineName: pipelineNameField,
+      pipelineGroupName: pipelineGroupNameField,
     }),
     review: useFormState({
       destinationApiSecret: useFormField<OAuthSecret | null>(null, yup.mixed()),
