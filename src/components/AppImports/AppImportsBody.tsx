@@ -94,14 +94,16 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
                   // TODO add a confirmation dialog!
                   deletePipelineMutation.mutate(pipelineGroup.pipelines.cutover)
                 }
-                isDisabled={deletePipelineMutation.isLoading} // TODO do we maybe want to put the whole page in a loading state while a delete happens?
+                isDisabled={deletePipelineMutation.isLoading}
               >
                 Delete
               </DropdownItem>,
               <DropdownItem
                 key="app-view-pipelies"
                 component="button"
-                onClick={() => history.push(`/dev-pipelines/ns/${namespace}`)}
+                onClick={() =>
+                  history.push(`/dev-pipelines/ns/${namespace}?name=${pipelineGroup.name}`)
+                }
               >
                 View pipelines
               </DropdownItem>,
@@ -143,7 +145,9 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
               dataLabel="Persistant volume claims"
               aria-labelledby="pvc-heading"
             >
-              TODO (number of PVCs)
+              {pipelineGroup.pipelines.stage?.spec.tasks.filter(
+                (task) => task.taskRef?.name === 'crane-transfer-pvc',
+              ).length || 0}
             </Td>
             <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="status-heading">
               TODO (status -- basic text, or maybe try to reuse status from pipelines UI)
