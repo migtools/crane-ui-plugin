@@ -18,7 +18,7 @@ import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
 import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
 
-// TODO navigate to the right tab of the imports page when submitting wizard
+// TODO confirm modals on all the destructive buttons
 // TODO wire up useStartPipelineRunMutation for each button
 // TODO progress/status
 

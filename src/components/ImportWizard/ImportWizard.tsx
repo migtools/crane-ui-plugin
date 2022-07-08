@@ -124,15 +124,10 @@ export const ImportWizard: React.FunctionComponent = () => {
     React.useState(false);
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
-    // On success, navigate to the Tekton UI!
-    const pipelineRuns = [newResources.stagePipelineRun, newResources.cutoverPipelineRun].filter(
-      (plr) => !!plr,
-    );
-    const pipelineRunsUrl = `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun`;
+    // On success, navigate to the app imports page!
+    // TODO use group name here instead of cutover pipeline name once we adjust those annotations
     history.push(
-      pipelineRuns.length === 1
-        ? `${pipelineRunsUrl}/${newResources.cutoverPipelineRun.metadata?.name}`
-        : pipelineRunsUrl,
+      `/application-imports/ns/${namespace}/${newResources.cutoverPipeline.metadata.name}`,
     );
   });
 
