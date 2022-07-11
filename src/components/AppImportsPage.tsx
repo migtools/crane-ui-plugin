@@ -13,12 +13,14 @@ import {
   Tab,
   Tabs,
   TabTitleText,
+  Alert,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useDeletePipelineMutation, useWatchCranePipelineGroups } from 'src/api/queries/pipelines';
 import { AppImportsBody } from './AppImports/AppImportsBody';
 import './AppImports/AppImports.css';
+import { watchErrorToString } from 'src/utils/helpers';
 
 const queryClient = new QueryClient();
 
@@ -104,7 +106,13 @@ const AppImportsPage: React.FunctionComponent = () => {
       {namespace === '#ALL_NS#' ? (
         <h1>TODO: handle all-namespaces case</h1>
       ) : error ? (
-        <h1>TODO: handle error case</h1>
+        <Alert
+          variant="danger"
+          title="Cannot load Pipelines and PipelineRuns"
+          className={spacing.mLg}
+        >
+          {watchErrorToString(error)}
+        </Alert>
       ) : loaded && pipelineGroups.length === 0 ? (
         <h1>TODO: empty state w/ button</h1>
       ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (

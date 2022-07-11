@@ -2,6 +2,7 @@ import {
   K8sResourceCommon,
   ObjectReference,
   OwnerReference,
+  WatchK8sResult,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
@@ -53,3 +54,11 @@ export const sortByCreationTimestamp = <T extends K8sResourceCommon>(
     if (aTimestamp > bTimestamp) return direction === 'asc' ? 1 : -1;
     return 0;
   });
+
+export const watchErrorToString = (error: WatchK8sResult<K8sResourceCommon>[2]) => {
+  if (!error) return;
+  if (error.name && error.message) return `${error.name}: ${error.message}`;
+  if (error.message) return error.message;
+  if (error.toString) return error.toString();
+  return 'Unknown error';
+};
