@@ -127,7 +127,7 @@ export const ImportWizard: React.FunctionComponent = () => {
     // On success, navigate to the app imports page!
     const newPipelineGroupName =
       newResources.cutoverPipeline.metadata.annotations?.['crane-ui-plugin.konveyor.io/group'];
-    history.push(`/application-imports/ns/${namespace}/${newPipelineGroupName}`);
+    history.push(`/app-imports/ns/${namespace}/${newPipelineGroupName}`);
   });
 
   const onSubmitWizard = () => {

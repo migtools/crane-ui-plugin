@@ -27,7 +27,6 @@ import { watchErrorToString } from 'src/utils/helpers';
 
 import { AppImportsBody } from './AppImports/AppImportsBody';
 import './AppImports/AppImports.css';
-import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 
 const queryClient = new QueryClient();
 
@@ -54,7 +53,7 @@ const AppImportsPage: React.FunctionComponent = () => {
 
   const setActivePipelineGroupName = React.useCallback(
     (name: string, op: 'push' | 'replace' = 'push') =>
-      history[op](`/application-imports/ns/${namespace}/${name}`),
+      history[op](`/app-imports/ns/${namespace}/${name}`),
     [history, namespace],
   );
 
@@ -86,12 +85,12 @@ const AppImportsPage: React.FunctionComponent = () => {
       !activePipelineGroup
     ) {
       deletePipelineMutation.reset();
-      history.replace(`/application-imports/ns/${namespace}`);
+      history.replace(`/app-imports/ns/${namespace}`);
     }
   }, [activePipelineGroupName, activePipelineGroup, deletePipelineMutation, history, namespace]);
 
   const isEmptyState = loaded && pipelineGroups.length === 0;
-  const goToImportWizard = () => history.push(`/import-application/ns/${namespace}`);
+  const goToImportWizard = () => history.push(`/app-imports/new/ns/${namespace}`);
 
   return (
     <Page>
