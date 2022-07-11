@@ -14,13 +14,18 @@ import {
   Tabs,
   TabTitleText,
   Alert,
+  EmptyState,
+  EmptyStateIcon,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+
 import { useDeletePipelineMutation, useWatchCranePipelineGroups } from 'src/api/queries/pipelines';
+import { watchErrorToString } from 'src/utils/helpers';
+
 import { AppImportsBody } from './AppImports/AppImportsBody';
 import './AppImports/AppImports.css';
-import { watchErrorToString } from 'src/utils/helpers';
 
 const queryClient = new QueryClient();
 
@@ -84,6 +89,9 @@ const AppImportsPage: React.FunctionComponent = () => {
     }
   }, [activePipelineGroupName, activePipelineGroup, deletePipelineMutation, history, namespace]);
 
+  const isEmptyState = loaded && pipelineGroups.length === 0;
+  const goToImportWizard = () => history.push(`/import-application/ns/${namespace}`);
+
   return (
     <Page>
       <PageSection variant="light">
@@ -92,12 +100,8 @@ const AppImportsPage: React.FunctionComponent = () => {
             <Title headingLevel="h1">Application Imports</Title>
             <Text>View status and take actions on your application import pipelines.</Text>
           </TextContent>
-          {namespace !== '#ALL_NS#' ? (
-            <Button
-              className={spacing.mxMd}
-              onClick={() => history.push(`/import-application/ns/${namespace}`)}
-              // TODO this button should be in the empty state instead when we have an empty state
-            >
+          {namespace !== '#ALL_NS#' && !isEmptyState ? (
+            <Button className={spacing.mxMd} onClick={goToImportWizard}>
               Start a new import
             </Button>
           ) : null}
@@ -113,8 +117,16 @@ const AppImportsPage: React.FunctionComponent = () => {
         >
           {watchErrorToString(error)}
         </Alert>
-      ) : loaded && pipelineGroups.length === 0 ? (
-        <h1>TODO: empty state w/ button</h1>
+      ) : isEmptyState ? (
+        <EmptyState variant="large" className={spacing.mtXl}>
+          <EmptyStateIcon icon={PlusCircleIcon} />
+          <Title headingLevel="h4" size="lg">
+            No application imports yet
+          </Title>
+          <Button variant="primary" onClick={goToImportWizard}>
+            Start a new import
+          </Button>
+        </EmptyState>
       ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
         <h1>TODO: spinner</h1>
       ) : (
