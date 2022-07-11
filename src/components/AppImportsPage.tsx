@@ -16,6 +16,7 @@ import {
   Alert,
   EmptyState,
   EmptyStateIcon,
+  Spinner,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
@@ -26,6 +27,7 @@ import { watchErrorToString } from 'src/utils/helpers';
 
 import { AppImportsBody } from './AppImports/AppImportsBody';
 import './AppImports/AppImports.css';
+import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 
 const queryClient = new QueryClient();
 
@@ -83,7 +85,6 @@ const AppImportsPage: React.FunctionComponent = () => {
       groupBeingDeletedName === activePipelineGroupName &&
       !activePipelineGroup
     ) {
-      console.log('NAVIGATING AFTER DELETE');
       deletePipelineMutation.reset();
       history.replace(`/application-imports/ns/${namespace}`);
     }
@@ -128,7 +129,12 @@ const AppImportsPage: React.FunctionComponent = () => {
           </Button>
         </EmptyState>
       ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
-        <h1>TODO: spinner</h1>
+        <EmptyState className={spacing.mtXl}>
+          <EmptyStateIcon variant="container" component={Spinner} />
+          <Title size="lg" headingLevel="h4">
+            Loading
+          </Title>
+        </EmptyState>
       ) : (
         <>
           {areTabsVisible ? (
