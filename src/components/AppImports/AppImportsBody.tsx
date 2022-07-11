@@ -13,6 +13,7 @@ import {
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
@@ -194,8 +195,8 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
               <Th modifier="nowrap" id="pipeline-run-heading">
                 Pipeline run
               </Th>
-              <Th modifier="nowrap" id="executed-heading">
-                Executed
+              <Th modifier="nowrap" id="started-heading">
+                Started
               </Th>
               <Th modifier="nowrap" id="status-heading">
                 Status
@@ -218,11 +219,14 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
                   </Td>
                   <Td
                     className="pf-m-truncate"
-                    dataLabel="Executed"
-                    aria-labelledby="executed-heading"
+                    dataLabel="Started"
+                    aria-labelledby="started-heading"
                   >
-                    TODO this needs to be time it was removed from pending?
-                    {pipelineRun.metadata?.creationTimestamp}
+                    {pipelineRun.status?.startTime ? (
+                      <Timestamp timestamp={pipelineRun.status?.startTime} />
+                    ) : (
+                      'Not started'
+                    )}
                   </Td>
                   <Td className="pf-m-truncate" dataLabel="Result" aria-labelledby="result-heading">
                     todo
