@@ -66,7 +66,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
   const isSomePipelineRunStarting = isStageStarting || isCutoverStarting;
 
   return (
-    <PageSection variant="light" className={spacing.pt_0}>
+    <PageSection variant="light">
       <Level hasGutter className={spacing.mbMd}>
         <Title headingLevel="h3">{pipelineGroup.name}</Title>
         <LevelItem>

@@ -17,6 +17,7 @@ import {
   EmptyState,
   EmptyStateIcon,
   Spinner,
+  Divider,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
@@ -40,8 +41,6 @@ const AppImportsPageWrapper: React.FunctionComponent = () => (
     </QueryClientProvider>
   </>
 );
-
-// TODO proper looking loading / empty states
 
 const AppImportsPage: React.FunctionComponent = () => {
   const { pipelineGroups, loaded, error } = useWatchCranePipelineGroups();
@@ -137,11 +136,7 @@ const AppImportsPage: React.FunctionComponent = () => {
         ) : (
           <>
             {areTabsVisible ? (
-              <PageSection
-                variant="light"
-                type="tabs"
-                className={`${spacing.pt_0} ${spacing.pbLg}`}
-              >
+              <PageSection variant="light" type="tabs" className={spacing.pt_0}>
                 <Tabs
                   activeKey={activePipelineGroupName}
                   onSelect={(_event, tabKey) => setActivePipelineGroupName(tabKey as string)}
@@ -156,7 +151,9 @@ const AppImportsPage: React.FunctionComponent = () => {
                   ))}
                 </Tabs>
               </PageSection>
-            ) : null}
+            ) : (
+              <Divider />
+            )}
             <AppImportsBody
               pipelineGroup={activePipelineGroup}
               deletePipelineMutation={deletePipelineMutation}
