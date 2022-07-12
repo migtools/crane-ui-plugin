@@ -20,10 +20,10 @@ import {
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useNamespaceContext();
   const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
 
   const configureSourceSecretMutation = useConfigureSourceSecretMutation({

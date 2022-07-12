@@ -20,10 +20,10 @@ import {
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 
 import { useDeletePipelineMutation, useWatchCranePipelineGroups } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
+import { NamespaceContext } from 'src/context/NamespaceContext';
 
 import { AppImportsBody } from './AppImports/AppImportsBody';
 import './AppImports/AppImports.css';
@@ -45,10 +45,9 @@ const AppImportsPageWrapper: React.FunctionComponent = () => (
 
 const AppImportsPage: React.FunctionComponent = () => {
   const { pipelineGroups, loaded, error } = useWatchCranePipelineGroups();
-  const [namespace] = useActiveNamespace();
   const {
-    params: { pipelineGroupName: activePipelineGroupName },
-  } = useRouteMatch<{ pipelineGroupName: string }>();
+    params: { pipelineGroupName: activePipelineGroupName, namespace },
+  } = useRouteMatch<{ pipelineGroupName: string; namespace: string }>();
   const history = useHistory();
 
   const setActivePipelineGroupName = React.useCallback(
@@ -93,73 +92,79 @@ const AppImportsPage: React.FunctionComponent = () => {
   const goToImportWizard = () => history.push(`/app-imports/new/ns/${namespace}`);
 
   return (
-    <Page>
-      <PageSection variant="light">
-        <Level>
-          <TextContent>
-            <Title headingLevel="h1">Application Imports</Title>
-            <Text>View status and take actions on your application import pipelines.</Text>
-          </TextContent>
-          {namespace !== '#ALL_NS#' && !isEmptyState ? (
-            <Button className={spacing.mxMd} onClick={goToImportWizard}>
+    <NamespaceContext.Provider value={namespace}>
+      <Page>
+        <PageSection variant="light">
+          <Level>
+            <TextContent>
+              <Title headingLevel="h1">Application Imports</Title>
+              <Text>View status and take actions on your application import pipelines.</Text>
+            </TextContent>
+            {namespace !== '#ALL_NS#' && !isEmptyState ? (
+              <Button className={spacing.mxMd} onClick={goToImportWizard}>
+                Start a new import
+              </Button>
+            ) : null}
+          </Level>
+        </PageSection>
+        {namespace === '#ALL_NS#' ? (
+          <h1>TODO: handle all-namespaces case</h1>
+        ) : error ? (
+          <Alert
+            variant="danger"
+            title="Cannot load Pipelines and PipelineRuns"
+            className={spacing.mLg}
+          >
+            {watchErrorToString(error)}
+          </Alert>
+        ) : isEmptyState ? (
+          <EmptyState variant="large" className={spacing.mtXl}>
+            <EmptyStateIcon icon={PlusCircleIcon} />
+            <Title headingLevel="h4" size="lg">
+              No application imports yet
+            </Title>
+            <Button variant="primary" onClick={goToImportWizard}>
               Start a new import
             </Button>
-          ) : null}
-        </Level>
-      </PageSection>
-      {namespace === '#ALL_NS#' ? (
-        <h1>TODO: handle all-namespaces case</h1>
-      ) : error ? (
-        <Alert
-          variant="danger"
-          title="Cannot load Pipelines and PipelineRuns"
-          className={spacing.mLg}
-        >
-          {watchErrorToString(error)}
-        </Alert>
-      ) : isEmptyState ? (
-        <EmptyState variant="large" className={spacing.mtXl}>
-          <EmptyStateIcon icon={PlusCircleIcon} />
-          <Title headingLevel="h4" size="lg">
-            No application imports yet
-          </Title>
-          <Button variant="primary" onClick={goToImportWizard}>
-            Start a new import
-          </Button>
-        </EmptyState>
-      ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
-        <EmptyState className={spacing.mtXl}>
-          <EmptyStateIcon variant="container" component={Spinner} />
-          <Title size="lg" headingLevel="h4">
-            Loading
-          </Title>
-        </EmptyState>
-      ) : (
-        <>
-          {areTabsVisible ? (
-            <PageSection variant="light" type="tabs" className={`${spacing.pt_0} ${spacing.pbLg}`}>
-              <Tabs
-                activeKey={activePipelineGroupName}
-                onSelect={(_event, tabKey) => setActivePipelineGroupName(tabKey as string)}
-                className={spacing.pxLg}
+          </EmptyState>
+        ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
+          <EmptyState className={spacing.mtXl}>
+            <EmptyStateIcon variant="container" component={Spinner} />
+            <Title size="lg" headingLevel="h4">
+              Loading
+            </Title>
+          </EmptyState>
+        ) : (
+          <>
+            {areTabsVisible ? (
+              <PageSection
+                variant="light"
+                type="tabs"
+                className={`${spacing.pt_0} ${spacing.pbLg}`}
               >
-                {pipelineGroups.map((group) => (
-                  <Tab
-                    key={group.name}
-                    eventKey={group.name}
-                    title={<TabTitleText>{group.name}</TabTitleText>}
-                  />
-                ))}
-              </Tabs>
-            </PageSection>
-          ) : null}
-          <AppImportsBody
-            pipelineGroup={activePipelineGroup}
-            deletePipelineMutation={deletePipelineMutation}
-          />
-        </>
-      )}
-    </Page>
+                <Tabs
+                  activeKey={activePipelineGroupName}
+                  onSelect={(_event, tabKey) => setActivePipelineGroupName(tabKey as string)}
+                  className={spacing.pxLg}
+                >
+                  {pipelineGroups.map((group) => (
+                    <Tab
+                      key={group.name}
+                      eventKey={group.name}
+                      title={<TabTitleText>{group.name}</TabTitleText>}
+                    />
+                  ))}
+                </Tabs>
+              </PageSection>
+            ) : null}
+            <AppImportsBody
+              pipelineGroup={activePipelineGroup}
+              deletePipelineMutation={deletePipelineMutation}
+            />
+          </>
+        )}
+      </Page>
+    </NamespaceContext.Provider>
   );
 };
 

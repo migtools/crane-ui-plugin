@@ -8,9 +8,9 @@ import {
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { useMutation } from 'react-query';
 import { attachOwnerReference, getObjectRef, sortByCreationTimestamp } from 'src/utils/helpers';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { WizardTektonResources } from '../pipelineHelpers';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
@@ -34,7 +34,7 @@ export const pipelineRunGVK: K8sGroupVersionKind = {
 };
 
 export const useWatchPipelines = () => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useNamespaceContext();
   return useK8sWatchResource<CranePipeline[]>({
     groupVersionKind: pipelineGVK,
     isList: true,
@@ -44,7 +44,7 @@ export const useWatchPipelines = () => {
 };
 
 export const useWatchPipelineRuns = () => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useNamespaceContext();
   return useK8sWatchResource<CranePipelineRun[]>({
     groupVersionKind: pipelineRunGVK,
     isList: true,

@@ -1,5 +1,5 @@
 import { K8sGroupVersionKind, useK8sWatchResource } from '@openshift-console/dynamic-plugin-sdk';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { PersistentVolumeClaim } from '../types/PersistentVolume';
 
 export const pvcGVK: K8sGroupVersionKind = {
@@ -9,7 +9,7 @@ export const pvcGVK: K8sGroupVersionKind = {
 };
 
 export const useWatchPVCs = () => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useNamespaceContext();
   const [data, loaded, error] = useK8sWatchResource<PersistentVolumeClaim[]>({
     groupVersionKind: pvcGVK,
     isList: true,

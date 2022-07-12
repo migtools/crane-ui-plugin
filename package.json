@@ -19,7 +19,6 @@
   "devDependencies": {
     "@konveyor/lib-ui": "^8.2.8",
     "@openshift-console/dynamic-plugin-sdk": "^0.0.12",
-    "@openshift-console/dynamic-plugin-sdk-internal": "^0.0.10",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.7",
     "@patternfly/patternfly": "^4.196.7",
     "@patternfly/react-code-editor": "^4.62.3",

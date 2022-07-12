@@ -12,11 +12,11 @@ import {
 } from '@patternfly/react-core';
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { useActiveNamespace } from '@openshift-console/dynamic-plugin-sdk-internal';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 import {
   isPipelineRunStarting,
   useDeletePipelineMutation,
@@ -39,7 +39,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
   pipelineGroup,
   deletePipelineMutation,
 }) => {
-  const [namespace] = useActiveNamespace();
+  const namespace = useNamespaceContext();
   const history = useHistory();
 
   // TODO is this working? does the element exist when focus is attempted? (renders when kebab opens)
