@@ -13,11 +13,11 @@ export const PipelineRunStatus: React.FunctionComponent<PipelineRunStatusProps> 
   pipelineRun,
   showAction = false,
 }) => {
-  const action = showAction ? ` ${resourceActionToString(pipelineRun, true)}` : '';
+  const action = resourceActionToString(pipelineRun, true);
   return (
     <StatusComponent
       status={pipelineRunStatus(pipelineRun) || ''}
-      title={`${pipelineRunStatus(pipelineRun) || ''}${showAction ? action : ''}`}
+      title={`${pipelineRunStatus(pipelineRun) || ''}${showAction ? ` ${action}` : ''}`}
     />
   );
 };
