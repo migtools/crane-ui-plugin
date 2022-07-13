@@ -16,8 +16,12 @@ import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-tab
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
-import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
+import { CranePipelineGroup, CranePipelineRun } from 'src/api/types/CranePipeline';
+import {
+  getPipelineGroupSourceNamespace,
+  getPipelineRunUrl,
+  pipelineActionToString,
+} from 'src/api/pipelineHelpers';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import {
   isPipelineRunStarting,
@@ -26,7 +30,6 @@ import {
 } from 'src/api/queries/pipelines';
 
 // TODO confirm modals on all the destructive buttons
-// TODO wire up useStartPipelineRunMutation for each button
 // TODO progress/status
 
 // TODO features: stage, cutover, refresh secrets, delete, ???
@@ -60,6 +63,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
   const nonPendingPipelineRuns = pipelineGroup.pipelineRuns.all.filter(
     (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
   );
+  const latestPipelineRun: CranePipelineRun | null = nonPendingPipelineRuns[0] || null;
 
   const startStageMutation = useStartPipelineRunMutation(pipelineGroup, 'stage');
   const isStageStarting = isPipelineRunStarting(pipelineGroup, startStageMutation);
@@ -180,7 +184,14 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
               ).length || 0}
             </Td>
             <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="status-heading">
-              TODO (status -- basic text, or maybe try to reuse status from pipelines UI)
+              {latestPipelineRun ? (
+                <Link to={getPipelineRunUrl(latestPipelineRun, namespace)}>
+                  {pipelineActionToString(latestPipelineRun)}: TODO (status -- basic text, or maybe
+                  try to reuse status from pipelines UI)
+                </Link>
+              ) : (
+                'Not started'
+              )}
             </Td>
           </Tr>
         </Tbody>
@@ -221,9 +232,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
                     dataLabel="Pipeline run"
                     aria-labelledby="pipeline-run-heading"
                   >
-                    <Link
-                      to={`/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${pipelineRun.metadata?.name}`}
-                    >
+                    <Link to={getPipelineRunUrl(pipelineRun, namespace)}>
                       {pipelineRun.metadata?.name}
                     </Link>
                   </Td>

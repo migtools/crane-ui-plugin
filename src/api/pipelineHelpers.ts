@@ -3,6 +3,7 @@ import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardF
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
 import { OAuthSecret } from './types/Secret';
 import { CranePipeline, CranePipelineGroup, CranePipelineRun } from './types/CranePipeline';
+import { pipelineRunGVK } from './queries/pipelines';
 
 export interface WizardTektonResources {
   stagePipeline: CranePipeline | null;
@@ -207,3 +208,13 @@ export const yamlToTektonResources = (
 export const getPipelineGroupSourceNamespace = (group?: CranePipelineGroup) =>
   (group?.pipelineRuns.all[0]?.spec.params?.find((param) => param.name === 'source-namespace')
     ?.value as string) || '';
+
+export const getPipelineRunUrl = (pipelineRun: CranePipelineRun, namespace: string) => {
+  const { group, version, kind } = pipelineRunGVK;
+  return `/k8s/ns/${namespace}/${group}~${version}~${kind}/${pipelineRun.metadata?.name}`;
+};
+
+export const pipelineActionToString = (resource: CranePipeline | CranePipelineRun) => {
+  const action = resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] || '';
+  return `${action.charAt(0).toUpperCase()}${action.slice(1)}`;
+};
