@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import {
   PageSection,
   Title,
@@ -220,9 +220,12 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
                     className="pf-m-truncate"
                     dataLabel="Pipeline run"
                     aria-labelledby="pipeline-run-heading"
-                    // TODO make this a link to the PLR detail page
                   >
-                    {pipelineRun.metadata?.name}
+                    <Link
+                      to={`/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun/${pipelineRun.metadata?.name}`}
+                    >
+                      {pipelineRun.metadata?.name}
+                    </Link>
                   </Td>
                   <Td
                     className="pf-m-truncate"
