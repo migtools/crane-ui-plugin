@@ -2,7 +2,12 @@ import * as yaml from 'js-yaml';
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
 import { OAuthSecret } from './types/Secret';
-import { CranePipeline, CranePipelineGroup, CranePipelineRun } from './types/CranePipeline';
+import {
+  CranePipeline,
+  CranePipelineAction,
+  CranePipelineGroup,
+  CranePipelineRun,
+} from './types/CranePipeline';
 import { pipelineRunGVK } from './queries/pipelines';
 
 export interface WizardTektonResources {
@@ -214,14 +219,15 @@ export const getPipelineRunUrl = (pipelineRun: CranePipelineRun, namespace: stri
   return `/k8s/ns/${namespace}/${group}~${version}~${kind}/${pipelineRun.metadata?.name}`;
 };
 
-export const pipelineActionToString = (
+export const actionToString = (action: CranePipelineAction, parens = false) =>
+  `${parens ? '(' : ''}${action.charAt(0).toUpperCase()}${action.slice(1)}${parens ? ')' : ''}`;
+
+export const resourceActionToString = (
   resource: CranePipeline | CranePipelineRun,
   parens = false,
 ) => {
   const action = resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] || '';
-  return `${parens ? '(' : ''}${action.charAt(0).toUpperCase()}${action.slice(1)}${
-    parens ? ')' : ''
-  }`;
+  return action ? actionToString(action, parens) : '';
 };
 
 // If a PLR has no startTime, sort it as started last because it is still starting

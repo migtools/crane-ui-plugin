@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StatusComponent } from '@openshift-console/dynamic-plugin-sdk';
 import { pipelineRunStatus } from 'src/reused/pipelines-plugin/src/utils/pipeline-filter-reducer';
 import { CranePipelineRun } from 'src/api/types/CranePipeline';
-import { pipelineActionToString } from 'src/api/pipelineHelpers';
+import { resourceActionToString } from 'src/api/pipelineHelpers';
 
 interface PipelineRunStatusProps {
   pipelineRun: CranePipelineRun;
@@ -13,7 +13,7 @@ export const PipelineRunStatus: React.FunctionComponent<PipelineRunStatusProps> 
   pipelineRun,
   showAction = false,
 }) => {
-  const action = showAction ? ` ${pipelineActionToString(pipelineRun, true)}` : '';
+  const action = showAction ? ` ${resourceActionToString(pipelineRun, true)}` : '';
   return (
     <StatusComponent
       status={pipelineRunStatus(pipelineRun) || ''}
