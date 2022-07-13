@@ -18,11 +18,16 @@ import {
   EmptyStateIcon,
   Spinner,
   Divider,
+  AlertActionLink,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 
-import { useDeletePipelineMutation, useWatchCranePipelineGroups } from 'src/api/queries/pipelines';
+import {
+  isMissingPipelineRuns,
+  useDeletePipelineMutation,
+  useWatchCranePipelineGroups,
+} from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
 import { NamespaceContext } from 'src/context/NamespaceContext';
 
@@ -167,7 +172,28 @@ const AppImportsPage: React.FunctionComponent = () => {
                 pipelineGroup={activePipelineGroup}
                 deletePipelineMutation={deletePipelineMutation}
               />
-              <PipelineGroupSummary pipelineGroup={activePipelineGroup} />
+              {isMissingPipelineRuns(activePipelineGroup) ? (
+                <Alert
+                  variant="warning"
+                  isInline
+                  title="Missing PipelineRuns"
+                  actionLinks={
+                    <AlertActionLink
+                      onClick={() =>
+                        deletePipelineMutation.mutate(activePipelineGroup.pipelines.cutover)
+                      }
+                    >
+                      Delete remaining Pipelines and PipelineRuns for this import
+                    </AlertActionLink>
+                  }
+                  className={spacing.mbLg}
+                >
+                  This application cannot be imported because pre-generated PipelineRuns have been
+                  deleted. Delete the import and start a new one.
+                </Alert>
+              ) : (
+                <PipelineGroupSummary pipelineGroup={activePipelineGroup} />
+              )}
               <PipelineGroupHistoryTable pipelineGroup={activePipelineGroup} />
             </PageSection>
           </>

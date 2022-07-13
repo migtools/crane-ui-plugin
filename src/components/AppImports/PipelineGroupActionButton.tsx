@@ -22,10 +22,7 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
   const isStatelessStage = action === 'stage' && !pipelineGroup.pipelines.stage;
-  const isDisabled = isStarting || isStatelessStage || isGroupBroken;
-
-  // TODO add tooltip on disabled stage when there are no PVCs
-  // TODO add a tooltip on disabled stage when the group is broken
+  const isDisabled = isStarting || isGroupBroken || isStatelessStage;
 
   const button = (
     <Button
@@ -49,13 +46,13 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     </Button>
   );
 
-  const disabledReason = isStatelessStage ? (
-    <>Stage is unavailable because no PVCs are included in this import.</>
-  ) : isGroupBroken ? (
+  const disabledReason = isGroupBroken ? (
     <>
       This application cannot be imported because pre-generated PipelineRuns have been deleted.
       Delete the import and start a new one.
     </>
+  ) : isStatelessStage ? (
+    <>Stage is unavailable because no PVCs are included in this import.</>
   ) : null;
 
   if (disabledReason) {

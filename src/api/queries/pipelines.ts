@@ -165,7 +165,7 @@ export const useStartPipelineRunMutation = (
   action: CranePipelineAction,
 ) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
-  return useMutation(() => {
+  return useMutation([pipelineGroup.name, action], () => {
     const pipeline = pipelineGroup.pipelines[action];
     const latestPipelineRun = pipelineGroup.pipelineRuns[action][0];
     if (!pipeline || !latestPipelineRun) return Promise.reject('Pipeline or PipelineRun not found');

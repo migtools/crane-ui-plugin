@@ -212,7 +212,7 @@ export const yamlToTektonResources = (
 
 export const getPipelineGroupSourceNamespace = (group?: CranePipelineGroup) =>
   (group?.pipelineRuns.all[0]?.spec.params?.find((param) => param.name === 'source-namespace')
-    ?.value as string) || '';
+    ?.value as string) || 'Unknown';
 
 export const getPipelineRunUrl = (pipelineRun: CranePipelineRun, namespace: string) => {
   const { group, version, kind } = pipelineRunGVK;
