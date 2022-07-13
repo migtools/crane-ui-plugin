@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from '@patternfly/react-core';
+import { Button, Tooltip } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
   isMissingPipelineRuns,
@@ -21,12 +21,13 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   const mutation = useStartPipelineRunMutation(pipelineGroup, action);
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
-  const isDisabled =
-    isStarting || isGroupBroken || (action === 'stage' && !pipelineGroup.pipelines.stage);
+  const isStatelessStage = action === 'stage' && !pipelineGroup.pipelines.stage;
+  const isDisabled = isStarting || isStatelessStage || isGroupBroken;
 
   // TODO add tooltip on disabled stage when there are no PVCs
   // TODO add a tooltip on disabled stage when the group is broken
-  return (
+
+  const button = (
     <Button
       id={`start-${action}-button`}
       onClick={() => {
@@ -47,4 +48,18 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
       {actionToString(action)}
     </Button>
   );
+
+  const disabledReason = isStatelessStage ? (
+    <>Stage is unavailable because no PVCs are included in this import.</>
+  ) : isGroupBroken ? (
+    <>
+      This application cannot be imported because pre-generated PipelineRuns have been deleted.
+      Delete the import and start a new one.
+    </>
+  ) : null;
+
+  if (disabledReason) {
+    return <Tooltip content={disabledReason}>{button}</Tooltip>;
+  }
+  return button;
 };

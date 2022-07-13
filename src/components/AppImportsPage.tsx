@@ -22,11 +22,7 @@ import {
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 
-import {
-  isMissingPipelineRuns,
-  useDeletePipelineMutation,
-  useWatchCranePipelineGroups,
-} from 'src/api/queries/pipelines';
+import { useDeletePipelineMutation, useWatchCranePipelineGroups } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
 import { NamespaceContext } from 'src/context/NamespaceContext';
 
@@ -171,12 +167,8 @@ const AppImportsPage: React.FunctionComponent = () => {
                 pipelineGroup={activePipelineGroup}
                 deletePipelineMutation={deletePipelineMutation}
               />
-              {!isMissingPipelineRuns(activePipelineGroup) ? (
-                <>
-                  <PipelineGroupSummary pipelineGroup={activePipelineGroup} />
-                  <PipelineGroupHistoryTable pipelineGroup={activePipelineGroup} />
-                </>
-              ) : null}
+              <PipelineGroupSummary pipelineGroup={activePipelineGroup} />
+              <PipelineGroupHistoryTable pipelineGroup={activePipelineGroup} />
             </PageSection>
           </>
         )}
