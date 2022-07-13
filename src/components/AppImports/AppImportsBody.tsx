@@ -9,6 +9,8 @@ import {
   DropdownItem,
   Level,
   LevelItem,
+  EmptyState,
+  EmptyStateBody,
 } from '@patternfly/react-core';
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
@@ -187,7 +189,12 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
         Import pipeline history
       </Title>
       {nonPendingPipelineRuns?.length === 0 ? (
-        <h1>TODO: empty state</h1>
+        <EmptyState variant="small">
+          <Title headingLevel="h4" size="md">
+            No import history yet
+          </Title>
+          <EmptyStateBody>Stage and Cutover PipelineRun history will appear here.</EmptyStateBody>
+        </EmptyState>
       ) : (
         <TableComposable aria-label="Pipeline history" variant="compact">
           <Thead>
