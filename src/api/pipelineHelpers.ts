@@ -214,7 +214,12 @@ export const getPipelineRunUrl = (pipelineRun: CranePipelineRun, namespace: stri
   return `/k8s/ns/${namespace}/${group}~${version}~${kind}/${pipelineRun.metadata?.name}`;
 };
 
-export const pipelineActionToString = (resource: CranePipeline | CranePipelineRun) => {
+export const pipelineActionToString = (
+  resource: CranePipeline | CranePipelineRun,
+  parens = false,
+) => {
   const action = resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] || '';
-  return `${action.charAt(0).toUpperCase()}${action.slice(1)}`;
+  return `${parens ? '(' : ''}${action.charAt(0).toUpperCase()}${action.slice(1)}${
+    parens ? ')' : ''
+  }`;
 };

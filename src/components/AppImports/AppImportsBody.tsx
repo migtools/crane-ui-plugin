@@ -17,17 +17,14 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup, CranePipelineRun } from 'src/api/types/CranePipeline';
-import {
-  getPipelineGroupSourceNamespace,
-  getPipelineRunUrl,
-  pipelineActionToString,
-} from 'src/api/pipelineHelpers';
+import { getPipelineGroupSourceNamespace, getPipelineRunUrl } from 'src/api/pipelineHelpers';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import {
   isPipelineRunStarting,
   useDeletePipelineMutation,
   useStartPipelineRunMutation,
 } from 'src/api/queries/pipelines';
+import { PipelineRunStatus } from './PipelineRunStatus';
 
 // TODO confirm modals on all the destructive buttons
 // TODO progress/status
@@ -64,6 +61,8 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
     (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
   );
   const latestPipelineRun: CranePipelineRun | null = nonPendingPipelineRuns[0] || null;
+
+  console.log({ latestPipelineRun });
 
   const startStageMutation = useStartPipelineRunMutation(pipelineGroup, 'stage');
   const isStageStarting = isPipelineRunStarting(pipelineGroup, startStageMutation);
@@ -158,10 +157,10 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
               Source project
             </Th>
             <Th modifier="nowrap" id="pvc-heading">
-              Persistant volume claims
+              Persistent volume claims
             </Th>
             <Th modifier="nowrap" id="status-heading">
-              Status
+              Last run status
             </Th>
           </Tr>
         </Thead>
@@ -176,18 +175,21 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
             </Td>
             <Td
               className="pf-m-truncate"
-              dataLabel="Persistant volume claims"
+              dataLabel="Persistent volume claims"
               aria-labelledby="pvc-heading"
             >
               {pipelineGroup.pipelines.stage?.spec.tasks.filter(
                 (task) => task.taskRef?.name === 'crane-transfer-pvc',
               ).length || 0}
             </Td>
-            <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="status-heading">
+            <Td
+              className="pf-m-truncate"
+              dataLabel="Last run status"
+              aria-labelledby="status-heading"
+            >
               {latestPipelineRun ? (
                 <Link to={getPipelineRunUrl(latestPipelineRun, namespace)}>
-                  {pipelineActionToString(latestPipelineRun)}: TODO (status -- basic text, or maybe
-                  try to reuse status from pipelines UI)
+                  <PipelineRunStatus pipelineRun={latestPipelineRun} showAction />
                 </Link>
               ) : (
                 'Not started'
@@ -248,7 +250,9 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
                     )}
                   </Td>
                   <Td className="pf-m-truncate" dataLabel="Result" aria-labelledby="result-heading">
-                    todo
+                    <Link to={getPipelineRunUrl(latestPipelineRun, namespace)}>
+                      <PipelineRunStatus pipelineRun={pipelineRun} />
+                    </Link>
                   </Td>
                   <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
                     <Button
