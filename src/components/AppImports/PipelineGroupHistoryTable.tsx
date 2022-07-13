@@ -31,6 +31,9 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
             <Th modifier="nowrap" id="pipeline-run-heading">
               Pipeline run
             </Th>
+            <Th modifier="nowrap" id="action-heading">
+              Action
+            </Th>
             <Th modifier="nowrap" id="started-heading">
               Started
             </Th>

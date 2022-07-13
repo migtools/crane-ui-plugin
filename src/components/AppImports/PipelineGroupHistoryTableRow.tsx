@@ -5,7 +5,7 @@ import { Tr, Td } from '@patternfly/react-table';
 import alignment from '@patternfly/react-styles/css/utilities/Alignment/alignment';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
-import { getPipelineRunUrl } from 'src/api/pipelineHelpers';
+import { getPipelineRunUrl, resourceActionToString } from 'src/api/pipelineHelpers';
 import { CranePipelineRun } from 'src/api/types/CranePipeline';
 import { PipelineRunStatus } from './PipelineRunStatus';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
@@ -31,6 +31,9 @@ export const PipelineGroupHistoryTableRow: React.FunctionComponent<
     <Tr key={`${pipelineRun.metadata?.name}`}>
       <Td className="pf-m-truncate" dataLabel="Pipeline run" aria-labelledby="pipeline-run-heading">
         <Link to={getPipelineRunUrl(pipelineRun, namespace)}>{pipelineRun.metadata?.name}</Link>
+      </Td>
+      <Td className="pf-m-truncate" dataLabel="Action" aria-labelledby="action-heading">
+        {resourceActionToString(pipelineRun)}
       </Td>
       <Td className="pf-m-truncate" dataLabel="Started" aria-labelledby="started-heading">
         {pipelineRun.status?.startTime ? (
