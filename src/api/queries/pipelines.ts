@@ -17,8 +17,10 @@ import { secretGVK } from './secrets';
 import {
   CraneAnnotations,
   CranePipeline,
+  CranePipelineAction,
   CranePipelineGroup,
   CranePipelineRun,
+  CRANE_PIPELINE_ACTIONS,
 } from '../types/CranePipeline';
 
 export const pipelineGVK: K8sGroupVersionKind = {
@@ -160,7 +162,7 @@ export const useCreateTektonResourcesMutation = (
 
 export const useStartPipelineRunMutation = (
   pipelineGroup: CranePipelineGroup,
-  action: 'stage' | 'cutover',
+  action: CranePipelineAction,
 ) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
   return useMutation(() => {
@@ -209,8 +211,17 @@ export const isPipelineRunStarting = (
 ) =>
   mutation.isLoading ||
   (mutation.isSuccess &&
+    !isMissingPipelineRuns(pipelineGroup) &&
     !pipelineGroup.pipelineRuns.all.find(
       (plr) =>
         plr.metadata?.name === mutation.data?.metadata.name &&
         plr.spec.status !== 'PipelineRunPending',
     ));
+
+export const isMissingPipelineRuns = (pipelineGroup?: CranePipelineGroup) => {
+  if (!pipelineGroup) return false;
+  return CRANE_PIPELINE_ACTIONS.some(
+    (action) =>
+      !!pipelineGroup.pipelines[action] && pipelineGroup.pipelineRuns[action].length === 0,
+  );
+};

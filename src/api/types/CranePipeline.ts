@@ -1,7 +1,10 @@
 import { PipelineKind, PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
 
+export const CRANE_PIPELINE_ACTIONS = ['stage', 'cutover'] as const;
+export type CranePipelineAction = typeof CRANE_PIPELINE_ACTIONS[number];
+
 export type CraneAnnotations = {
-  'crane-ui-plugin.konveyor.io/action': 'stage' | 'cutover';
+  'crane-ui-plugin.konveyor.io/action': CranePipelineAction;
   'crane-ui-plugin.konveyor.io/group': string;
 };
 
