@@ -100,7 +100,7 @@ const AppImportsPage: React.FunctionComponent = () => {
               <Text>View status and take actions on your application import pipelines.</Text>
             </TextContent>
             {namespace !== '#ALL_NS#' && !isEmptyState ? (
-              <Button className={spacing.mxMd} onClick={goToImportWizard}>
+              <Button variant="secondary" className={spacing.mxMd} onClick={goToImportWizard}>
                 Start a new import
               </Button>
             ) : null}

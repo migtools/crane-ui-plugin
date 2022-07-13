@@ -82,7 +82,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
               // TODO add a confirm modal here
               startStageMutation.mutate();
             }}
-            variant="secondary"
+            variant="primary"
             className={spacing.mrSm}
             isAriaDisabled={!pipelineGroup.pipelines.stage || isSomePipelineRunStarting}
             {...(isStageStarting
@@ -101,7 +101,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
               // TODO add a confirm modal here
               startCutoverMutation.mutate();
             }}
-            variant="secondary"
+            variant="primary"
             isAriaDisabled={isSomePipelineRunStarting}
             {...(isCutoverStarting
               ? {
