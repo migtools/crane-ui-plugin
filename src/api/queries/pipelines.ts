@@ -201,8 +201,6 @@ const useDeleteMutation = <T extends K8sResourceCommon>(gvk: K8sGroupVersionKind
 };
 
 export const useDeletePipelineMutation = () => useDeleteMutation<CranePipeline>(pipelineGVK);
-export const useDeletePipelineRunMutation = () =>
-  useDeleteMutation<CranePipelineRun>(pipelineRunGVK);
 
 // Until the new PipelineRun appears in the watched pipelineGroup, we still consider it loading/starting
 export const isPipelineRunStarting = (

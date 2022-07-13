@@ -1,10 +1,14 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Title, EmptyState, EmptyStateBody } from '@patternfly/react-core';
-import { TableComposable, Thead, Tr, Th, Tbody } from '@patternfly/react-table';
+import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { PipelineGroupHistoryTableRow } from './PipelineGroupHistoryTableRow';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { getPipelineRunUrl, resourceActionToString } from 'src/api/pipelineHelpers';
+import { PipelineRunStatus } from './PipelineRunStatus';
 
 interface PipelineGroupHistoryTableProps {
   pipelineGroup: CranePipelineGroup;
@@ -12,48 +16,76 @@ interface PipelineGroupHistoryTableProps {
 
 export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHistoryTableProps> = ({
   pipelineGroup,
-}) => (
-  <>
-    <Title headingLevel="h3" className={spacing.mbMd}>
-      Import pipeline history
-    </Title>
-    {pipelineGroup.pipelineRuns.nonPending.length === 0 ? (
-      <EmptyState variant="small">
-        <Title headingLevel="h4" size="md">
-          No import history yet
-        </Title>
-        <EmptyStateBody>Stage and Cutover PipelineRun history will appear here.</EmptyStateBody>
-      </EmptyState>
-    ) : (
-      <TableComposable aria-label="Pipeline history" variant="compact">
-        <Thead>
-          <Tr>
-            <Th modifier="nowrap" id="pipeline-run-heading">
-              Pipeline run
-            </Th>
-            <Th modifier="nowrap" id="action-heading">
-              Action
-            </Th>
-            <Th modifier="nowrap" id="started-heading">
-              Started
-            </Th>
-            <Th modifier="nowrap" id="status-heading">
-              Status
-            </Th>
-            <Th modifier="nowrap" id="delete-heading" />
-          </Tr>
-        </Thead>
-        <Tbody>
-          {pipelineGroup.pipelineRuns.all
-            .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
-            .map((pipelineRun) => (
-              <PipelineGroupHistoryTableRow
-                key={pipelineRun.metadata?.name}
-                pipelineRun={pipelineRun}
-              />
-            ))}
-        </Tbody>
-      </TableComposable>
-    )}
-  </>
-);
+}) => {
+  const namespace = useNamespaceContext();
+  return (
+    <>
+      <Title headingLevel="h3" className={spacing.mbMd}>
+        Import pipeline history
+      </Title>
+      {pipelineGroup.pipelineRuns.nonPending.length === 0 ? (
+        <EmptyState variant="small">
+          <Title headingLevel="h4" size="md">
+            No import history yet
+          </Title>
+          <EmptyStateBody>Stage and Cutover PipelineRun history will appear here.</EmptyStateBody>
+        </EmptyState>
+      ) : (
+        <TableComposable aria-label="Pipeline history" variant="compact">
+          <Thead>
+            <Tr>
+              <Th modifier="nowrap" id="pipeline-run-heading">
+                Pipeline run
+              </Th>
+              <Th modifier="nowrap" id="action-heading">
+                Action
+              </Th>
+              <Th modifier="nowrap" id="started-heading">
+                Started
+              </Th>
+              <Th modifier="nowrap" id="status-heading">
+                Status
+              </Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {pipelineGroup.pipelineRuns.all
+              .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
+              .map((pipelineRun) => (
+                <Tr key={`${pipelineRun.metadata?.name}`}>
+                  <Td
+                    className="pf-m-truncate"
+                    dataLabel="Pipeline run"
+                    aria-labelledby="pipeline-run-heading"
+                  >
+                    <Link to={getPipelineRunUrl(pipelineRun, namespace)}>
+                      {pipelineRun.metadata?.name}
+                    </Link>
+                  </Td>
+                  <Td className="pf-m-truncate" dataLabel="Action" aria-labelledby="action-heading">
+                    {resourceActionToString(pipelineRun)}
+                  </Td>
+                  <Td
+                    className="pf-m-truncate"
+                    dataLabel="Started"
+                    aria-labelledby="started-heading"
+                  >
+                    {pipelineRun.status?.startTime ? (
+                      <Timestamp timestamp={pipelineRun.status?.startTime} />
+                    ) : (
+                      'Not started'
+                    )}
+                  </Td>
+                  <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="result-heading">
+                    <Link to={getPipelineRunUrl(pipelineRun, namespace)}>
+                      <PipelineRunStatus pipelineRun={pipelineRun} />
+                    </Link>
+                  </Td>
+                </Tr>
+              ))}
+          </Tbody>
+        </TableComposable>
+      )}
+    </>
+  );
+};
