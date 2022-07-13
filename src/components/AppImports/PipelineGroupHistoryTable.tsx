@@ -4,13 +4,13 @@ import { TableComposable, Thead, Tr, Th, Tbody } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { PipelineHistoryTableRow } from './PipelineHistoryTableRow';
+import { PipelineGroupHistoryTableRow } from './PipelineGroupHistoryTableRow';
 
-interface PipelineHistoryTableProps {
+interface PipelineGroupHistoryTableProps {
   pipelineGroup: CranePipelineGroup;
 }
 
-export const PipelineHistoryTable: React.FunctionComponent<PipelineHistoryTableProps> = ({
+export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHistoryTableProps> = ({
   pipelineGroup,
 }) => (
   <>
@@ -44,7 +44,10 @@ export const PipelineHistoryTable: React.FunctionComponent<PipelineHistoryTableP
           {pipelineGroup.pipelineRuns.all
             .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
             .map((pipelineRun) => (
-              <PipelineHistoryTableRow key={pipelineRun.metadata?.name} pipelineRun={pipelineRun} />
+              <PipelineGroupHistoryTableRow
+                key={pipelineRun.metadata?.name}
+                pipelineRun={pipelineRun}
+              />
             ))}
         </Tbody>
       </TableComposable>

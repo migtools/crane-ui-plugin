@@ -26,8 +26,16 @@ import { useDeletePipelineMutation, useWatchCranePipelineGroups } from 'src/api/
 import { watchErrorToString } from 'src/utils/helpers';
 import { NamespaceContext } from 'src/context/NamespaceContext';
 
-import { AppImportsBody } from './AppImports/AppImportsBody';
+import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
+import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';
+import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTable';
 import './AppImports/AppImports.css';
+
+// TODO confirm modals on all the destructive buttons
+// TODO progress/status
+
+// TODO features: stage, cutover, refresh secrets, delete, ???
+// TODO stage only for pipelines with PVCs - disable or hide button? tooltip?
 
 const queryClient = new QueryClient();
 
@@ -154,10 +162,14 @@ const AppImportsPage: React.FunctionComponent = () => {
             ) : (
               <Divider />
             )}
-            <AppImportsBody
-              pipelineGroup={activePipelineGroup}
-              deletePipelineMutation={deletePipelineMutation}
-            />
+            <PageSection variant="light">
+              <PipelineGroupHeader
+                pipelineGroup={activePipelineGroup}
+                deletePipelineMutation={deletePipelineMutation}
+              />
+              <PipelineGroupSummary pipelineGroup={activePipelineGroup} />
+              <PipelineGroupHistoryTable pipelineGroup={activePipelineGroup} />
+            </PageSection>
           </>
         )}
       </Page>
