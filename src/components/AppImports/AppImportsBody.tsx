@@ -14,7 +14,6 @@ import {
 } from '@patternfly/react-core';
 import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup, CranePipelineRun } from 'src/api/types/CranePipeline';
 import { getPipelineGroupSourceNamespace, getPipelineRunUrl } from 'src/api/pipelineHelpers';
@@ -25,6 +24,7 @@ import {
   useStartPipelineRunMutation,
 } from 'src/api/queries/pipelines';
 import { PipelineRunStatus } from './PipelineRunStatus';
+import { PipelineHistoryRow } from './PipelineHistoryRow';
 
 // TODO confirm modals on all the destructive buttons
 // TODO progress/status
@@ -61,8 +61,6 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
     (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
   );
   const latestPipelineRun: CranePipelineRun | null = nonPendingPipelineRuns[0] || null;
-
-  console.log({ latestPipelineRun });
 
   const startStageMutation = useStartPipelineRunMutation(pipelineGroup, 'stage');
   const isStageStarting = isPipelineRunStarting(pipelineGroup, startStageMutation);
@@ -228,43 +226,7 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
             {pipelineGroup.pipelineRuns.all
               .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
               .map((pipelineRun) => (
-                <Tr key={`${pipelineRun.metadata?.name}`}>
-                  <Td
-                    className="pf-m-truncate"
-                    dataLabel="Pipeline run"
-                    aria-labelledby="pipeline-run-heading"
-                  >
-                    <Link to={getPipelineRunUrl(pipelineRun, namespace)}>
-                      {pipelineRun.metadata?.name}
-                    </Link>
-                  </Td>
-                  <Td
-                    className="pf-m-truncate"
-                    dataLabel="Started"
-                    aria-labelledby="started-heading"
-                  >
-                    {pipelineRun.status?.startTime ? (
-                      <Timestamp timestamp={pipelineRun.status?.startTime} />
-                    ) : (
-                      'Not started'
-                    )}
-                  </Td>
-                  <Td className="pf-m-truncate" dataLabel="Result" aria-labelledby="result-heading">
-                    <Link to={getPipelineRunUrl(latestPipelineRun, namespace)}>
-                      <PipelineRunStatus pipelineRun={pipelineRun} />
-                    </Link>
-                  </Td>
-                  <Td className="pf-m-truncate" dataLabel="" aria-labelledby="delete-heading">
-                    <Button
-                      variant="secondary"
-                      onClick={() =>
-                        alert(`todo implement delete for ${pipelineRun.metadata?.name}`)
-                      }
-                    >
-                      Delete
-                    </Button>
-                  </Td>
-                </Tr>
+                <PipelineHistoryRow key={pipelineRun.metadata?.name} pipelineRun={pipelineRun} />
               ))}
           </Tbody>
         </TableComposable>

@@ -182,12 +182,14 @@ export const useStartPipelineRunMutation = (
   });
 };
 
-export const useDeletePipelineMutation = (onSuccess?: () => void) => {
-  const [model] = useK8sModel(pipelineGVK);
-  return useMutation<unknown, Error, CranePipeline>((resource) => k8sDelete({ model, resource }), {
-    onSuccess,
-  });
+const useDeleteMutation = <T extends K8sResourceCommon>(gvk: K8sGroupVersionKind) => {
+  const [model] = useK8sModel(gvk);
+  return useMutation<unknown, Error, T>((resource) => k8sDelete({ model, resource }));
 };
+
+export const useDeletePipelineMutation = () => useDeleteMutation<CranePipeline>(pipelineGVK);
+export const useDeletePipelineRunMutation = () =>
+  useDeleteMutation<CranePipelineRun>(pipelineRunGVK);
 
 // Until the new PipelineRun appears in the watched pipelineGroup, we still consider it loading/starting
 export const isPipelineRunStarting = (
