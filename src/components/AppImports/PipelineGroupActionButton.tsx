@@ -24,6 +24,11 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   const isStatelessStage = action === 'stage' && !pipelineGroup.pipelines.stage;
   const isDisabled = isStarting || isGroupBroken || isStatelessStage;
 
+  React.useEffect(() => {
+    // Don't keep old mutation state around in case relevant resources get deleted and mess with isStarting
+    if (!isStarting && mutation.isSuccess) mutation.reset();
+  }, [isStarting, mutation]);
+
   const button = (
     <Button
       id={`start-${action}-button`}
