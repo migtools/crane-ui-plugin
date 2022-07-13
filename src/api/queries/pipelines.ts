@@ -11,7 +11,7 @@ import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-t
 import { useMutation } from 'react-query';
 import { attachOwnerReference, getObjectRef, sortByCreationTimestamp } from 'src/utils/helpers';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-import { WizardTektonResources } from '../pipelineHelpers';
+import { sortByStartedTime, WizardTektonResources } from '../pipelineHelpers';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
 import {
@@ -59,7 +59,7 @@ export const useWatchCranePipelineGroups = () => {
 
   // Pipeline tabs show up in creation order, PipelineRun history shows up latest first
   const allPipelines = sortByCreationTimestamp(watchedPipelines, 'asc');
-  const allPipelineRuns = sortByCreationTimestamp(watchedPipelineRuns, 'desc');
+  const allPipelineRuns = sortByStartedTime(watchedPipelineRuns, 'desc');
 
   const byAction =
     (action: CraneAnnotations['crane-ui-plugin.konveyor.io/action']) =>

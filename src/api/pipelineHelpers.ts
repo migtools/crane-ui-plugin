@@ -223,3 +223,14 @@ export const pipelineActionToString = (
     parens ? ')' : ''
   }`;
 };
+
+// If a PLR has no startTime, sort it as started last because it is still starting
+export const sortByStartedTime = (pipelineRuns: CranePipelineRun[], direction: 'asc' | 'desc') =>
+  [...pipelineRuns].sort((a, b) => {
+    const [aTimestamp, bTimestamp] = [a, b].map((plr) => plr.status?.startTime || null);
+    if ((!!aTimestamp && !bTimestamp) || (!!aTimestamp && !!bTimestamp && aTimestamp < bTimestamp))
+      return direction === 'asc' ? -1 : 1;
+    if ((!aTimestamp && !!bTimestamp) || (!!aTimestamp && !!bTimestamp && aTimestamp > bTimestamp))
+      return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
