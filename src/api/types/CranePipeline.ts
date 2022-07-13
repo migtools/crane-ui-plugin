@@ -23,5 +23,7 @@ export interface CranePipelineGroup {
     stage: CranePipelineRun[];
     cutover: CranePipelineRun[];
     all: CranePipelineRun[];
+    nonPending: CranePipelineRun[];
+    latestNonPending: CranePipelineRun | null;
   };
 }

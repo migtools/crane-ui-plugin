@@ -11,11 +11,14 @@ import { PipelineRunStatus } from './PipelineRunStatus';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { useDeletePipelineRunMutation } from 'src/api/queries/pipelines';
 
-interface PipelineHistoryRowProps {
+interface PipelineHistoryTableRowProps {
   pipelineRun: CranePipelineRun;
 }
 
-export const PipelineHistoryRow: React.FunctionComponent<PipelineHistoryRowProps> = ({
+// TODO somehow need to prevent deleting the only PLR of each type, since that leaves no template for starting new ones
+// Disable delete button for those ones with a popover?
+
+export const PipelineHistoryTableRow: React.FunctionComponent<PipelineHistoryTableRowProps> = ({
   pipelineRun,
 }) => {
   const namespace = useNamespaceContext();

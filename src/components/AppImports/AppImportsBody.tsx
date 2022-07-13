@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import {
   PageSection,
   Title,
@@ -9,22 +9,18 @@ import {
   DropdownItem,
   Level,
   LevelItem,
-  EmptyState,
-  EmptyStateBody,
 } from '@patternfly/react-core';
-import { TableComposable, Tbody, Thead, Tr, Th, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-import { CranePipelineGroup, CranePipelineRun } from 'src/api/types/CranePipeline';
-import { getPipelineGroupSourceNamespace, getPipelineRunUrl } from 'src/api/pipelineHelpers';
+import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import {
   isPipelineRunStarting,
   useDeletePipelineMutation,
   useStartPipelineRunMutation,
 } from 'src/api/queries/pipelines';
-import { PipelineRunStatus } from './PipelineRunStatus';
-import { PipelineHistoryRow } from './PipelineHistoryRow';
+import { PipelineHistoryTable } from './PipelineHistoryTable';
+import { PipelineGroupSummary } from './PipelineGroupSummary';
 
 // TODO confirm modals on all the destructive buttons
 // TODO progress/status
@@ -56,11 +52,6 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
     toggleAppKebabOpen();
     onFocus('toggle-id-app-kebab');
   };
-
-  const nonPendingPipelineRuns = pipelineGroup.pipelineRuns.all.filter(
-    (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
-  );
-  const latestPipelineRun: CranePipelineRun | null = nonPendingPipelineRuns[0] || null;
 
   const startStageMutation = useStartPipelineRunMutation(pipelineGroup, 'stage');
   const isStageStarting = isPipelineRunStarting(pipelineGroup, startStageMutation);
@@ -142,95 +133,8 @@ export const AppImportsBody: React.FunctionComponent<AppImportsBodyProps> = ({
           />
         </LevelItem>
       </Level>
-      <TableComposable
-        aria-label="Pipeline import review"
-        variant="compact"
-        borders={false}
-        gridBreakPoint="grid"
-        className={`summary-table ${spacing.mbLg}`}
-      >
-        <Thead>
-          <Tr>
-            <Th modifier="nowrap" id="source-project-heading">
-              Source project
-            </Th>
-            <Th modifier="nowrap" id="pvc-heading">
-              Persistent volume claims
-            </Th>
-            <Th modifier="nowrap" id="status-heading">
-              Last run status
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr className={spacing.pl_0}>
-            <Td
-              className="pf-m-truncate"
-              dataLabel="Source project"
-              aria-labelledby="source-project-heading"
-            >
-              {getPipelineGroupSourceNamespace(pipelineGroup)}
-            </Td>
-            <Td
-              className="pf-m-truncate"
-              dataLabel="Persistent volume claims"
-              aria-labelledby="pvc-heading"
-            >
-              {pipelineGroup.pipelines.stage?.spec.tasks.filter(
-                (task) => task.taskRef?.name === 'crane-transfer-pvc',
-              ).length || 0}
-            </Td>
-            <Td
-              className="pf-m-truncate"
-              dataLabel="Last run status"
-              aria-labelledby="status-heading"
-            >
-              {latestPipelineRun ? (
-                <Link to={getPipelineRunUrl(latestPipelineRun, namespace)}>
-                  <PipelineRunStatus pipelineRun={latestPipelineRun} showAction />
-                </Link>
-              ) : (
-                'Not started'
-              )}
-            </Td>
-          </Tr>
-        </Tbody>
-      </TableComposable>
-      <Title headingLevel="h3" className={spacing.mbMd}>
-        Import pipeline history
-      </Title>
-      {nonPendingPipelineRuns?.length === 0 ? (
-        <EmptyState variant="small">
-          <Title headingLevel="h4" size="md">
-            No import history yet
-          </Title>
-          <EmptyStateBody>Stage and Cutover PipelineRun history will appear here.</EmptyStateBody>
-        </EmptyState>
-      ) : (
-        <TableComposable aria-label="Pipeline history" variant="compact">
-          <Thead>
-            <Tr>
-              <Th modifier="nowrap" id="pipeline-run-heading">
-                Pipeline run
-              </Th>
-              <Th modifier="nowrap" id="started-heading">
-                Started
-              </Th>
-              <Th modifier="nowrap" id="status-heading">
-                Status
-              </Th>
-              <Th modifier="nowrap" id="delete-heading" />
-            </Tr>
-          </Thead>
-          <Tbody>
-            {pipelineGroup.pipelineRuns.all
-              .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
-              .map((pipelineRun) => (
-                <PipelineHistoryRow key={pipelineRun.metadata?.name} pipelineRun={pipelineRun} />
-              ))}
-          </Tbody>
-        </TableComposable>
-      )}
+      <PipelineGroupSummary pipelineGroup={pipelineGroup} />
+      <PipelineHistoryTable pipelineGroup={pipelineGroup} />
     </PageSection>
   );
 };

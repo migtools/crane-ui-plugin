@@ -53,6 +53,7 @@ export const useWatchPipelineRuns = () => {
   });
 };
 
+// TODO memoize these?
 export const useWatchCranePipelineGroups = () => {
   const [watchedPipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
   const [watchedPipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
@@ -76,18 +77,28 @@ export const useWatchCranePipelineGroups = () => {
   const allCutoverPipelines = allPipelines.filter(byAction('cutover'));
   const allCutoverPipelineRuns = allPipelineRuns.filter(byAction('cutover'));
 
-  const pipelineGroups: CranePipelineGroup[] = allCutoverPipelines.map((cutoverPipeline) => ({
-    name: cutoverPipeline.metadata?.annotations?.['crane-ui-plugin.konveyor.io/group'] || '',
-    pipelines: {
-      stage: allStagePipelines.find(bySameGroup(cutoverPipeline)) || null,
-      cutover: cutoverPipeline,
-    },
-    pipelineRuns: {
-      stage: allStagePipelineRuns.filter(bySameGroup(cutoverPipeline)),
-      cutover: allCutoverPipelineRuns.filter(bySameGroup(cutoverPipeline)),
-      all: allPipelineRuns.filter(bySameGroup(cutoverPipeline)),
-    },
-  }));
+  const pipelineGroups: CranePipelineGroup[] = allCutoverPipelines.map((cutoverPipeline) => {
+    const allPipelineRunsInGroup = allPipelineRuns.filter(bySameGroup(cutoverPipeline));
+    const nonPendingPipelineRunsInGroup = allPipelineRunsInGroup.filter(
+      (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
+    );
+    const latestNonPendingPipelineRun: CranePipelineRun | null =
+      nonPendingPipelineRunsInGroup[0] || null;
+    return {
+      name: cutoverPipeline.metadata?.annotations?.['crane-ui-plugin.konveyor.io/group'] || '',
+      pipelines: {
+        stage: allStagePipelines.find(bySameGroup(cutoverPipeline)) || null,
+        cutover: cutoverPipeline,
+      },
+      pipelineRuns: {
+        stage: allStagePipelineRuns.filter(bySameGroup(cutoverPipeline)),
+        cutover: allCutoverPipelineRuns.filter(bySameGroup(cutoverPipeline)),
+        all: allPipelineRunsInGroup,
+        nonPending: nonPendingPipelineRunsInGroup,
+        latestNonPending: latestNonPendingPipelineRun,
+      },
+    };
+  });
 
   return {
     pipelineGroups,
