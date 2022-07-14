@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Helmet from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { useHistory, useRouteMatch } from 'react-router-dom';
+import { Link, useHistory, useRouteMatch } from 'react-router-dom';
 import {
   Page,
   PageSection,
@@ -19,6 +19,7 @@ import {
   Spinner,
   Divider,
   AlertActionLink,
+  EmptyStateBody,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
@@ -62,6 +63,7 @@ const AppImportsPage: React.FunctionComponent = () => {
     params: { pipelineGroupName: activePipelineGroupName, namespace },
   } = useRouteMatch<{ pipelineGroupName: string; namespace: string }>();
   const history = useHistory();
+  const isAllNamespaces = !namespace || namespace === '#ALL_NS#';
 
   const setActivePipelineGroupName = React.useCallback(
     (name: string, op: 'push' | 'replace' = 'push') =>
@@ -120,8 +122,16 @@ const AppImportsPage: React.FunctionComponent = () => {
             ) : null}
           </Level>
         </PageSection>
-        {namespace === '#ALL_NS#' ? (
-          <h1>TODO: handle all-namespaces case</h1>
+        {isAllNamespaces ? (
+          <EmptyState variant="large" className={spacing.mtXl}>
+            <Title headingLevel="h4" size="lg">
+              No project selected
+            </Title>
+            <EmptyStateBody>
+              <Link to="/project-details/all-namespaces">Select a project</Link> and return to this
+              page.
+            </EmptyStateBody>
+          </EmptyState>
         ) : error ? (
           <Alert
             variant="danger"
