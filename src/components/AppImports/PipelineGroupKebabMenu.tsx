@@ -19,7 +19,6 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
   const namespace = useNamespaceContext();
   const history = useHistory();
 
-  // TODO is this working? does the element exist when focus is attempted? (renders when kebab opens)
   const onFocus = (id: string) => {
     const element = document.getElementById(id);
     element?.focus();

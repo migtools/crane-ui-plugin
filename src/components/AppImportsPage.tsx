@@ -38,11 +38,6 @@ import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';
 import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTable';
 import './AppImports/AppImports.css';
 
-// TODO maybe reuse progress bar from tekton UI for more detailed status?
-
-// TODO features: stage, cutover, refresh secrets, delete, ???
-// TODO stage only for pipelines with PVCs - disable or hide button? tooltip?
-
 const queryClient = new QueryClient();
 
 const AppImportsPageWrapper: React.FunctionComponent = () => {
