@@ -5,6 +5,7 @@ import { Dropdown, KebabToggle, DropdownItem } from '@patternfly/react-core';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { pipelinesListUrl } from 'src/utils/paths';
 
 interface PipelineGroupKebabMenuProps {
   pipelineGroup: CranePipelineGroup;
@@ -53,7 +54,7 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
         <DropdownItem
           key="app-view-pipelies"
           component="button"
-          onClick={() => history.push(`/dev-pipelines/ns/${namespace}?name=${pipelineGroup.name}`)}
+          onClick={() => history.push(pipelinesListUrl(namespace, pipelineGroup.name))}
         >
           View pipelines
         </DropdownItem>,

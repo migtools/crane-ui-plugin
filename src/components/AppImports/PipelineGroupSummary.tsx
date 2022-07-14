@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-import { getPipelineGroupSourceNamespace, getPipelineRunUrl } from 'src/api/pipelineHelpers';
+import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { pipelineRunUrl } from 'src/utils/paths';
 import { PipelineRunStatus } from './PipelineRunStatus';
 
 interface PipelineGroupSummaryProps {
@@ -62,7 +63,7 @@ export const PipelineGroupSummary: React.FunctionComponent<PipelineGroupSummaryP
             aria-labelledby="status-heading"
           >
             {latestPipelineRun ? (
-              <Link to={getPipelineRunUrl(latestPipelineRun, namespace)}>
+              <Link to={pipelineRunUrl(namespace, latestPipelineRun)}>
                 <PipelineRunStatus pipelineRun={latestPipelineRun} showAction />
               </Link>
             ) : (

@@ -7,7 +7,8 @@ import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-import { getPipelineRunUrl, resourceActionToString } from 'src/api/pipelineHelpers';
+import { resourceActionToString } from 'src/api/pipelineHelpers';
+import { pipelineRunUrl } from 'src/utils/paths';
 import { PipelineRunStatus } from './PipelineRunStatus';
 
 interface PipelineGroupHistoryTableProps {
@@ -58,7 +59,7 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
                     dataLabel="Pipeline run"
                     aria-labelledby="pipeline-run-heading"
                   >
-                    <Link to={getPipelineRunUrl(pipelineRun, namespace)}>
+                    <Link to={pipelineRunUrl(namespace, pipelineRun)}>
                       {pipelineRun.metadata?.name}
                     </Link>
                   </Td>
@@ -77,7 +78,7 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
                     )}
                   </Td>
                   <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="result-heading">
-                    <Link to={getPipelineRunUrl(pipelineRun, namespace)}>
+                    <Link to={pipelineRunUrl(namespace, pipelineRun)}>
                       <PipelineRunStatus pipelineRun={pipelineRun} />
                     </Link>
                   </Td>

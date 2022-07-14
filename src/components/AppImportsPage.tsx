@@ -29,6 +29,7 @@ import {
   useWatchCranePipelineGroups,
 } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
+import { appImportsPageUrl, appImportWizardUrl } from 'src/utils/paths';
 import { NamespaceContext } from 'src/context/NamespaceContext';
 
 import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
@@ -64,7 +65,7 @@ const AppImportsPage: React.FunctionComponent = () => {
 
   const setActivePipelineGroupName = React.useCallback(
     (name: string, op: 'push' | 'replace' = 'push') =>
-      history[op](`/app-imports/ns/${namespace}/${name}`),
+      history[op](appImportsPageUrl(namespace, name)),
     [history, namespace],
   );
 
@@ -96,12 +97,12 @@ const AppImportsPage: React.FunctionComponent = () => {
       !activePipelineGroup
     ) {
       deletePipelineMutation.reset();
-      history.replace(`/app-imports/ns/${namespace}`);
+      history.replace(appImportsPageUrl(namespace));
     }
   }, [activePipelineGroupName, activePipelineGroup, deletePipelineMutation, history, namespace]);
 
   const isEmptyState = loaded && pipelineGroups.length === 0;
-  const goToImportWizard = () => history.push(`/app-imports/new/ns/${namespace}`);
+  const goToImportWizard = () => history.push(appImportWizardUrl(namespace));
 
   return (
     <NamespaceContext.Provider value={namespace}>
