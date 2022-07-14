@@ -4,7 +4,7 @@
 
 The Crane UI plugin provides a UI for constructing container migration pipelines within the OpenShift console.
 
-It is provided as an OpenShift Console dynamic plugin which requires OpenShift 4.10 or greater.
+It is provided as an OpenShift Console dynamic plugin which requires OpenShift 4.11 or greater.
 
 You can run the plugin using a local development environment or build an image to deploy it to a cluster.
 
@@ -24,9 +24,15 @@ You'll need:
    - Deploy [crane-reverse-proxy](https://github.com/konveyor/crane-reverse-proxy) including its dev-only route:
 
      ```sh
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/rbac.yml
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/deploy.yml
-     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/dev-route.yml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/dev/namespace.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/default/deployment.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/default/service.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/rbac/serviceAccount.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/rbac/role.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/rbac/clusterRole.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/rbac/roleBinding.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/rbac/clusterRoleBinding.yaml
+     oc create -f https://raw.githubusercontent.com/konveyor/crane-reverse-proxy/main/config/dev/route.yaml
      ```
 
    - Deploy [crane-secret-service](https://github.com/konveyor/crane-secret-service) including its dev-only route:
