@@ -39,7 +39,7 @@ import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTabl
 import './AppImports/AppImports.css';
 
 // TODO confirm modals on all the destructive buttons
-// TODO progress/status
+// TODO maybe reuse progress bar from tekton UI for more detailed status?
 
 // TODO features: stage, cutover, refresh secrets, delete, ???
 // TODO stage only for pipelines with PVCs - disable or hide button? tooltip?

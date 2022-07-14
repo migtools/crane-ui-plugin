@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Tooltip } from '@patternfly/react-core';
+import { Button, ButtonProps, Tooltip } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
   isMissingPipelineRuns,
@@ -12,17 +12,18 @@ import { actionToString } from 'src/api/pipelineHelpers';
 interface PipelineGroupActionButtonProps {
   pipelineGroup: CranePipelineGroup;
   action: CranePipelineAction;
+  variant?: ButtonProps['variant'];
 }
 
 export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupActionButtonProps> = ({
   pipelineGroup,
   action,
+  variant = 'secondary',
 }) => {
   const mutation = useStartPipelineRunMutation(pipelineGroup, action);
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
-  const isStatelessStage = action === 'stage' && !pipelineGroup.pipelines.stage;
-  const isDisabled = isStarting || isGroupBroken || isStatelessStage;
+  const isDisabled = isStarting || isGroupBroken;
 
   React.useEffect(() => {
     // Don't keep old mutation state around in case relevant resources get deleted and mess with isStarting
@@ -36,7 +37,7 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
         // TODO add a confirm modal here
         mutation.mutate();
       }}
-      variant="primary"
+      variant={variant}
       className={spacing.mlSm}
       isAriaDisabled={isDisabled}
       {...(isStarting
@@ -56,8 +57,6 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
       This application cannot be imported because pre-generated PipelineRuns have been deleted.
       Delete the import and start a new one.
     </>
-  ) : isStatelessStage ? (
-    <>Stage is unavailable because no PVCs are included in this import.</>
   ) : null;
 
   if (disabledReason) {

@@ -15,16 +15,29 @@ interface PipelineGroupHeaderProps {
 export const PipelineGroupHeader: React.FunctionComponent<PipelineGroupHeaderProps> = ({
   pipelineGroup,
   deletePipelineMutation,
-}) => (
-  <Level hasGutter className={spacing.mbMd}>
-    <Title headingLevel="h3">{pipelineGroup.name}</Title>
-    <LevelItem>
-      <PipelineGroupActionButton pipelineGroup={pipelineGroup} action="stage" />
-      <PipelineGroupActionButton pipelineGroup={pipelineGroup} action="cutover" />
-      <PipelineGroupKebabMenu
-        pipelineGroup={pipelineGroup}
-        deletePipelineMutation={deletePipelineMutation}
-      />
-    </LevelItem>
-  </Level>
-);
+}) => {
+  const hasStage = !!pipelineGroup.pipelines.stage;
+  return (
+    <Level hasGutter className={spacing.mbMd}>
+      <Title headingLevel="h3">{pipelineGroup.name}</Title>
+      <LevelItem>
+        {hasStage ? (
+          <PipelineGroupActionButton
+            pipelineGroup={pipelineGroup}
+            action="stage"
+            variant="primary"
+          />
+        ) : null}
+        <PipelineGroupActionButton
+          pipelineGroup={pipelineGroup}
+          action="cutover"
+          variant={hasStage ? 'secondary' : 'primary'}
+        />
+        <PipelineGroupKebabMenu
+          pipelineGroup={pipelineGroup}
+          deletePipelineMutation={deletePipelineMutation}
+        />
+      </LevelItem>
+    </Level>
+  );
+};
