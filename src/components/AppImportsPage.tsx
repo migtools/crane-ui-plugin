@@ -29,7 +29,7 @@ import {
   useWatchCranePipelineGroups,
 } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
-import { appImportsPageUrl, appImportWizardUrl, appImportsAllNamespacesUrl } from 'src/utils/paths';
+import { appImportsPageUrl, appImportWizardUrl } from 'src/utils/paths';
 import { NamespaceContext } from 'src/context/NamespaceContext';
 
 import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
@@ -62,19 +62,6 @@ const AppImportsPage: React.FunctionComponent = () => {
     params: { pipelineGroupName: activePipelineGroupName, namespace },
   } = useRouteMatch<{ pipelineGroupName: string; namespace: string }>();
   const history = useHistory();
-
-  const isAllNamespaces = !namespace || namespace === '#ALL_NS#';
-  const isK8sRoute = !!useRouteMatch('/k8s');
-
-  React.useEffect(() => {
-    if (!isK8sRoute) {
-      if (isAllNamespaces) {
-        history.replace(appImportsAllNamespacesUrl());
-      } else {
-        history.replace(appImportsPageUrl(namespace, activePipelineGroupName));
-      }
-    }
-  }, [activePipelineGroupName, history, isAllNamespaces, isK8sRoute, namespace]);
 
   const setActivePipelineGroupName = React.useCallback(
     (name: string, op: 'push' | 'replace' = 'push') =>

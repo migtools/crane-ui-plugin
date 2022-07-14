@@ -3,7 +3,7 @@
     "type": "console.page/route",
     "properties": {
       "exact": true,
-      "path": ["/import-application/ns/:namespace"],
+      "path": ["/app-imports/new/ns/:namespace"],
       "component": { "$codeRef": "ImportPage" }
     }
   },
@@ -12,10 +12,8 @@
     "properties": {
       "exact": true,
       "path": [
-        "/k8s/ns/:namespace/app-imports",
-        "/k8s/ns/:namespace/app-imports/:pipelineGroupName",
-        "/k8s/all-namespaces/app-imports",
         "/app-imports/ns/:namespace",
+        "/app-imports/ns/:namespace/:pipelineGroupName",
         "/app-imports/all-namespaces"
       ],
       "component": { "$codeRef": "AppImportsPage" }
@@ -48,7 +46,7 @@
       "groupId": "import-application-group",
       "label": "Import from cluster",
       "description": "Import a manually deployed application on another cluster to an automated GitOps workflow.",
-      "href": "/import-application/ns/:namespace",
+      "href": "/app-imports/new/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
     }
   },
@@ -59,7 +57,7 @@
       "groupId": "import-application-group",
       "label": "Application imports",
       "description": "View imported applications.",
-      "href": "/k8s/ns/:namespace/app-imports",
+      "href": "/app-imports/ns/:namespace",
       "icon": { "$codeRef": "icons.applicationsIconElement" }
     }
   },
