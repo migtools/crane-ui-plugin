@@ -18,7 +18,7 @@ You'll need:
 
 ### To set up for local development:
 
-1. Install dependencies on your cluster. You can install them by installing the [mtk-operator](https://github.com/konveyor/mtk-operator), or manually:
+1. Install dependencies on your cluster. You can install them by installing the [crane-operator](https://github.com/konveyor/crane-operator), or manually:
 
    - Install the **Red Hat OpenShift Pipelines** operator from OperatorHub
    - Deploy [crane-reverse-proxy](https://github.com/konveyor/crane-reverse-proxy) including its dev-only route:
