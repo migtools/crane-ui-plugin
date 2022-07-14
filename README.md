@@ -14,7 +14,7 @@ You'll need:
 
 - Node.js 16+ and Yarn 1.x installed
 - Python and [jq](https://stedolan.github.io/jq/download/) installed (for the start-console.sh setup script)
-- An OpenShift 4.10+ cluster (the Console UI will run locally, but it needs a real cluster on the backend)
+- An OpenShift 4.11+ cluster (the Console UI will run locally, but it needs a real cluster on the backend)
 
 ### To set up for local development:
 
