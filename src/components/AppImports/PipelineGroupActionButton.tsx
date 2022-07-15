@@ -2,11 +2,17 @@ import * as React from 'react';
 import { Button, ButtonProps, Tooltip } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
+  hasRunWithStatus,
   isMissingPipelineRuns,
   isPipelineRunStarting,
+  isSomePipelineRunning,
   useStartPipelineRunMutation,
 } from 'src/api/queries/pipelines';
-import { CranePipelineAction, CranePipelineGroup } from 'src/api/types/CranePipeline';
+import {
+  CranePipelineAction,
+  CranePipelineGroup,
+  PipelineRunStatusString,
+} from 'src/api/types/CranePipeline';
 import { actionToString } from 'src/api/pipelineHelpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { PipelineExplanation } from 'src/common/components/PipelineExplanation';
@@ -28,8 +34,13 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     onSuccess: () => setIsConfirmModalOpen(false),
   });
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
+  const isRunning = isSomePipelineRunning(pipelineGroup);
+  const isPastCutover = (['Running', 'Succeeded'] as PipelineRunStatusString[]).some((status) =>
+    hasRunWithStatus(pipelineGroup, 'cutover', status),
+  );
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
-  const isDisabled = isStarting || isGroupBroken;
+  const isDisabled =
+    isStarting || isGroupBroken || isRunning || (action === 'stage' && isPastCutover);
 
   React.useEffect(() => {
     // Don't keep old mutation state around in case relevant resources get deleted and mess with isStarting
@@ -60,6 +71,10 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
       This application cannot be imported because pre-generated PipelineRuns have been deleted.
       Delete the import and start a new one.
     </>
+  ) : isRunning ? (
+    <>A stage or cutover cannot be started while one is already running.</>
+  ) : action === 'stage' && isPastCutover ? (
+    <>A stage cannot be run after a cutover is already running or succeeded.</>
   ) : null;
 
   return (

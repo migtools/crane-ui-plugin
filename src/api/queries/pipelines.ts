@@ -21,7 +21,9 @@ import {
   CranePipelineGroup,
   CranePipelineRun,
   CRANE_PIPELINE_ACTIONS,
+  PipelineRunStatusString,
 } from '../types/CranePipeline';
+import { pipelineRunStatus } from 'src/reused/pipelines-plugin/src/utils/pipeline-filter-reducer';
 
 export const pipelineGVK: K8sGroupVersionKind = {
   group: 'tekton.dev',
@@ -240,3 +242,12 @@ export const isMissingPipelineRuns = (pipelineGroup?: CranePipelineGroup) => {
       !!pipelineGroup.pipelines[action] && pipelineGroup.pipelineRuns[action].length === 0,
   );
 };
+
+export const hasRunWithStatus = (
+  pipelineGroup: CranePipelineGroup,
+  action: CranePipelineAction,
+  status: PipelineRunStatusString,
+) => !!pipelineGroup.pipelineRuns[action].find((plr) => pipelineRunStatus(plr) === status);
+
+export const isSomePipelineRunning = (pipelineGroup: CranePipelineGroup) =>
+  CRANE_PIPELINE_ACTIONS.some((a) => hasRunWithStatus(pipelineGroup, a, 'Running'));
