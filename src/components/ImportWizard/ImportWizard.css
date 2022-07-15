@@ -15,3 +15,11 @@
 #crane-import-wizard .advanced-switch .pf-c-switch__label {
   font-weight: normal;
 }
+
+#crane-import-wizard .pipeline-info-help-icon {
+  color: var(--pf-global--Color--200);
+}
+
+#crane-import-wizard .pipeline-info-help-icon:hover {
+  color: var(--pf-global--Color--100);
+}

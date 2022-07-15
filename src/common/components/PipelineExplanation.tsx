@@ -5,16 +5,21 @@ import { CranePipelineAction } from 'src/api/types/CranePipeline';
 interface PipelineExplanationProps {
   action: CranePipelineAction;
   isStatefulMigration: boolean;
+  hasVisualization?: boolean;
 }
 
 export const PipelineExplanation: React.FunctionComponent<PipelineExplanationProps> = ({
   action,
   isStatefulMigration,
+  hasVisualization = false,
 }) => {
   if (action === 'stage') {
     return (
       <TextContent>
-        <Text component="p">During a stage migration:</Text>
+        <Text component="p">
+          {hasVisualization ? 'This shows the pipeline tasks for a stage import. ' : ''}
+          During a stage import:
+        </Text>
         <TextList>
           <TextListItem>PVC data is synchronized into the active project.</TextListItem>
           <TextListItem>
@@ -23,7 +28,7 @@ export const PipelineExplanation: React.FunctionComponent<PipelineExplanationPro
         </TextList>
         <Text component="p">
           The stage pipeline can be re-run multiple times to lower the downtime of a subsequent
-          cutover.
+          cutover import.
         </Text>
       </TextContent>
     );
@@ -31,7 +36,10 @@ export const PipelineExplanation: React.FunctionComponent<PipelineExplanationPro
   if (action === 'cutover') {
     return (
       <TextContent>
-        <Text component="p">During a cutover migration:</Text>
+        <Text component="p">
+          {hasVisualization ? 'This shows the pipeline tasks for a cutover import. ' : ''}
+          During a cutover import:
+        </Text>
         <TextList>
           <TextListItem>All applications on the source namespace are halted.</TextListItem>
           {isStatefulMigration ? (
@@ -39,7 +47,9 @@ export const PipelineExplanation: React.FunctionComponent<PipelineExplanationPro
           ) : null}
           <TextListItem>Workloads are migrated into the active project.</TextListItem>
         </TextList>
-        <Text component="p">The cutover pipeline is the final step in an import.</Text>
+        {isStatefulMigration ? (
+          <Text component="p">The cutover pipeline is the final step in a migration project.</Text>
+        ) : null}
       </TextContent>
     );
   }
