@@ -33,6 +33,7 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
+import { appImportsPageUrl } from 'src/utils/paths';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -125,16 +126,10 @@ export const ImportWizard: React.FunctionComponent = () => {
     React.useState(false);
 
   const createTektonResourcesMutation = useCreateTektonResourcesMutation((newResources) => {
-    // On success, navigate to the Tekton UI!
-    const pipelineRuns = [newResources.stagePipelineRun, newResources.cutoverPipelineRun].filter(
-      (plr) => !!plr,
-    );
-    const pipelineRunsUrl = `/k8s/ns/${namespace}/tekton.dev~v1beta1~PipelineRun`;
-    history.push(
-      pipelineRuns.length === 1
-        ? `${pipelineRunsUrl}/${newResources.cutoverPipelineRun.metadata?.name}`
-        : pipelineRunsUrl,
-    );
+    // On success, navigate to the app imports page!
+    const newPipelineGroupName =
+      newResources.cutoverPipeline.metadata.annotations?.['crane-ui-plugin.konveyor.io/group'];
+    history.push(appImportsPageUrl(namespace, newPipelineGroupName));
   });
 
   const onSubmitWizard = () => {

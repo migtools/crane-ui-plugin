@@ -43,7 +43,7 @@ export const PVCEditStep: React.FunctionComponent = () => {
       </TextContent>
       <ListPageFilter
         data={data}
-        loaded // TODO do we use this while loading or not render this at all while loading?
+        loaded
         rowFilters={rowFilters}
         onFilterChange={onFilterChange}
         hideLabelFilter

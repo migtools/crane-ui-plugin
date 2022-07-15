@@ -1,14 +1,19 @@
 import * as yaml from 'js-yaml';
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { getAllPipelineTasks } from './pipelineTaskHelpers';
-import { PipelineKind, PipelineRunKind } from '../reused/pipelines-plugin/src/types';
 import { OAuthSecret } from './types/Secret';
+import {
+  CranePipeline,
+  CranePipelineAction,
+  CranePipelineGroup,
+  CranePipelineRun,
+} from './types/CranePipeline';
 
 export interface WizardTektonResources {
-  stagePipeline: PipelineKind | null;
-  stagePipelineRun: PipelineRunKind | null;
-  cutoverPipeline: PipelineKind;
-  cutoverPipelineRun: PipelineRunKind;
+  stagePipeline: CranePipeline | null;
+  stagePipelineRun: CranePipelineRun | null;
+  cutoverPipeline: CranePipeline;
+  cutoverPipelineRun: CranePipelineRun;
 }
 
 export const formsToTektonResources = (
@@ -17,12 +22,15 @@ export const formsToTektonResources = (
   namespace: string,
 ): WizardTektonResources => {
   const { sourceNamespace, sourceApiSecret } = forms.sourceClusterProject.values;
-  const { pipelineName } = forms.pipelineSettings.values;
+  const { pipelineGroupName } = forms.pipelineSettings.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const isStatefulMigration = selectedPVCs.length > 0;
   const hasMultiplePipelines = isStatefulMigration;
+  const cutoverPipelineName = hasMultiplePipelines
+    ? `${pipelineGroupName}-cutover`
+    : pipelineGroupName;
 
-  const pipelineCommon: PipelineKind = {
+  const pipelineCommon: Partial<CranePipeline> = {
     apiVersion: 'tekton.dev/v1beta1',
     kind: 'Pipeline',
     spec: {
@@ -35,7 +43,7 @@ export const formsToTektonResources = (
     },
   };
 
-  const pipelineRunCommon: PipelineRunKind = {
+  const pipelineRunCommon: Partial<CranePipelineRun> = {
     apiVersion: 'tekton.dev/v1beta1',
     kind: 'PipelineRun',
     spec: {
@@ -54,10 +62,17 @@ export const formsToTektonResources = (
 
   const tasks = getAllPipelineTasks(forms, namespace);
 
-  const stagePipeline: PipelineKind | null = hasMultiplePipelines
+  const stagePipeline: CranePipeline | null = hasMultiplePipelines
     ? {
         ...pipelineCommon,
-        metadata: { name: `${pipelineName}-stage`, namespace },
+        metadata: {
+          name: `${pipelineGroupName}-stage`,
+          namespace,
+          annotations: {
+            'crane-ui-plugin.konveyor.io/action': 'stage',
+            'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
+          },
+        },
         spec: {
           ...pipelineCommon.spec,
           workspaces: [{ name: 'kubeconfig' }],
@@ -73,21 +88,35 @@ export const formsToTektonResources = (
       }
     : null;
 
-  const stagePipelineRun: PipelineRunKind | null = hasMultiplePipelines
+  const stagePipelineRun: CranePipelineRun | null = hasMultiplePipelines
     ? {
         ...pipelineRunCommon,
-        metadata: { generateName: `${pipelineName}-stage-`, namespace },
+        metadata: {
+          generateName: `${pipelineGroupName}-stage-`,
+          namespace,
+          annotations: {
+            'crane-ui-plugin.konveyor.io/action': 'stage',
+            'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
+          },
+        },
         spec: {
           ...pipelineRunCommon.spec,
-          pipelineRef: { name: `${pipelineName}-stage` },
+          pipelineRef: { name: `${pipelineGroupName}-stage` },
           workspaces: [{ name: 'kubeconfig', volumeClaimTemplate: workspaceVolumeClaimTemplate }],
         },
       }
     : null;
 
-  const cutoverPipeline: PipelineKind = {
+  const cutoverPipeline: CranePipeline = {
     ...pipelineCommon,
-    metadata: { name: hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName, namespace },
+    metadata: {
+      name: cutoverPipelineName,
+      namespace,
+      annotations: {
+        'crane-ui-plugin.konveyor.io/action': 'cutover',
+        'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
+      },
+    },
     spec: {
       ...pipelineCommon.spec,
       workspaces: [{ name: 'shared-data' }, { name: 'kubeconfig' }],
@@ -125,15 +154,21 @@ export const formsToTektonResources = (
     },
   };
 
-  const cutoverPipelineRun: PipelineRunKind = {
+  const cutoverPipelineRun: CranePipelineRun = {
     ...pipelineRunCommon,
     metadata: {
-      generateName: hasMultiplePipelines ? `${pipelineName}-cutover-` : `${pipelineName}-`,
+      generateName: hasMultiplePipelines
+        ? `${pipelineGroupName}-cutover-`
+        : `${pipelineGroupName}-`,
       namespace,
+      annotations: {
+        'crane-ui-plugin.konveyor.io/action': 'cutover',
+        'crane-ui-plugin.konveyor.io/group': pipelineGroupName,
+      },
     },
     spec: {
       ...pipelineRunCommon.spec,
-      pipelineRef: { name: hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName },
+      pipelineRef: { name: cutoverPipelineName },
       workspaces: [
         { name: 'shared-data', volumeClaimTemplate: workspaceVolumeClaimTemplate },
         { name: 'kubeconfig', volumeClaimTemplate: workspaceVolumeClaimTemplate },
@@ -149,27 +184,53 @@ export const yamlToTektonResources = (
 ): Partial<WizardTektonResources> => {
   const { stagePipelineYaml, stagePipelineRunYaml, cutoverPipelineYaml, cutoverPipelineRunYaml } =
     forms.review.values;
-  let stagePipeline: PipelineKind | null | undefined;
-  let stagePipelineRun: PipelineRunKind | null | undefined;
-  let cutoverPipeline: PipelineKind | undefined;
-  let cutoverPipelineRun: PipelineRunKind | undefined;
+  let stagePipeline: CranePipeline | null | undefined;
+  let stagePipelineRun: CranePipelineRun | null | undefined;
+  let cutoverPipeline: CranePipeline | undefined;
+  let cutoverPipelineRun: CranePipelineRun | undefined;
   try {
-    stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as PipelineKind) : null;
+    stagePipeline = stagePipelineYaml ? (yaml.load(stagePipelineYaml) as CranePipeline) : null;
     // eslint-disable-next-line no-empty
   } catch (e) {}
   try {
     stagePipelineRun = stagePipelineRunYaml
-      ? (yaml.load(stagePipelineRunYaml) as PipelineRunKind)
+      ? (yaml.load(stagePipelineRunYaml) as CranePipelineRun)
       : null;
     // eslint-disable-next-line no-empty
   } catch (e) {}
   try {
-    cutoverPipeline = yaml.load(cutoverPipelineYaml) as PipelineKind;
+    cutoverPipeline = yaml.load(cutoverPipelineYaml) as CranePipeline;
     // eslint-disable-next-line no-empty
   } catch (e) {}
   try {
-    cutoverPipelineRun = yaml.load(cutoverPipelineRunYaml) as PipelineRunKind;
+    cutoverPipelineRun = yaml.load(cutoverPipelineRunYaml) as CranePipelineRun;
     // eslint-disable-next-line no-empty
   } catch (e) {}
   return { stagePipeline, stagePipelineRun, cutoverPipeline, cutoverPipelineRun };
 };
+
+export const getPipelineGroupSourceNamespace = (group?: CranePipelineGroup) =>
+  (group?.pipelineRuns.all[0]?.spec.params?.find((param) => param.name === 'source-namespace')
+    ?.value as string) || 'Unknown';
+
+export const actionToString = (action: CranePipelineAction, parens = false) =>
+  `${parens ? '(' : ''}${action.charAt(0).toUpperCase()}${action.slice(1)}${parens ? ')' : ''}`;
+
+export const resourceActionToString = (
+  resource: CranePipeline | CranePipelineRun,
+  parens = false,
+) => {
+  const action = resource.metadata.annotations?.['crane-ui-plugin.konveyor.io/action'] || '';
+  return action ? actionToString(action, parens) : '';
+};
+
+// If a PLR has no startTime, sort it as started last because it is still starting
+export const sortByStartedTime = (pipelineRuns: CranePipelineRun[], direction: 'asc' | 'desc') =>
+  [...pipelineRuns].sort((a, b) => {
+    const [aTimestamp, bTimestamp] = [a, b].map((plr) => plr.status?.startTime || null);
+    if ((!!aTimestamp && !bTimestamp) || (!!aTimestamp && !!bTimestamp && aTimestamp < bTimestamp))
+      return direction === 'asc' ? -1 : 1;
+    if ((!aTimestamp && !!bTimestamp) || (!!aTimestamp && !!bTimestamp && aTimestamp > bTimestamp))
+      return direction === 'asc' ? 1 : -1;
+    return 0;
+  });

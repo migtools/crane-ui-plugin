@@ -65,8 +65,6 @@ export const PVCSelectStep: React.FunctionComponent = () => {
     capacity: 'Capacity',
   };
 
-  // TODO warn with a confirm modal when clicking Next with no PVCs selected
-
   return (
     <ResolvedQuery result={sourcePVCsQuery} errorTitle="Cannot load PVCs from source cluster">
       <TextContent className={spacing.mbMd}>

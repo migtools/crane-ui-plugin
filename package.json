@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@konveyor/lib-ui": "^8.2.8",
-    "@openshift-console/dynamic-plugin-sdk": "0.0.11",
+    "@openshift-console/dynamic-plugin-sdk": "^0.0.12",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.7",
     "@patternfly/patternfly": "^4.196.7",
     "@patternfly/react-code-editor": "^4.62.3",
@@ -79,6 +79,7 @@
     "description": "Provides a UI for constructing container migration pipelines within the OpenShift console",
     "exposedModules": {
       "ImportPage": "./components/ImportPage",
+      "AppImportsPage": "./components/AppImportsPage",
       "icons": "./utils/icons.tsx",
       "actions": "./utils/actions.ts"
     },

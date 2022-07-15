@@ -28,16 +28,10 @@ import { getYamlFieldKeys, YamlFieldKey } from './helpers';
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
-  const { pipelineName } = forms.pipelineSettings.values;
+  const { pipelineGroupName } = forms.pipelineSettings.values;
   const isStatefulMigration = forms.pvcSelect.values.selectedPVCs.length > 0;
   const hasMultiplePipelines = isStatefulMigration;
   const { stagePipeline, cutoverPipeline } = yamlToTektonResources(forms);
-
-  // TODO warn somehow if the user is going to override their manual edits here when they go to another step (use isTouched)? not sure how to do that if they use canJumpTo
-
-  // TODO take a look at onEditorDidMount in the PF examples, what's going on with that, how is it implemented?
-  // https://www.patternfly.org/v4/components/code-editor/
-  // TODO figure out what's going wrong when we try to set up monaco-editor-webpack-plugin, which we need for syntax highlighting
 
   const [isAdvancedMode, setIsAdvancedMode] = React.useState(false);
 
@@ -63,8 +57,10 @@ export const ReviewStep: React.FunctionComponent = () => {
     if (hasTouchedEditor && isAdvancedMode) scrollToEditor();
   };
 
-  const stagePipelineName = `${pipelineName}-stage`;
-  const cutoverPipelineName = hasMultiplePipelines ? `${pipelineName}-cutover` : pipelineName;
+  const stagePipelineName = `${pipelineGroupName}-stage`;
+  const cutoverPipelineName = hasMultiplePipelines
+    ? `${pipelineGroupName}-cutover`
+    : pipelineGroupName;
 
   return (
     <div className={spacing.pbLg}>
@@ -188,7 +184,7 @@ export const ReviewStep: React.FunctionComponent = () => {
       {hasMultiplePipelines ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Title headingLevel="h3" size="2xl">
+            <Title headingLevel="h3" size="xl">
               {stagePipelineName}
 
               <Popover
