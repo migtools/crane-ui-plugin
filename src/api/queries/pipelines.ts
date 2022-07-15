@@ -187,7 +187,7 @@ export const useStartPipelineRunMutation = (
         kind: 'PipelineRun',
         spec: { ...latestPipelineRun.spec },
         metadata: {
-          generateName: pipeline.metadata?.name || '',
+          generateName: `${pipeline.metadata?.name || ''}-`,
           namespace: pipeline.metadata.namespace,
           ownerReferences: latestPipelineRun.metadata?.ownerReferences,
           annotations: pipeline.metadata.annotations,
