@@ -1,5 +1,14 @@
 import * as React from 'react';
-import { Button, ButtonProps, Tooltip } from '@patternfly/react-core';
+import {
+  Button,
+  ButtonProps,
+  TextContent,
+  Text,
+  TextList,
+  TextListItem,
+  Title,
+  Tooltip,
+} from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
   isMissingPipelineRuns,
@@ -8,6 +17,7 @@ import {
 } from 'src/api/queries/pipelines';
 import { CranePipelineAction, CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { actionToString } from 'src/api/pipelineHelpers';
+import { ConfirmModal } from 'src/common/components/ConfirmModal';
 
 interface PipelineGroupActionButtonProps {
   pipelineGroup: CranePipelineGroup;
@@ -20,7 +30,11 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   action,
   variant = 'secondary',
 }) => {
-  const mutation = useStartPipelineRunMutation(pipelineGroup, action);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
+
+  const mutation = useStartPipelineRunMutation(pipelineGroup, action, {
+    onSuccess: () => setIsConfirmModalOpen(false),
+  });
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
   const isDisabled = isStarting || isGroupBroken;
@@ -33,10 +47,7 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   const button = (
     <Button
       id={`start-${action}-button`}
-      onClick={() => {
-        // TODO add a confirm modal here
-        mutation.mutate();
-      }}
+      onClick={() => setIsConfirmModalOpen(true)}
       variant={variant}
       className={spacing.mlSm}
       isAriaDisabled={isDisabled}
@@ -59,8 +70,53 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     </>
   ) : null;
 
-  if (disabledReason) {
-    return <Tooltip content={disabledReason}>{button}</Tooltip>;
-  }
-  return button;
+  const confirmMessagesByAction: Record<CranePipelineAction, React.ReactNode> = {
+    stage: (
+      <TextContent>
+        <Title headingLevel="h2" size="md">
+          During a stage migration:
+        </Title>
+        <TextList>
+          <TextListItem>PVC data is synchronized into the active project.</TextListItem>
+          <TextListItem>
+            Workloads are not migrated and remain running in the source cluster.
+          </TextListItem>
+        </TextList>
+        <Text component="p">
+          The stage pipeline can be re-run multiple times to lower the downtime of a subsequent
+          cutover.
+        </Text>
+      </TextContent>
+    ),
+    cutover: (
+      <TextContent>
+        <Title headingLevel="h2" size="md">
+          During a cutover migration:
+        </Title>
+        <TextList>
+          <TextListItem>All applications on the source namespace are halted.</TextListItem>
+          {pipelineGroup.isStatefulApp ? (
+            <TextListItem>PVC data is migrated into the active project.</TextListItem>
+          ) : null}
+          <TextListItem>Workloads are migrated into the active project.</TextListItem>
+        </TextList>
+      </TextContent>
+    ),
+  };
+
+  return (
+    <>
+      {disabledReason ? <Tooltip content={disabledReason}>{button}</Tooltip> : button}
+      <ConfirmModal
+        title={`Run ${action}?`}
+        body={confirmMessagesByAction[action]}
+        confirmButtonText={actionToString(action)}
+        isOpen={isConfirmModalOpen}
+        toggleOpen={() => setIsConfirmModalOpen(!isConfirmModalOpen)}
+        mutateFn={mutation.mutate}
+        mutateResult={mutation}
+        errorText={`Cannot start ${action} PipelineRun`}
+      />
+    </>
+  );
 };

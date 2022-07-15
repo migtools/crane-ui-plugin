@@ -8,7 +8,7 @@ import {
   useK8sWatchResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
-import { useMutation } from 'react-query';
+import { useMutation, UseMutationOptions } from 'react-query';
 import { attachOwnerReference, getObjectRef, sortByCreationTimestamp } from 'src/utils/helpers';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { sortByStartedTime, WizardTektonResources } from '../pipelineHelpers';
@@ -80,6 +80,7 @@ export const useWatchCranePipelineGroups = () => {
   const allCutoverPipelineRuns = allPipelineRuns.filter(byAction('cutover'));
 
   const pipelineGroups: CranePipelineGroup[] = allCutoverPipelines.map((cutoverPipeline) => {
+    const stagePipeline = allStagePipelines.find(bySameGroup(cutoverPipeline)) || null;
     const allPipelineRunsInGroup = allPipelineRuns.filter(bySameGroup(cutoverPipeline));
     const nonPendingPipelineRunsInGroup = allPipelineRunsInGroup.filter(
       (pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending',
@@ -89,7 +90,7 @@ export const useWatchCranePipelineGroups = () => {
     return {
       name: cutoverPipeline.metadata?.annotations?.['crane-ui-plugin.konveyor.io/group'] || '',
       pipelines: {
-        stage: allStagePipelines.find(bySameGroup(cutoverPipeline)) || null,
+        stage: stagePipeline,
         cutover: cutoverPipeline,
       },
       pipelineRuns: {
@@ -99,6 +100,7 @@ export const useWatchCranePipelineGroups = () => {
         nonPending: nonPendingPipelineRunsInGroup,
         latestNonPending: latestNonPendingPipelineRun,
       },
+      isStatefulApp: !!stagePipeline,
     };
   });
 
@@ -163,44 +165,59 @@ export const useCreateTektonResourcesMutation = (
 export const useStartPipelineRunMutation = (
   pipelineGroup: CranePipelineGroup,
   action: CranePipelineAction,
+  options?: Partial<UseMutationOptions>,
 ) => {
   const [pipelineRunModel] = useK8sModel(pipelineRunGVK);
-  return useMutation([pipelineGroup.name, action], () => {
-    const pipeline = pipelineGroup.pipelines[action];
-    const latestPipelineRun = pipelineGroup.pipelineRuns[action][0];
-    if (!pipeline || !latestPipelineRun) return Promise.reject('Pipeline or PipelineRun not found');
-    if (latestPipelineRun.spec.status === 'PipelineRunPending') {
-      return k8sPatch({
+  return useMutation(
+    [pipelineGroup.name, action],
+    () => {
+      const pipeline = pipelineGroup.pipelines[action];
+      const latestPipelineRun = pipelineGroup.pipelineRuns[action][0];
+      if (!pipeline || !latestPipelineRun)
+        return Promise.reject('Pipeline or PipelineRun not found');
+      if (latestPipelineRun.spec.status === 'PipelineRunPending') {
+        return k8sPatch({
+          model: pipelineRunModel,
+          resource: latestPipelineRun,
+          data: [{ op: 'remove', path: '/spec/status' }],
+        });
+      }
+      const newPipelineRun: CranePipelineRun = {
+        apiVersion: 'tekton.dev/v1beta1',
+        kind: 'PipelineRun',
+        spec: { ...latestPipelineRun.spec },
+        metadata: {
+          generateName: pipeline.metadata?.name || '',
+          namespace: pipeline.metadata.namespace,
+          ownerReferences: latestPipelineRun.metadata?.ownerReferences,
+          annotations: pipeline.metadata.annotations,
+        },
+      };
+      delete newPipelineRun.spec.status;
+      return k8sCreate({
         model: pipelineRunModel,
-        resource: latestPipelineRun,
-        data: [{ op: 'remove', path: '/spec/status' }],
+        data: newPipelineRun,
       });
-    }
-    const newPipelineRun: CranePipelineRun = {
-      apiVersion: 'tekton.dev/v1beta1',
-      kind: 'PipelineRun',
-      spec: { ...latestPipelineRun.spec },
-      metadata: {
-        generateName: pipeline.metadata?.name || '',
-        namespace: pipeline.metadata.namespace,
-        ownerReferences: latestPipelineRun.metadata?.ownerReferences,
-        annotations: pipeline.metadata.annotations,
-      },
-    };
-    delete newPipelineRun.spec.status;
-    return k8sCreate({
-      model: pipelineRunModel,
-      data: newPipelineRun,
-    });
-  });
+    },
+    options || {},
+  );
 };
 
-const useDeleteMutation = <T extends K8sResourceCommon>(gvk: K8sGroupVersionKind) => {
+const useDeleteMutation = <T extends K8sResourceCommon>(
+  gvk: K8sGroupVersionKind,
+  options?: Partial<UseMutationOptions<unknown, Error, T>>,
+) => {
   const [model] = useK8sModel(gvk);
-  return useMutation<unknown, Error, T>((resource) => k8sDelete({ model, resource }));
+  return useMutation<unknown, Error, T>(
+    ['delete', gvk],
+    (resource) => k8sDelete({ model, resource }),
+    options || {},
+  );
 };
 
-export const useDeletePipelineMutation = () => useDeleteMutation<CranePipeline>(pipelineGVK);
+export const useDeletePipelineMutation = (
+  options?: Partial<UseMutationOptions<unknown, Error, CranePipeline>>,
+) => useDeleteMutation<CranePipeline>(pipelineGVK, options);
 
 // Until the new PipelineRun appears in the watched pipelineGroup, we still consider it loading/starting
 export const isPipelineRunStarting = (

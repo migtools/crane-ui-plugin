@@ -119,7 +119,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
             <Title headingLevel="h1">Application Imports</Title>
             <Text>View status and take actions on your application import pipelines.</Text>
           </TextContent>
-          {namespace !== '#ALL_NS#' && !isEmptyState ? (
+          {!isAllNamespaces && !isEmptyState ? (
             <Button variant="secondary" className={spacing.mxMd} onClick={goToImportWizard}>
               Start a new import
             </Button>

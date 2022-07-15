@@ -52,7 +52,7 @@ export const ConfirmModal: React.FunctionComponent<IConfirmModalProps> = ({
       onClose={toggleOpen}
       footer={
         <Stack hasGutter>
-          {mutateResult ? (
+          {mutateResult?.isError ? (
             <ResolvedQuery result={mutateResult} errorTitle={errorText} spinnerMode="inline" />
           ) : null}
           <Flex spaceItems={{ default: 'spaceItemsSm' }}>
