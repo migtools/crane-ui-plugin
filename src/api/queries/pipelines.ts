@@ -100,7 +100,7 @@ export const useWatchCranePipelineGroups = () => {
         nonPending: nonPendingPipelineRunsInGroup,
         latestNonPending: latestNonPendingPipelineRun,
       },
-      isStatefulApp: !!stagePipeline,
+      isStatefulMigration: !!stagePipeline,
     };
   });
 

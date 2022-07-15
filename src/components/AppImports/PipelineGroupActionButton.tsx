@@ -1,14 +1,5 @@
 import * as React from 'react';
-import {
-  Button,
-  ButtonProps,
-  TextContent,
-  Text,
-  TextList,
-  TextListItem,
-  Title,
-  Tooltip,
-} from '@patternfly/react-core';
+import { Button, ButtonProps, Tooltip } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
   isMissingPipelineRuns,
@@ -18,6 +9,7 @@ import {
 import { CranePipelineAction, CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { actionToString } from 'src/api/pipelineHelpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
+import { PipelineExplanation } from 'src/common/components/PipelineExplanation';
 
 interface PipelineGroupActionButtonProps {
   pipelineGroup: CranePipelineGroup;
@@ -70,46 +62,17 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     </>
   ) : null;
 
-  const confirmMessagesByAction: Record<CranePipelineAction, React.ReactNode> = {
-    stage: (
-      <TextContent>
-        <Title headingLevel="h2" size="md">
-          During a stage migration:
-        </Title>
-        <TextList>
-          <TextListItem>PVC data is synchronized into the active project.</TextListItem>
-          <TextListItem>
-            Workloads are not migrated and remain running in the source cluster.
-          </TextListItem>
-        </TextList>
-        <Text component="p">
-          The stage pipeline can be re-run multiple times to lower the downtime of a subsequent
-          cutover.
-        </Text>
-      </TextContent>
-    ),
-    cutover: (
-      <TextContent>
-        <Title headingLevel="h2" size="md">
-          During a cutover migration:
-        </Title>
-        <TextList>
-          <TextListItem>All applications on the source namespace are halted.</TextListItem>
-          {pipelineGroup.isStatefulApp ? (
-            <TextListItem>PVC data is migrated into the active project.</TextListItem>
-          ) : null}
-          <TextListItem>Workloads are migrated into the active project.</TextListItem>
-        </TextList>
-      </TextContent>
-    ),
-  };
-
   return (
     <>
       {disabledReason ? <Tooltip content={disabledReason}>{button}</Tooltip> : button}
       <ConfirmModal
         title={`Run ${action}?`}
-        body={confirmMessagesByAction[action]}
+        body={
+          <PipelineExplanation
+            action={action}
+            isStatefulMigration={pipelineGroup.isStatefulMigration}
+          />
+        }
         confirmButtonText={actionToString(action)}
         isOpen={isConfirmModalOpen}
         toggleOpen={() => setIsConfirmModalOpen(!isConfirmModalOpen)}
