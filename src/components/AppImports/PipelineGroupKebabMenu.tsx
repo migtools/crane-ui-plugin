@@ -55,7 +55,7 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
         position="right"
         dropdownItems={[
           isRunning ? (
-            <Tooltip content="The import pipelines cannot be deleted while one is running">
+            <Tooltip content="The import pipelines cannot be deleted while one is running.">
               {deleteItem}
             </Tooltip>
           ) : (
