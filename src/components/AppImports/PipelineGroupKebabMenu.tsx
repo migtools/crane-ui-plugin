@@ -80,6 +80,7 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
           </>
         }
         confirmButtonText="Delete"
+        confirmButtonVariant="danger"
         isOpen={isConfirmDeleteModalOpen}
         toggleOpen={() => setIsConfirmDeleteModalOpen(!isConfirmDeleteModalOpen)}
         mutateFn={() => deletePipelineMutation.mutate(pipelineGroup.pipelines.cutover)}
