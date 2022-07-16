@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Dropdown, KebabToggle, DropdownItem } from '@patternfly/react-core';
+import { Dropdown, KebabToggle, DropdownItem, Tooltip } from '@patternfly/react-core';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { useDeletePipelineMutation } from 'src/api/queries/pipelines';
+import { isSomePipelineRunning, useDeletePipelineMutation } from 'src/api/queries/pipelines';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { pipelinesListUrl } from 'src/utils/paths';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
@@ -33,6 +33,17 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
   };
 
   const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = React.useState(false);
+  const isRunning = isSomePipelineRunning(pipelineGroup);
+  const deleteItem = (
+    <DropdownItem
+      key="app-delete"
+      component="button"
+      onClick={() => setIsConfirmDeleteModalOpen(true)}
+      isAriaDisabled={deletePipelineMutation.isLoading || isRunning}
+    >
+      Delete
+    </DropdownItem>
+  );
 
   return (
     <>
@@ -43,14 +54,13 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
         isPlain
         position="right"
         dropdownItems={[
-          <DropdownItem
-            key="app-delete"
-            component="button"
-            onClick={() => setIsConfirmDeleteModalOpen(true)}
-            isDisabled={deletePipelineMutation.isLoading}
-          >
-            Delete
-          </DropdownItem>,
+          isRunning ? (
+            <Tooltip content="The import pipelines cannot be deleted while one is running">
+              {deleteItem}
+            </Tooltip>
+          ) : (
+            deleteItem
+          ),
           <DropdownItem
             key="app-view-pipelies"
             component="button"
