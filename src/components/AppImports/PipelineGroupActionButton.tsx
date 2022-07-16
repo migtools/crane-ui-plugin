@@ -2,17 +2,13 @@ import * as React from 'react';
 import { Button, ButtonProps, Tooltip } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
-  hasRunWithStatus,
-  isMissingPipelineRuns,
-  isPipelineRunStarting,
-  isSomePipelineRunning,
   useStartPipelineRunMutation,
+  isPipelineRunStarting,
+  isMissingPipelineRuns,
+  isSomePipelineRunning,
+  hasRunningOrSucceededCutover,
 } from 'src/api/queries/pipelines';
-import {
-  CranePipelineAction,
-  CranePipelineGroup,
-  PipelineRunStatusString,
-} from 'src/api/types/CranePipeline';
+import { CranePipelineAction, CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { actionToString } from 'src/api/pipelineHelpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { PipelineExplanation } from 'src/common/components/PipelineExplanation';
@@ -34,11 +30,9 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     onSuccess: () => setIsConfirmModalOpen(false),
   });
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
-  const isRunning = isSomePipelineRunning(pipelineGroup);
-  const isPastCutover = (['Running', 'Succeeded'] as PipelineRunStatusString[]).some((status) =>
-    hasRunWithStatus(pipelineGroup, 'cutover', status),
-  );
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
+  const isRunning = isSomePipelineRunning(pipelineGroup);
+  const isPastCutover = hasRunningOrSucceededCutover(pipelineGroup);
   const isDisabled =
     isStarting || isGroupBroken || isRunning || (action === 'stage' && isPastCutover);
 

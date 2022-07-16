@@ -21,9 +21,11 @@ import {
   CranePipelineGroup,
   CranePipelineRun,
   CRANE_PIPELINE_ACTIONS,
-  PipelineRunStatusString,
 } from '../types/CranePipeline';
-import { pipelineRunStatus } from 'src/reused/pipelines-plugin/src/utils/pipeline-filter-reducer';
+import {
+  pipelineRunStatus,
+  PipelineRunStatusString,
+} from 'src/reused/pipelines-plugin/src/utils/pipeline-filter-reducer';
 
 export const pipelineGVK: K8sGroupVersionKind = {
   group: 'tekton.dev',
@@ -229,10 +231,8 @@ export const isPipelineRunStarting = (
   mutation.isLoading ||
   (mutation.isSuccess &&
     !isMissingPipelineRuns(pipelineGroup) &&
-    !pipelineGroup.pipelineRuns.all.find(
-      (plr) =>
-        plr.metadata?.name === mutation.data?.metadata.name &&
-        plr.spec.status !== 'PipelineRunPending',
+    !pipelineGroup.pipelineRuns.nonPending.find(
+      (plr) => plr.metadata?.name === mutation.data?.metadata.name,
     ));
 
 export const isMissingPipelineRuns = (pipelineGroup?: CranePipelineGroup) => {
@@ -251,3 +251,7 @@ export const hasRunWithStatus = (
 
 export const isSomePipelineRunning = (pipelineGroup: CranePipelineGroup) =>
   CRANE_PIPELINE_ACTIONS.some((a) => hasRunWithStatus(pipelineGroup, a, 'Running'));
+
+export const hasRunningOrSucceededCutover = (pipelineGroup: CranePipelineGroup) =>
+  hasRunWithStatus(pipelineGroup, 'cutover', 'Running') ||
+  hasRunWithStatus(pipelineGroup, 'cutover', 'Succeeded');

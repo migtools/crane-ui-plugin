@@ -5,6 +5,15 @@ import { Condition, PipelineRunKind } from '../types';
 // NOTE: This is only a partial snippet of the original file, all we needed was the `pipelineRunStatus` function.
 // NOTE: i18next usage has been temporarily removed here as we cannot inherit the strings from the console itself.
 
+// NOTE: This type has been added since copying the code:
+export type PipelineRunStatusString =
+  | 'Running'
+  | 'Succeeded'
+  | 'Failed'
+  | 'Cancelled'
+  | 'Pending'
+  | 'Skipped';
+
 export enum SucceedConditionReason {
   PipelineRunCancelled = 'PipelineRunCancelled',
   TaskRunCancelled = 'TaskRunCancelled',
@@ -20,7 +29,7 @@ export enum SucceedConditionReason {
 
 // Converts the PipelineRun (and TaskRun) condition status into a human readable string.
 // See also tkn cli implementation at https://github.com/tektoncd/cli/blob/release-v0.15.0/pkg/formatted/k8s.go#L54-L83
-export const pipelineRunStatus = (pipelineRun: PipelineRunKind): string | null => {
+export const pipelineRunStatus = (pipelineRun: PipelineRunKind): PipelineRunStatusString | null => {
   const conditions: Condition[] = _.get(pipelineRun, ['status', 'conditions'], []);
   if (conditions.length === 0) return null;
 

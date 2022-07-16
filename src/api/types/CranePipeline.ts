@@ -31,11 +31,3 @@ export interface CranePipelineGroup {
   };
   isStatefulMigration: boolean;
 }
-
-export type PipelineRunStatusString =
-  | 'Running'
-  | 'Succeeded'
-  | 'Failed'
-  | 'Cancelled'
-  | 'Pending'
-  | 'Skipped';
