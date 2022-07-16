@@ -50,40 +50,34 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
             </Tr>
           </Thead>
           <Tbody>
-            {pipelineGroup.pipelineRuns.all
-              .filter((pipelineRun) => pipelineRun.spec.status !== 'PipelineRunPending')
-              .map((pipelineRun) => (
-                <Tr key={`${pipelineRun.metadata?.name}`}>
-                  <Td
-                    className="pf-m-truncate"
-                    dataLabel="Pipeline run"
-                    aria-labelledby="pipeline-run-heading"
-                  >
-                    <Link to={pipelineRunUrl(namespace, pipelineRun)}>
-                      {pipelineRun.metadata?.name}
-                    </Link>
-                  </Td>
-                  <Td className="pf-m-truncate" dataLabel="Action" aria-labelledby="action-heading">
-                    {resourceActionToString(pipelineRun)}
-                  </Td>
-                  <Td
-                    className="pf-m-truncate"
-                    dataLabel="Started"
-                    aria-labelledby="started-heading"
-                  >
-                    {pipelineRun.status?.startTime ? (
-                      <Timestamp timestamp={pipelineRun.status?.startTime} />
-                    ) : (
-                      'Not started'
-                    )}
-                  </Td>
-                  <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="result-heading">
-                    <Link to={pipelineRunUrl(namespace, pipelineRun)}>
-                      <PipelineRunStatus pipelineRun={pipelineRun} />
-                    </Link>
-                  </Td>
-                </Tr>
-              ))}
+            {pipelineGroup.pipelineRuns.nonPending.map((pipelineRun) => (
+              <Tr key={`${pipelineRun.metadata?.name}`}>
+                <Td
+                  className="pf-m-truncate"
+                  dataLabel="Pipeline run"
+                  aria-labelledby="pipeline-run-heading"
+                >
+                  <Link to={pipelineRunUrl(namespace, pipelineRun)}>
+                    {pipelineRun.metadata?.name}
+                  </Link>
+                </Td>
+                <Td className="pf-m-truncate" dataLabel="Action" aria-labelledby="action-heading">
+                  {resourceActionToString(pipelineRun)}
+                </Td>
+                <Td className="pf-m-truncate" dataLabel="Started" aria-labelledby="started-heading">
+                  {pipelineRun.status?.startTime ? (
+                    <Timestamp timestamp={pipelineRun.status?.startTime} />
+                  ) : (
+                    'Not started'
+                  )}
+                </Td>
+                <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="result-heading">
+                  <Link to={pipelineRunUrl(namespace, pipelineRun)}>
+                    <PipelineRunStatus pipelineRun={pipelineRun} />
+                  </Link>
+                </Td>
+              </Tr>
+            ))}
           </Tbody>
         </TableComposable>
       )}
