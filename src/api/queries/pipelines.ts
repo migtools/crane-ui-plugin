@@ -251,7 +251,3 @@ export const hasRunWithStatus = (
 
 export const isSomePipelineRunning = (pipelineGroup: CranePipelineGroup) =>
   CRANE_PIPELINE_ACTIONS.some((a) => hasRunWithStatus(pipelineGroup, a, 'Running'));
-
-export const hasRunningOrSucceededCutover = (pipelineGroup: CranePipelineGroup) =>
-  hasRunWithStatus(pipelineGroup, 'cutover', 'Running') ||
-  hasRunWithStatus(pipelineGroup, 'cutover', 'Succeeded');

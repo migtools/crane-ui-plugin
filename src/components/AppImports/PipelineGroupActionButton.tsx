@@ -6,7 +6,7 @@ import {
   isPipelineRunStarting,
   isMissingPipelineRuns,
   isSomePipelineRunning,
-  hasRunningOrSucceededCutover,
+  hasRunWithStatus,
 } from 'src/api/queries/pipelines';
 import { CranePipelineAction, CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { actionToString } from 'src/api/pipelineHelpers';
@@ -32,7 +32,7 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   const isStarting = isPipelineRunStarting(pipelineGroup, mutation);
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
   const isRunning = isSomePipelineRunning(pipelineGroup);
-  const isPastCutover = hasRunningOrSucceededCutover(pipelineGroup);
+  const isPastCutover = hasRunWithStatus(pipelineGroup, 'cutover', 'Succeeded');
   const isDisabled = isStarting || isGroupBroken || isRunning || isPastCutover;
 
   React.useEffect(() => {
@@ -67,7 +67,7 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   ) : isRunning ? (
     <>A stage or cutover cannot be started while one is already running.</>
   ) : isPastCutover ? (
-    <>A {action} cannot be run after a cutover is already running or succeeded.</>
+    <>A stage or cutover cannot be run after a cutover is already succeeded.</>
   ) : null;
 
   return (
