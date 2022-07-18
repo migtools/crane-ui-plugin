@@ -33,8 +33,7 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
   const isGroupBroken = isMissingPipelineRuns(pipelineGroup);
   const isRunning = isSomePipelineRunning(pipelineGroup);
   const isPastCutover = hasRunningOrSucceededCutover(pipelineGroup);
-  const isDisabled =
-    isStarting || isGroupBroken || isRunning || (action === 'stage' && isPastCutover);
+  const isDisabled = isStarting || isGroupBroken || isRunning || isPastCutover;
 
   React.useEffect(() => {
     // Don't keep old mutation state around in case relevant resources get deleted and mess with isStarting
@@ -67,8 +66,8 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     </>
   ) : isRunning ? (
     <>A stage or cutover cannot be started while one is already running.</>
-  ) : action === 'stage' && isPastCutover ? (
-    <>A stage cannot be run after a cutover is already running or succeeded.</>
+  ) : isPastCutover ? (
+    <>A {action} cannot be run after a cutover is already running or succeeded.</>
   ) : null;
 
   return (
