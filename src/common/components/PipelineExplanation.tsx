@@ -17,8 +17,9 @@ export const PipelineExplanation: React.FunctionComponent<PipelineExplanationPro
     return (
       <TextContent>
         <Text component="p">
-          {hasVisualization ? 'This shows the pipeline tasks for a stage import. ' : ''}
-          During a stage import:
+          {hasVisualization
+            ? 'This shows the pipeline tasks for the stage phase of an import. During the stage phase:'
+            : 'During the stage phase of an import:'}
         </Text>
         <TextList>
           <TextListItem>PVC data is synchronized into the active project.</TextListItem>
@@ -37,8 +38,9 @@ export const PipelineExplanation: React.FunctionComponent<PipelineExplanationPro
     return (
       <TextContent>
         <Text component="p">
-          {hasVisualization ? 'This shows the pipeline tasks for a cutover import. ' : ''}
-          During a cutover import:
+          {hasVisualization
+            ? 'This shows the pipeline tasks for the cutover phase of an import. During the cutover phase:'
+            : 'During the cutover phase of an import:'}
         </Text>
         <TextList>
           <TextListItem>All applications on the source namespace are halted.</TextListItem>
