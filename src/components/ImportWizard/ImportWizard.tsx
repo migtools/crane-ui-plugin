@@ -39,6 +39,7 @@ import {
   topologyPageUrl,
   appImportsPageUrl,
 } from 'src/utils/paths';
+import { ImportWizardWelcomeModal } from './ImportWizardWelcomeModal';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -55,6 +56,11 @@ interface ImportWizardProps {
 
 export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reachedFrom }) => {
   const history = useHistory();
+
+  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (reachedFrom !== 'add') setIsWelcomeModalOpen(true);
+  }, [reachedFrom]);
 
   const forms = useImportWizardFormState();
 
@@ -348,6 +354,10 @@ export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reach
             </WizardContextConsumer>
           </WizardFooter>
         }
+      />
+      <ImportWizardWelcomeModal
+        isOpen={isWelcomeModalOpen}
+        onClose={() => setIsWelcomeModalOpen(false)}
       />
     </ImportWizardFormContext.Provider>
   );
