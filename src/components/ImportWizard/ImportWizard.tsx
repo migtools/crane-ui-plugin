@@ -33,7 +33,12 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
-import { appImportsPageUrl } from 'src/utils/paths';
+import {
+  WizardReachedFromParam,
+  addPageUrl,
+  topologyPageUrl,
+  appImportsPageUrl,
+} from 'src/utils/paths';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -44,7 +49,11 @@ enum StepId {
   Review,
 }
 
-export const ImportWizard: React.FunctionComponent = () => {
+interface ImportWizardProps {
+  reachedFrom: WizardReachedFromParam;
+}
+
+export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reachedFrom }) => {
   const history = useHistory();
 
   const forms = useImportWizardFormState();
@@ -231,7 +240,15 @@ export const ImportWizard: React.FunctionComponent = () => {
         ]}
         onSubmit={(event) => event.preventDefault()}
         onSave={onSubmitWizard}
-        onClose={() => history.push(`/add/ns/${namespace}`)}
+        onClose={() => {
+          if (reachedFrom === 'add') {
+            history.push(addPageUrl(namespace));
+          } else if (reachedFrom === 'topology') {
+            history.push(topologyPageUrl(namespace));
+          } else {
+            history.push(appImportsPageUrl(namespace));
+          }
+        }}
         onNext={onMoveToStep}
         onBack={onMoveToStep}
         onGoToStep={onMoveToStep}

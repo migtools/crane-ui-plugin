@@ -46,7 +46,7 @@
       "groupId": "import-application-group",
       "label": "Import from cluster",
       "description": "Import a manually deployed application on another cluster to an automated GitOps workflow.",
-      "href": "/app-imports/new/ns/:namespace",
+      "href": "/app-imports/new/ns/:namespace?from=add",
       "icon": { "$codeRef": "icons.importIconElement" }
     }
   },
