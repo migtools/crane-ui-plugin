@@ -33,12 +33,7 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
-import {
-  WizardReachedFromParam,
-  addPageUrl,
-  topologyPageUrl,
-  appImportsPageUrl,
-} from 'src/utils/paths';
+import { WizardReachedFromParam, appImportsPageUrl } from 'src/utils/paths';
 import { ImportWizardWelcomeModal } from './ImportWizardWelcomeModal';
 
 enum StepId {
@@ -246,15 +241,7 @@ export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reach
         ]}
         onSubmit={(event) => event.preventDefault()}
         onSave={onSubmitWizard}
-        onClose={() => {
-          if (reachedFrom === 'add') {
-            history.push(addPageUrl(namespace));
-          } else if (reachedFrom === 'topology') {
-            history.push(topologyPageUrl(namespace));
-          } else {
-            history.push(appImportsPageUrl(namespace));
-          }
-        }}
+        onClose={() => history.goBack()}
         onNext={onMoveToStep}
         onBack={onMoveToStep}
         onGoToStep={onMoveToStep}

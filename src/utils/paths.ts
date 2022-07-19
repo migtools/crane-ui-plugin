@@ -16,7 +16,3 @@ export const pipelineRunUrl = (namespace: string, pipelineRun: PipelineRunKind) 
 
 export const pipelinesListUrl = (namespace: string, nameFilter?: string) =>
   `/dev-pipelines/ns/${namespace}${nameFilter ? `?name=${nameFilter}` : ''}`;
-
-export const addPageUrl = (namespace: string) => `/add/ns/${namespace}`;
-
-export const topologyPageUrl = (namespace: string) => `/topology/ns/${namespace}`;
