@@ -11,13 +11,11 @@ import {
   Button,
   Popover,
   Title,
-  List,
-  ListItem,
 } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
-import QuestionCircle from '@patternfly/react-icons/dist/esm/icons/question-circle-icon';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -25,6 +23,7 @@ import { yamlToTektonResources } from 'src/api/pipelineHelpers';
 import { PipelineVisualizationWrapper } from 'src/common/components/PipelineVisualizationWrapper';
 import { columnNames as pvcColumnNames } from './PVCEditStep';
 import { getYamlFieldKeys, YamlFieldKey } from './helpers';
+import { PipelineExplanation } from 'src/common/components/PipelineExplanation';
 
 export const ReviewStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);
@@ -184,36 +183,25 @@ export const ReviewStep: React.FunctionComponent = () => {
       {hasMultiplePipelines ? (
         <>
           <TextContent className={spacing.mbSm}>
-            <Title headingLevel="h3" size="xl">
+            <Title headingLevel="h3" size="lg">
               {stagePipelineName}
-
               <Popover
+                hasAutoWidth
                 bodyContent={
-                  <TextContent>
-                    <Text>
-                      This shows the pipeline tasks for a stage import. During a stage import:
-                    </Text>
-                    <List>
-                      <ListItem>PVC data is synchronized into the active project.</ListItem>
-                      <ListItem>
-                        Workloads are not migrated and remain running in the source cluster.
-                      </ListItem>
-                    </List>
-                    <Text>
-                      A stage pipeline can be re-run multiple times to lower the downtime of a
-                      subsequent cutover import.
-                    </Text>
-                  </TextContent>
+                  <PipelineExplanation
+                    action="stage"
+                    isStatefulMigration={isStatefulMigration}
+                    hasVisualization
+                  />
                 }
               >
                 <Button
-                  aria-label="More info for visualization pipeline field"
+                  aria-label={`More info for ${stagePipelineName} pipeline visualization`}
                   variant="link"
                   isInline
-                  className="pf-u-ml-sm"
-                  style={{ color: 'var(--pf-global--palette--white)' }}
+                  className={`${spacing.mlSm} pipeline-info-help-icon`}
                 >
-                  <QuestionCircle />
+                  <HelpIcon />
                 </Button>
               </Popover>
             </Title>
@@ -222,40 +210,25 @@ export const ReviewStep: React.FunctionComponent = () => {
         </>
       ) : null}
       <TextContent className={spacing.mbSm}>
-        <Title headingLevel="h3" size="xl">
+        <Title headingLevel="h3" size="lg">
           {cutoverPipelineName}
-
           <Popover
+            hasAutoWidth
             bodyContent={
-              isStatefulMigration ? (
-                <TextContent>
-                  <Text>
-                    This shows the pipeline tasks for a cutover import. During a cutover import:
-                  </Text>
-                  <List>
-                    <ListItem>All applications on the source namespace are halted.</ListItem>
-                    <ListItem>PVC data is migrated into the active project.</ListItem>
-                    <ListItem>Workloads are migrated into the active project.</ListItem>
-                  </List>
-                  {hasMultiplePipelines ? (
-                    <Text>The cutover pipeline is the final step in a migration project.</Text>
-                  ) : null}
-                </TextContent>
-              ) : (
-                <TextContent>
-                  <Text>This shows the pipeline tasks for the application import</Text>
-                </TextContent>
-              )
+              <PipelineExplanation
+                action="cutover"
+                isStatefulMigration={isStatefulMigration}
+                hasVisualization
+              />
             }
           >
             <Button
-              aria-label="More info for visualization pipeline field"
+              aria-label={`More info for ${cutoverPipelineName} pipeline visualization`}
               variant="link"
               isInline
-              className="pf-u-ml-sm"
-              style={{ color: 'var(--pf-global--palette--white)' }}
+              className={`${spacing.mlSm} pipeline-info-help-icon`}
             >
-              <QuestionCircle />
+              <HelpIcon />
             </Button>
           </Popover>
         </Title>

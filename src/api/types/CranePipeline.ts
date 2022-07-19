@@ -29,4 +29,5 @@ export interface CranePipelineGroup {
     nonPending: CranePipelineRun[];
     latestNonPending: CranePipelineRun | null;
   };
+  isStatefulMigration: boolean;
 }

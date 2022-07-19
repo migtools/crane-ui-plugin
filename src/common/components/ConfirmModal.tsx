@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Modal, Stack, Flex, Button, ModalProps } from '@patternfly/react-core';
+import { Modal, Stack, Flex, Button, ModalProps, ButtonProps } from '@patternfly/react-core';
 import { ResolvedQuery } from '@konveyor/lib-ui';
 import { UseMutationResult, UseQueryResult } from 'react-query';
 
@@ -26,8 +26,9 @@ export interface IConfirmModalProps {
   title: string;
   body: React.ReactNode;
   confirmButtonText: string;
-  cancelButtonText?: string;
   confirmButtonDisabled?: boolean;
+  confirmButtonVariant?: ButtonProps['variant'];
+  cancelButtonText?: string;
   errorText?: string;
 }
 
@@ -41,6 +42,7 @@ export const ConfirmModal: React.FunctionComponent<IConfirmModalProps> = ({
   body,
   confirmButtonText,
   confirmButtonDisabled = false,
+  confirmButtonVariant = 'primary',
   cancelButtonText = 'Cancel',
   errorText = 'Error performing action',
 }: IConfirmModalProps) =>
@@ -52,14 +54,14 @@ export const ConfirmModal: React.FunctionComponent<IConfirmModalProps> = ({
       onClose={toggleOpen}
       footer={
         <Stack hasGutter>
-          {mutateResult ? (
+          {mutateResult?.isError ? (
             <ResolvedQuery result={mutateResult} errorTitle={errorText} spinnerMode="inline" />
           ) : null}
           <Flex spaceItems={{ default: 'spaceItemsSm' }}>
             <Button
               id="modal-confirm-button"
               key="confirm"
-              variant="primary"
+              variant={confirmButtonVariant}
               onClick={mutateFn}
               isDisabled={mutateResult?.isLoading || confirmButtonDisabled}
             >
