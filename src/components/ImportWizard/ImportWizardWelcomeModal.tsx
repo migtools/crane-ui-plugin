@@ -14,7 +14,7 @@ export const ImportWizardWelcomeModal: React.FunctionComponent<ImportWizardWelco
   reachedFrom,
 }) => {
   const namespace = useNamespaceContext();
-  const [isDisabled, setIsDisabled] = localStorageContext.useKey(
+  const [isDisabled, setIsDisabled] = localStorageContext.useStorage(
     'isCraneWizardWelcomeModalDisabled',
   );
   const [isOpen, setIsOpen] = React.useState(false);

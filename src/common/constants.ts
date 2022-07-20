@@ -1,4 +1,4 @@
-import { createLocalStorageContext } from './context/LocalStorageContext';
+import { createLocalStorageContext } from './context/createLocalStorageContext';
 
 export const PROXY_SERVICE_URL = '/api/proxy/plugin/crane-ui-plugin/remote-cluster';
 export const SECRET_SERVICE_URL = '/api/proxy/plugin/crane-ui-plugin/secret-service';
