@@ -109,7 +109,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
   }, [activePipelineGroupName, activePipelineGroup, deletePipelineMutation, history, namespace]);
 
   const isEmptyState = loaded && pipelineGroups.length === 0;
-  const goToImportWizard = () => history.push(appImportWizardUrl(namespace, 'imports'));
+  const goToImportWizard = () => history.push(appImportWizardUrl(namespace));
 
   return (
     <Page>

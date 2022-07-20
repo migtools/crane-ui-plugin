@@ -1,24 +1,15 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
-import { appImportsPageUrl, pipelinesListUrl, WizardReachedFromParam } from 'src/utils/paths';
+import { appImportsPageUrl, pipelinesListUrl } from 'src/utils/paths';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useLocalStorage } from 'src/common/hooks/useLocalStorage';
 
-type ImportWizardWelcomeModalProps = {
-  reachedFrom: WizardReachedFromParam;
-};
-
-export const ImportWizardWelcomeModal: React.FunctionComponent<ImportWizardWelcomeModalProps> = ({
-  reachedFrom,
-}) => {
+export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();
   const [isDisabled, setIsDisabled] = useLocalStorage('isCraneWizardWelcomeModalDisabled');
-  const [isOpen, setIsOpen] = React.useState(false);
-  React.useEffect(() => {
-    if (reachedFrom !== 'add' && isDisabled !== 'true') setIsOpen(true);
-  }, [isDisabled, reachedFrom]);
+  const [isOpen, setIsOpen] = React.useState(isDisabled !== 'true');
   const onClose = () => setIsOpen(false);
   return (
     <Modal

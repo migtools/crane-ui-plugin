@@ -1,10 +1,7 @@
 import { pipelineRunGVK } from 'src/api/queries/pipelines';
 import { PipelineRunKind } from 'src/reused/pipelines-plugin/src/types';
 
-export type WizardReachedFromParam = 'add' | 'topology' | 'imports' | null;
-
-export const appImportWizardUrl = (namespace: string, from?: WizardReachedFromParam) =>
-  `/app-imports/new/ns/${namespace}${from ? `?from=${from}` : ''}`;
+export const appImportWizardUrl = (namespace: string) => `/app-imports/new/ns/${namespace}`;
 
 export const appImportsPageUrl = (namespace: string, pipelineGroupName?: string) =>
   `/app-imports/ns/${namespace}${pipelineGroupName ? `/${pipelineGroupName}` : ''}`;

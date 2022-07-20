@@ -33,7 +33,7 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
-import { WizardReachedFromParam, appImportsPageUrl } from 'src/utils/paths';
+import { appImportsPageUrl } from 'src/utils/paths';
 import { ImportWizardWelcomeModal } from './ImportWizardWelcomeModal';
 
 enum StepId {
@@ -45,11 +45,7 @@ enum StepId {
   Review,
 }
 
-interface ImportWizardProps {
-  reachedFrom: WizardReachedFromParam;
-}
-
-export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reachedFrom }) => {
+export const ImportWizard: React.FunctionComponent = () => {
   const history = useHistory();
 
   const forms = useImportWizardFormState();
@@ -337,7 +333,7 @@ export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reach
           </WizardFooter>
         }
       />
-      <ImportWizardWelcomeModal reachedFrom={reachedFrom} />
+      <ImportWizardWelcomeModal />
     </ImportWizardFormContext.Provider>
   );
 };

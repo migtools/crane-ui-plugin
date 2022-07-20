@@ -22,7 +22,7 @@ export const useTopologyGraphActionProvider: TopologyActionProvider = ({ element
             label: 'Import application from cluster',
             icon: importIconElement,
             cta: {
-              href: appImportWizardUrl(namespace, 'topology'),
+              href: appImportWizardUrl(namespace),
             },
             path: 'add-to-project',
           },

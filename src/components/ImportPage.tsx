@@ -1,11 +1,10 @@
 import * as React from 'react';
 import Helmet from 'react-helmet';
-import { useLocation, useRouteMatch } from 'react-router-dom';
+import { useRouteMatch } from 'react-router-dom';
 import { PageSection, Title } from '@patternfly/react-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ImportWizard } from './ImportWizard/ImportWizard';
 import { NamespaceContext } from 'src/context/NamespaceContext';
-import { WizardReachedFromParam } from 'src/utils/paths';
 
 const queryClient = new QueryClient();
 
@@ -13,8 +12,6 @@ const ImportPage: React.FunctionComponent = () => {
   const {
     params: { namespace },
   } = useRouteMatch<{ namespace: string }>();
-  const location = useLocation();
-  const urlParams = React.useMemo(() => new URLSearchParams(location.search), [location.search]);
   return (
     <>
       <Helmet>
@@ -27,7 +24,7 @@ const ImportPage: React.FunctionComponent = () => {
               <Title headingLevel="h1">Import application</Title>
             </PageSection>
             <PageSection variant="light" type="wizard">
-              <ImportWizard reachedFrom={urlParams.get('from') as WizardReachedFromParam} />
+              <ImportWizard />
             </PageSection>
           </>
         </NamespaceContext.Provider>
