@@ -1,25 +1,40 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Modal, ModalProps, TextContent, Text } from '@patternfly/react-core';
-import { appImportsPageUrl, pipelinesListUrl } from 'src/utils/paths';
+import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
+import { appImportsPageUrl, pipelinesListUrl, WizardReachedFromParam } from 'src/utils/paths';
 import { useNamespaceContext } from 'src/common/context/NamespaceContext';
+import { useLocalStorageContext } from 'src/common/context/LocalStorageContext';
+import { localStorageContext } from 'src/common/context/CraneLocalStorageContext';
+import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
-type ImportWizardWelcomeModalProps = Pick<ModalProps, 'isOpen' | 'onClose'>;
+type ImportWizardWelcomeModalProps = {
+  reachedFrom: WizardReachedFromParam;
+};
 
-export const ImportWizardWelcomeModal: React.FunctionComponent<ImportWizardWelcomeModalProps> = (
-  props,
-) => {
+export const ImportWizardWelcomeModal: React.FunctionComponent<ImportWizardWelcomeModalProps> = ({
+  reachedFrom,
+}) => {
   const namespace = useNamespaceContext();
+  const [isDisabled, setIsDisabled] = useLocalStorageContext(
+    localStorageContext,
+    'isCraneWizardWelcomeModalDisabled',
+  );
+  const [isOpen, setIsOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (reachedFrom !== 'add' && isDisabled !== 'true') setIsOpen(true);
+  }, [isDisabled, reachedFrom]);
+  const onClose = () => setIsOpen(false);
   return (
     <Modal
       variant="small"
       title="Import application from another cluster"
       actions={[
-        <Button key="confirm" variant="primary" onClick={props.onClose}>
+        <Button key="confirm" variant="primary" onClick={onClose}>
           Get started
         </Button>,
       ]}
-      {...props}
+      isOpen={isOpen}
+      onClose={onClose}
     >
       <TextContent>
         <Text component="p">
@@ -32,6 +47,15 @@ export const ImportWizardWelcomeModal: React.FunctionComponent<ImportWizardWelco
           on the <Link to={pipelinesListUrl(namespace)}>Pipelines</Link> page.
         </Text>
       </TextContent>
+      <Checkbox
+        className={spacing.mtMd}
+        label="Don't show this again"
+        id="show-again-checkbox"
+        isChecked={isDisabled === 'true'}
+        onChange={(checked: boolean) => {
+          setIsDisabled(checked ? 'true' : 'false');
+        }}
+      />
     </Modal>
   );
 };

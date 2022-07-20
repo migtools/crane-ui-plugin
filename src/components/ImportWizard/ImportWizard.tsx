@@ -52,11 +52,6 @@ interface ImportWizardProps {
 export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reachedFrom }) => {
   const history = useHistory();
 
-  const [isWelcomeModalOpen, setIsWelcomeModalOpen] = React.useState(false);
-  React.useEffect(() => {
-    if (reachedFrom !== 'add') setIsWelcomeModalOpen(true);
-  }, [reachedFrom]);
-
   const forms = useImportWizardFormState();
 
   const formsByStepId: Record<StepId, IFormState<unknown> | null> = {
@@ -342,10 +337,7 @@ export const ImportWizard: React.FunctionComponent<ImportWizardProps> = ({ reach
           </WizardFooter>
         }
       />
-      <ImportWizardWelcomeModal
-        isOpen={isWelcomeModalOpen}
-        onClose={() => setIsWelcomeModalOpen(false)}
-      />
+      <ImportWizardWelcomeModal reachedFrom={reachedFrom} />
     </ImportWizardFormContext.Provider>
   );
 };
