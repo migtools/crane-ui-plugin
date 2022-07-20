@@ -30,8 +30,8 @@ export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
         </Text>
         <Text component="p">
           The <Link to={appImportsPageUrl(namespace)}>Application Imports</Link> page can be used to
-          view status and take actions on these pipelines, and they can also be seen in more detail
-          on the <Link to={pipelinesListUrl(namespace)}>Pipelines</Link> page.
+          view status and take actions on these pipelines, and they can also be viewed in more
+          detail on the <Link to={pipelinesListUrl(namespace)}>Pipelines</Link> page.
         </Text>
       </TextContent>
       <Checkbox
