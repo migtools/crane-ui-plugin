@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
+import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { appImportsPageUrl, pipelinesListUrl } from 'src/utils/paths';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
-import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useLocalStorage } from 'src/common/hooks/useLocalStorage';
 
 export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
