@@ -5,7 +5,7 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 import { pipelineRunUrl } from 'src/utils/paths';
 import { PipelineRunStatus } from './PipelineRunStatus';
 

@@ -10,7 +10,7 @@ import {
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { attachOwnerReference, getObjectRef, sortByCreationTimestamp } from 'src/utils/helpers';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 import { sortByStartedTime, WizardTektonResources } from '../pipelineHelpers';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';

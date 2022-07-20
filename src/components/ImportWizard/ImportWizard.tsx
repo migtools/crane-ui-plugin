@@ -12,7 +12,7 @@ import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard'
 import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
 import { useHistory } from 'react-router-dom';
 
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
 import { PVCSelectStep } from './PVCSelectStep';

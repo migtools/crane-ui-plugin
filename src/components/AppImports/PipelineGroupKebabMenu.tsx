@@ -4,7 +4,7 @@ import { Dropdown, KebabToggle, DropdownItem, Tooltip } from '@patternfly/react-
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { isSomePipelineRunning, useDeletePipelineMutation } from 'src/api/queries/pipelines';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 import { pipelinesListUrl } from 'src/utils/paths';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 

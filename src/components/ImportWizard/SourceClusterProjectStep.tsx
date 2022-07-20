@@ -20,7 +20,7 @@ import {
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();

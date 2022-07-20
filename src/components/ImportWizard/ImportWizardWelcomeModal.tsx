@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Modal, ModalProps, TextContent, Text } from '@patternfly/react-core';
 import { appImportsPageUrl, pipelinesListUrl } from 'src/utils/paths';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 
 type ImportWizardWelcomeModalProps = Pick<ModalProps, 'isOpen' | 'onClose'>;
 

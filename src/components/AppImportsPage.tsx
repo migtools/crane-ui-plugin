@@ -31,7 +31,7 @@ import {
 } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
 import { appImportsPageUrl, appImportWizardUrl } from 'src/utils/paths';
-import { NamespaceContext, useNamespaceContext } from 'src/context/NamespaceContext';
+import { NamespaceContext, useNamespaceContext } from 'src/common/context/NamespaceContext';
 
 import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
 import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';

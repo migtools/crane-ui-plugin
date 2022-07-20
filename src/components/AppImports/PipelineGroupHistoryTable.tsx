@@ -6,7 +6,7 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useNamespaceContext } from 'src/common/context/NamespaceContext';
 import { resourceActionToString } from 'src/api/pipelineHelpers';
 import { pipelineRunUrl } from 'src/utils/paths';
 import { PipelineRunStatus } from './PipelineRunStatus';
