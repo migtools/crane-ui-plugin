@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
 import { appImportsPageUrl, pipelinesListUrl, WizardReachedFromParam } from 'src/utils/paths';
-import { useNamespaceContext } from 'src/common/context/NamespaceContext';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useLocalStorage } from 'src/common/hooks/useLocalStorage';
 

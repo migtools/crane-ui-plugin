@@ -4,7 +4,7 @@ import { useLocation, useRouteMatch } from 'react-router-dom';
 import { PageSection, Title } from '@patternfly/react-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ImportWizard } from './ImportWizard/ImportWizard';
-import { NamespaceContext } from 'src/common/context/NamespaceContext';
+import { NamespaceContext } from 'src/context/NamespaceContext';
 import { WizardReachedFromParam } from 'src/utils/paths';
 
 const queryClient = new QueryClient();

@@ -9,7 +9,7 @@ import {
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation } from 'react-query';
 import { SECRET_SERVICE_URL } from 'src/common/constants';
-import { useNamespaceContext } from 'src/common/context/NamespaceContext';
+import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { OAuthSecret, Secret } from '../types/Secret';
 
 export const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
