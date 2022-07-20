@@ -13,28 +13,18 @@ const getLocalStorageValues = <KeyListType extends readonly string[]>(
     return { ...values, [key]: window.localStorage.getItem(key) };
   }, {});
 
-interface LocalStorageContext<KeyListType extends readonly string[]> {
+interface LocalStorageContextValue<KeyListType extends readonly string[]> {
   storageValues: LocalStorageValues<KeyListType>;
   setStorageValues: (newValues: LocalStorageValues<KeyListType>) => void;
 }
 
-export const createLocalStorageContext = <KeyListType extends readonly string[]>() =>
-  React.createContext<LocalStorageContext<KeyListType>>({
-    storageValues: {},
-    setStorageValues: () => {
-      console.error(
-        'setStorageValues was called without a LocalStorageContextProvider in the tree',
-      );
-    },
-  });
-
 interface LocalStorageContextProviderProps<KeyListType extends readonly string[]> {
   children: React.ReactNode;
-  context: React.Context<LocalStorageContext<KeyListType>>;
+  context: React.Context<LocalStorageContextValue<KeyListType>>;
   keyList: KeyListType;
 }
 
-export const LocalStorageContextProvider = <KeyListType extends readonly string[]>({
+const LocalStorageContextProvider = <KeyListType extends readonly string[]>({
   children,
   context,
   keyList,
@@ -69,8 +59,8 @@ export const LocalStorageContextProvider = <KeyListType extends readonly string[
   );
 };
 
-export const useLocalStorageContext = <KeyListType extends readonly string[]>(
-  context: React.Context<LocalStorageContext<KeyListType>>,
+const useLocalStorageContextKey = <KeyListType extends readonly string[]>(
+  context: React.Context<LocalStorageContextValue<KeyListType>>,
   key: KeyListType[number],
 ): [string | undefined, (value: string) => void] => {
   const { storageValues, setStorageValues } = React.useContext(context);
@@ -78,4 +68,24 @@ export const useLocalStorageContext = <KeyListType extends readonly string[]>(
   const setValue = (value: string) =>
     setStorageValues({ [key]: value } as LocalStorageValues<KeyListType>);
   return [value, setValue];
+};
+
+export const createLocalStorageContext = <KeyListType extends readonly string[]>(
+  keyList: KeyListType,
+) => {
+  const context = React.createContext<LocalStorageContextValue<KeyListType>>({
+    storageValues: {},
+    setStorageValues: () => {
+      console.error(
+        'setStorageValues was called without a LocalStorageContextProvider in the tree',
+      );
+    },
+  });
+  const Provider: React.FunctionComponent<{ children: React.ReactNode }> = ({ children }) => (
+    <LocalStorageContextProvider context={context} keyList={keyList}>
+      {children}
+    </LocalStorageContextProvider>
+  );
+  const useKey = (key: KeyListType[number]) => useLocalStorageContextKey(context, key);
+  return { context, Provider, useKey };
 };

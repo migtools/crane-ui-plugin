@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
 import { appImportsPageUrl, pipelinesListUrl, WizardReachedFromParam } from 'src/utils/paths';
 import { useNamespaceContext } from 'src/common/context/NamespaceContext';
-import { useLocalStorageContext } from 'src/common/context/LocalStorageContext';
-import { localStorageContext } from 'src/common/context/CraneLocalStorageContext';
+import { localStorageContext } from 'src/common/constants';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 type ImportWizardWelcomeModalProps = {
@@ -15,8 +14,7 @@ export const ImportWizardWelcomeModal: React.FunctionComponent<ImportWizardWelco
   reachedFrom,
 }) => {
   const namespace = useNamespaceContext();
-  const [isDisabled, setIsDisabled] = useLocalStorageContext(
-    localStorageContext,
+  const [isDisabled, setIsDisabled] = localStorageContext.useKey(
     'isCraneWizardWelcomeModalDisabled',
   );
   const [isOpen, setIsOpen] = React.useState(false);
