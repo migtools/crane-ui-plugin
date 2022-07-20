@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ImportWizard } from './ImportWizard/ImportWizard';
 import { NamespaceContext } from 'src/common/context/NamespaceContext';
 import { WizardReachedFromParam } from 'src/utils/paths';
-import { localStorageContext } from 'src/common/constants';
 
 const queryClient = new QueryClient();
 
@@ -23,16 +22,14 @@ const ImportPage: React.FunctionComponent = () => {
       </Helmet>
       <QueryClientProvider client={queryClient}>
         <NamespaceContext.Provider value={namespace}>
-          <localStorageContext.Provider>
-            <>
-              <PageSection variant="light">
-                <Title headingLevel="h1">Import application</Title>
-              </PageSection>
-              <PageSection variant="light" type="wizard">
-                <ImportWizard reachedFrom={urlParams.get('from') as WizardReachedFromParam} />
-              </PageSection>
-            </>
-          </localStorageContext.Provider>
+          <>
+            <PageSection variant="light">
+              <Title headingLevel="h1">Import application</Title>
+            </PageSection>
+            <PageSection variant="light" type="wizard">
+              <ImportWizard reachedFrom={urlParams.get('from') as WizardReachedFromParam} />
+            </PageSection>
+          </>
         </NamespaceContext.Provider>
       </QueryClientProvider>
     </>
