@@ -19,12 +19,12 @@ import {
   useSourceApiRootQuery,
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
-import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
   const namespace = useNamespaceContext();
-  const form = React.useContext(ImportWizardFormContext).sourceClusterProject;
+  const formContext = React.useContext(ImportWizardFormContext);
+  const form = formContext.sourceClusterProject;
 
   const configureSourceSecretMutation = useConfigureSourceSecretMutation({
     existingSecretFromState: form.values.sourceApiSecret,
@@ -49,12 +49,6 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
 
   const credentialsValidating =
     configureSourceSecretMutation.isLoading || sourceApiRootQuery.isLoading;
-  const credentialsAreValid = areSourceCredentialsValid(
-    form.fields.apiUrl,
-    form.fields.token,
-    form.fields.sourceApiSecret,
-    sourceApiRootQuery,
-  );
 
   const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
     form.values.sourceApiSecret,
@@ -92,7 +86,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
 
   const apiUrlFieldProps = getAsyncValidationFieldProps({
     validating: credentialsValidating,
-    valid: credentialsAreValid,
+    valid: form.fields.apiUrl.isValid,
     labelIcon: (
       <Popover
         headerContent={`API URL of the source cluster`}
@@ -118,7 +112,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
 
   const sourceTokenFieldProps = getAsyncValidationFieldProps({
     validating: credentialsValidating,
-    valid: credentialsAreValid,
+    valid: form.fields.token.isValid,
     labelIcon: (
       <Popover
         headerContent={`OAuth token of the source cluster`}
@@ -144,7 +138,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
 
   const sourceNamespaceFieldProps = getAsyncValidationFieldProps({
     validating: validateSourceNamespaceQuery.isLoading,
-    valid: validateSourceNamespaceQuery.data?.data.kind === 'Namespace',
+    valid: form.fields.sourceNamespace.isValid,
     labelIcon: (
       <Popover
         headerContent={`Name of the project to be imported`}
