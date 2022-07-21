@@ -34,6 +34,7 @@ import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
 import { appImportsPageUrl } from 'src/utils/paths';
+import { ImportWizardWelcomeModal } from './ImportWizardWelcomeModal';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -231,7 +232,7 @@ export const ImportWizard: React.FunctionComponent = () => {
         ]}
         onSubmit={(event) => event.preventDefault()}
         onSave={onSubmitWizard}
-        onClose={() => history.push(`/add/ns/${namespace}`)}
+        onClose={() => history.goBack()}
         onNext={onMoveToStep}
         onBack={onMoveToStep}
         onGoToStep={onMoveToStep}
@@ -332,6 +333,7 @@ export const ImportWizard: React.FunctionComponent = () => {
           </WizardFooter>
         }
       />
+      <ImportWizardWelcomeModal />
     </ImportWizardFormContext.Provider>
   );
 };
