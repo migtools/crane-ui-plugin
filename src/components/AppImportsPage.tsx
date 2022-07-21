@@ -79,6 +79,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
   // If pipeline groups are loaded and we don't have one selected, or we have one selected that doesn't exist, select the first one
   React.useEffect(() => {
     if (
+      !isAllNamespaces &&
       loaded &&
       pipelineGroups.length > 0 &&
       (!activePipelineGroupName ||
@@ -86,7 +87,13 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
     ) {
       setActivePipelineGroupName(pipelineGroups[0].name, 'replace');
     }
-  }, [activePipelineGroupName, loaded, pipelineGroups, setActivePipelineGroupName]);
+  }, [
+    isAllNamespaces,
+    loaded,
+    pipelineGroups,
+    activePipelineGroupName,
+    setActivePipelineGroupName,
+  ]);
 
   const areTabsVisible = pipelineGroups.length > 1;
   const activePipelineGroup = pipelineGroups.find(({ name }) => name === activePipelineGroupName);
