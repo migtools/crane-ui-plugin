@@ -46,8 +46,18 @@ export const useImportWizardFormState = () => {
       return true;
     });
 
-  const apiUrlField = useFormField('', credentialsFieldSchema.label('Cluster API URL'));
-  const tokenField = useFormField('', credentialsFieldSchema.label('OAuth token'));
+  const resetSourceSelections = () => {
+    // If the source cluster/project is changing, reset everything the user has selected based on data from the source.
+    forms.pvcSelect.clear();
+    forms.pvcEdit.clear();
+  };
+
+  const apiUrlField = useFormField('', credentialsFieldSchema.label('Cluster API URL'), {
+    onChange: resetSourceSelections,
+  });
+  const tokenField = useFormField('', credentialsFieldSchema.label('OAuth token'), {
+    onChange: resetSourceSelections,
+  });
 
   const sourceApiRootQuery = useSourceApiRootQuery(sourceApiSecretField.value);
   const credentialsAreValid = areSourceCredentialsValid(
@@ -90,7 +100,9 @@ export const useImportWizardFormState = () => {
     editValuesByPVCField.reinitialize(defaultEditValuesByPVC);
   };
 
-  const sourceNamespaceField = useFormField('', yup.string()); // Temporary schema reassigned below
+  const sourceNamespaceField = useFormField('', yup.string(), {
+    onChange: resetSourceSelections,
+  }); // Temporary schema reassigned below
   const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
     sourceApiSecretField.value,
     sourceNamespaceField.value,
