@@ -61,12 +61,13 @@ export const useWatchPipelineRuns = () => {
 
 // TODO memoize these?
 export const useWatchCranePipelineGroups = () => {
+  const namespace = useNamespaceContext();
   const [watchedPipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
   const [watchedPipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
 
   // Pipeline tabs show up in creation order, PipelineRun history shows up latest first
-  const allPipelines = sortByCreationTimestamp(watchedPipelines, 'asc');
-  const allPipelineRuns = sortByStartedTime(watchedPipelineRuns, 'desc');
+  const allPipelines = namespace ? sortByCreationTimestamp(watchedPipelines, 'asc') : [];
+  const allPipelineRuns = namespace ? sortByStartedTime(watchedPipelineRuns, 'desc') : [];
 
   const byAction =
     (action: CraneAnnotations['crane-ui-plugin.konveyor.io/action']) =>
