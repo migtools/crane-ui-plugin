@@ -48,9 +48,46 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     ],
   };
 
+  const sourceRegistryInfo: PipelineTask = {
+    name: 'source-registry-info',
+    runAfter: ['export'],
+    params: [{ name: 'context', value: 'source' }],
+    taskRef: { name: 'oc-registry-info', kind: 'ClusterTask' },
+    workspaces: [{ name: 'kubeconfig', workspace: 'kubeconfig' }],
+  };
+
+  const destinationRegistryInfo: PipelineTask = {
+    name: 'destination-registry-info',
+    runAfter: ['export'],
+    params: [{ name: 'context', value: 'destination' }],
+    taskRef: { name: 'oc-registry-info', kind: 'ClusterTask' },
+    workspaces: [{ name: 'kubeconfig', workspace: 'kubeconfig' }],
+  };
+
+  const imageSyncTask: PipelineTask = {
+    name: 'image-sync',
+    params: [
+      { name: 'src-context', value: 'source' },
+      {
+        name: 'src-internal-registry-url',
+        value: '$(tasks.source-registry-info.results.internal)',
+      },
+      { name: 'src-public-registry-url', value: '$(tasks.source-registry-info.results.public)' },
+      { name: 'dest-context', value: 'destination' },
+      { name: 'dest-public-registry-url', value: '$(tasks.dest-registry-info.results.public)' },
+    ],
+    runAfter: ['source-registry-info', 'destination-registry-info'],
+    taskRef: { name: 'crane-image-sync', kind: 'ClusterTask' },
+    workspaces: [
+      { name: 'export', workspace: 'shared-data', subPath: 'export' },
+      { name: 'skopeo', workspace: 'shared-data', subPath: 'skopeo' },
+      { name: 'kubeconfig', workspace: 'kubeconfig' },
+    ],
+  };
+
   const craneTransformTask: PipelineTask = {
     name: 'transform',
-    runAfter: ['export'],
+    runAfter: ['image-sync'],
     params: [
       {
         name: 'optional-flags',
@@ -186,6 +223,9 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     generateSourceKubeconfigTask,
     generateDestinationKubeconfigTask,
     craneExportTask,
+    sourceRegistryInfo,
+    destinationRegistryInfo,
+    imageSyncTask,
     craneTransformTask,
     craneApplyTask,
     kustomizeInitTask,
