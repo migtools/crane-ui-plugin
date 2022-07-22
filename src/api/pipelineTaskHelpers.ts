@@ -6,6 +6,10 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
   const { sourceNamespace } = forms.sourceClusterProject.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const { editValuesByPVC } = forms.pvcEdit.values;
+  const registryReplacements = [
+    `$(tasks.source-registry-info.results.internal)/${sourceNamespace}=$(tasks.destination-registry-info.results.internal)/$(context.taskRun.namespace)`,
+    `$(tasks.source-registry-info.results.public)/${sourceNamespace}=$(tasks.destination-registry-info.results.public)/$(context.taskRun.namespace)`,
+  ];
 
   const pvcRenameMap = function (pvc: PersistentVolumeClaim): string {
     const editValues = editValuesByPVC[pvc.metadata?.name || ''];
@@ -74,7 +78,11 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
       },
       { name: 'src-public-registry-url', value: '$(tasks.source-registry-info.results.public)' },
       { name: 'dest-context', value: 'destination' },
-      { name: 'dest-public-registry-url', value: '$(tasks.dest-registry-info.results.public)' },
+      {
+        name: 'dest-public-registry-url',
+        value: '$(tasks.destination-registry-info.results.public)',
+      },
+      { name: 'dest-namespace', value: '$(context.taskRun.namespace)' },
     ],
     runAfter: ['source-registry-info', 'destination-registry-info'],
     taskRef: { name: 'crane-image-sync', kind: 'ClusterTask' },
@@ -91,7 +99,9 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     params: [
       {
         name: 'optional-flags',
-        value: `pvc-rename-map=${selectedPVCs.map(pvcRenameMap).join(',')}`,
+        value: `"registry-replacement=${registryReplacements.join(
+          ',',
+        )}","pvc-rename-map=${selectedPVCs.map(pvcRenameMap).join(',')}"`,
       },
     ],
     taskRef: { name: 'crane-transform', kind: 'ClusterTask' },
