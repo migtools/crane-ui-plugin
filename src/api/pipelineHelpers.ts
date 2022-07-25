@@ -124,6 +124,8 @@ export const formsToTektonResources = (
         tasks.generateSourceKubeconfigTask,
         tasks.generateDestinationKubeconfigTask,
         tasks.craneExportTask,
+        tasks.sourceRegistryInfo,
+        tasks.destinationRegistryInfo,
         ...(isStatefulMigration
           ? [
               tasks.quiesceDeploymentsTask,
