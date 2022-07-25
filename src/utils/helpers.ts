@@ -4,6 +4,7 @@ import {
   OwnerReference,
   WatchK8sResult,
 } from '@openshift-console/dynamic-plugin-sdk';
+import hash from 'object-hash';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 
 export const isSameResource = (
@@ -61,4 +62,15 @@ export const watchErrorToString = (error: WatchK8sResult<K8sResourceCommon>[2]) 
   if (error.message) return error.message;
   if (error.toString) return error.toString();
   return 'Unknown error';
+};
+
+// Based on https://github.com/konveyor/crane/pull/124
+// Ensures a resource name will not be longer than 63 characters
+export const getValidatedName = (prefix: string, name: string) => {
+  if (prefix.length > 31) {
+    console.error('getValidatedName: Prefix must be no longer than 31 characters'); // 31 + 32 (md5) = 63
+    return name;
+  }
+  if (prefix.length + name.length < 63) return `${prefix}${name}`;
+  return `${prefix}${hash(name, { algorithm: 'md5' })}`;
 };
