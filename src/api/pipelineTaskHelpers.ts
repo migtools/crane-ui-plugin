@@ -217,18 +217,6 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     };
   });
 
-  const chownTask = {
-    name: 'chown',
-    params: [
-      { name: 'pvcs', value: selectedPVCs.map((pvc) => pvc.metadata?.name).join(',') },
-      { name: 'namespace', value: '$(params.source-namespace)' },
-      { name: 'context', value: 'destination' },
-    ],
-    runAfter: ['transfer-pvc'],
-    taskRef: { kind: 'ClusterTask', name: 'crane-ownership-change' },
-    workspaces: [{ name: 'kubeconfig', workspace: 'kubeconfig' }],
-  };
-
   return {
     generateSourceKubeconfigTask,
     generateDestinationKubeconfigTask,
@@ -245,6 +233,5 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     quiesceStatefulSetsTask,
     quiesceJobsTask,
     transferPvcTasks,
-    chownTask,
   };
 };
