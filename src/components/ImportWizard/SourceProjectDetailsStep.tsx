@@ -1,6 +1,12 @@
 import * as React from 'react';
-import { TextContent, Text } from '@patternfly/react-core';
-import { TableComposable, Tbody, Td, Th, Tr } from '@patternfly/react-table';
+import {
+  TextContent,
+  Text,
+  DescriptionList,
+  DescriptionListGroup,
+  DescriptionListTerm,
+  DescriptionListDescription,
+} from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
@@ -30,26 +36,26 @@ export const SourceProjectDetailsStep: React.FunctionComponent = () => {
         <Text component="h2">Project details</Text>
         <Text component="h3">{forms.sourceClusterProject.values.sourceNamespace}</Text>
       </TextContent>
-      <TableComposable
-        aria-label="Project details table"
-        variant="compact"
-        className="project-details-table"
-      >
-        <Tbody>
-          <Tr>
-            <Th className={spacing.pr_2xl}>Pods</Th>
-            <Td id="details-pods">{sourcePodsQuery.data?.data.items.length}</Td>
-          </Tr>
-          <Tr>
-            <Th className={spacing.pr_2xl}>Persistent Volume Claims (PVCs)</Th>
-            <Td id="details-pvcs">{sourcePVCsQuery.data?.data.items.length}</Td>
-          </Tr>
-          <Tr>
-            <Th className={spacing.pr_2xl}>Services</Th>
-            <Td id="details-services">{sourceServicesQuery.data?.data.items.length}</Td>
-          </Tr>
-        </Tbody>
-      </TableComposable>
+      <DescriptionList isHorizontal horizontalTermWidthModifier={{ default: '30ch' }}>
+        <DescriptionListGroup>
+          <DescriptionListTerm>Pods</DescriptionListTerm>
+          <DescriptionListDescription>
+            {sourcePodsQuery.data?.data.items.length}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+        <DescriptionListGroup>
+          <DescriptionListTerm>Persistent Volume Claims (PVCs)</DescriptionListTerm>
+          <DescriptionListDescription>
+            {sourcePVCsQuery.data?.data.items.length}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+        <DescriptionListGroup>
+          <DescriptionListTerm>Services</DescriptionListTerm>
+          <DescriptionListDescription>
+            {sourceServicesQuery.data?.data.items.length}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+      </DescriptionList>
     </ResolvedQueries>
   );
 };

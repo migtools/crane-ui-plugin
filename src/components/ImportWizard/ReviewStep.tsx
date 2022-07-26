@@ -11,6 +11,10 @@ import {
   Button,
   Popover,
   Title,
+  DescriptionList,
+  DescriptionListDescription,
+  DescriptionListGroup,
+  DescriptionListTerm,
 } from '@patternfly/react-core';
 import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
@@ -72,114 +76,87 @@ export const ReviewStep: React.FunctionComponent = () => {
           that will be created when you select Finish.
         </Text>
       </TextContent>
-      <TableComposable
-        gridBreakPoint="grid"
-        aria-label="Application import review"
-        variant="compact"
-        borders={false}
-        className={spacing.mbLg}
+      <DescriptionList
+        isHorizontal
+        horizontalTermWidthModifier={{ default: '30ch' }}
+        className={`${spacing.mtLg} ${spacing.mbXl}`}
       >
-        <Thead>
-          <Tr>
-            <Th modifier="nowrap" id="pipeline-name">
-              Pipeline {hasMultiplePipelines ? 'names' : 'name'}
-            </Th>
-            <Th modifier="nowrap" id="source-cluster-api-url">
-              Source cluster API URL
-            </Th>
-            <Th modifier="nowrap" id="source-project-name">
-              Source project name
-            </Th>
-            <Th modifier="nowrap" id="persistent-volume-claims">
-              Persistent volume claims
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td
-              className="pf-m-truncate"
-              aria-labelledby="pipeline-name"
-              dataLabel="Pipeline names"
-            >
-              {(hasMultiplePipelines
-                ? [stagePipelineName, cutoverPipelineName]
-                : [cutoverPipelineName]
-              ).join(', ')}
-            </Td>
-
-            <Td
-              className="pf-m-truncate"
-              aria-labelledby="source-cluster-api-url"
-              dataLabel="Source cluster API URL"
-            >
-              {forms.sourceClusterProject.values.apiUrl}
-            </Td>
-
-            <Td
-              className="pf-m-truncate"
-              aria-labelledby="source-project-name"
-              dataLabel="Source project name"
-            >
-              {forms.sourceClusterProject.values.sourceNamespace}
-            </Td>
-
-            <Td
-              className="pf-m-truncate"
-              aria-labelledby="persistent-volume-claims"
-              dataLabel="Persistent volume claims"
-            >
-              {forms.pvcSelect.values.selectedPVCs.length > 0 ? (
-                <Popover
-                  aria-label="Persistent volume claim details"
-                  headerContent="Persistent volume claims"
-                  hasAutoWidth
-                  bodyContent={
-                    <TableComposable variant="compact" borders={false}>
-                      <Thead>
-                        <Tr>
-                          <Th modifier="nowrap">{pvcColumnNames.sourcePvcName}</Th>
-                          <Th modifier="nowrap">{pvcColumnNames.targetPvcName}</Th>
-                          <Th modifier="nowrap">{pvcColumnNames.storageClass}</Th>
-                          <Th modifier="nowrap">{pvcColumnNames.capacity}</Th>
-                          <Th modifier="nowrap">{pvcColumnNames.verifyCopy}</Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {forms.pvcSelect.values.selectedPVCs.map((pvc) => {
-                          const { targetPvcName, storageClass, capacity, verifyCopy } =
-                            forms.pvcEdit.values.editValuesByPVC[pvc.metadata?.name || ''];
-                          return (
-                            <Tr key={pvc.metadata?.name}>
-                              <Td dataLabel={pvcColumnNames.sourcePvcName}>{pvc.metadata?.name}</Td>
-                              <Td dataLabel={pvcColumnNames.targetPvcName}>{targetPvcName}</Td>
-                              <Td dataLabel={pvcColumnNames.storageClass}>{storageClass}</Td>
-                              <Td dataLabel={pvcColumnNames.capacity}>{capacity}</Td>
-                              <Td dataLabel={pvcColumnNames.verifyCopy}>
-                                {verifyCopy ? 'Yes' : 'No'}
-                              </Td>
-                            </Tr>
-                          );
-                        })}
-                      </Tbody>
-                    </TableComposable>
-                  }
+        <DescriptionListGroup>
+          <DescriptionListTerm>
+            Pipeline {hasMultiplePipelines ? 'names' : 'name'}
+          </DescriptionListTerm>
+          <DescriptionListDescription>
+            {(hasMultiplePipelines
+              ? [stagePipelineName, cutoverPipelineName]
+              : [cutoverPipelineName]
+            ).join(', ')}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+        <DescriptionListGroup>
+          <DescriptionListTerm>Source cluster API URL</DescriptionListTerm>
+          <DescriptionListDescription>
+            {forms.sourceClusterProject.values.apiUrl}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+        <DescriptionListGroup>
+          <DescriptionListTerm>Source project name</DescriptionListTerm>
+          <DescriptionListDescription>
+            {forms.sourceClusterProject.values.sourceNamespace}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+        <DescriptionListGroup>
+          <DescriptionListTerm>Persistent volume claims</DescriptionListTerm>
+          <DescriptionListDescription>
+            {forms.pvcSelect.values.selectedPVCs.length > 0 ? (
+              <Popover
+                aria-label="Persistent volume claim details"
+                headerContent="Persistent volume claims"
+                hasAutoWidth
+                bodyContent={
+                  <TableComposable variant="compact" borders={false}>
+                    <Thead>
+                      <Tr>
+                        <Th modifier="nowrap">{pvcColumnNames.sourcePvcName}</Th>
+                        <Th modifier="nowrap">{pvcColumnNames.targetPvcName}</Th>
+                        <Th modifier="nowrap">{pvcColumnNames.storageClass}</Th>
+                        <Th modifier="nowrap">{pvcColumnNames.capacity}</Th>
+                        <Th modifier="nowrap">{pvcColumnNames.verifyCopy}</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {forms.pvcSelect.values.selectedPVCs.map((pvc) => {
+                        const { targetPvcName, storageClass, capacity, verifyCopy } =
+                          forms.pvcEdit.values.editValuesByPVC[pvc.metadata?.name || ''];
+                        return (
+                          <Tr key={pvc.metadata?.name}>
+                            <Td dataLabel={pvcColumnNames.sourcePvcName}>{pvc.metadata?.name}</Td>
+                            <Td dataLabel={pvcColumnNames.targetPvcName}>{targetPvcName}</Td>
+                            <Td dataLabel={pvcColumnNames.storageClass}>{storageClass}</Td>
+                            <Td dataLabel={pvcColumnNames.capacity}>{capacity}</Td>
+                            <Td dataLabel={pvcColumnNames.verifyCopy}>
+                              {verifyCopy ? 'Yes' : 'No'}
+                            </Td>
+                          </Tr>
+                        );
+                      })}
+                    </Tbody>
+                  </TableComposable>
+                }
+              >
+                <Button
+                  aria-label={`${forms.pvcSelect.values.selectedPVCs.length} persistent volume claims`}
+                  variant="link"
+                  isInline
                 >
-                  <Button
-                    aria-label={`${forms.pvcSelect.values.selectedPVCs.length} persistent volume claims`}
-                    variant="link"
-                    isInline
-                  >
-                    {forms.pvcSelect.values.selectedPVCs.length}
-                  </Button>
-                </Popover>
-              ) : (
-                0
-              )}
-            </Td>
-          </Tr>
-        </Tbody>
-      </TableComposable>
+                  {forms.pvcSelect.values.selectedPVCs.length}
+                </Button>
+              </Popover>
+            ) : (
+              0
+            )}
+          </DescriptionListDescription>
+        </DescriptionListGroup>
+      </DescriptionList>
       {hasMultiplePipelines ? (
         <>
           <TextContent className={spacing.mbSm}>
