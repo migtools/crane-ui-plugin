@@ -2,10 +2,6 @@
   height: 100%;
 }
 
-#crane-import-wizard .project-details-table {
-  width: auto;
-}
-
 #crane-import-wizard .json-popover .pf-c-popover__content {
   overflow-y: scroll;
   max-height: 20rem;

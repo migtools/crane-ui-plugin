@@ -36,7 +36,6 @@ import { NamespaceContext, useNamespaceContext } from 'src/context/NamespaceCont
 import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
 import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';
 import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTable';
-import './AppImports/AppImports.css';
 
 const queryClient = new QueryClient();
 
