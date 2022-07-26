@@ -1,17 +1,19 @@
 import { ImportWizardFormState } from 'src/components/ImportWizard/ImportWizardFormContext';
 import { PipelineTask } from 'src/reused/pipelines-plugin/src/types';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
+import { getValidatedName } from 'src/utils/helpers';
 
 export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: string) => {
   const { sourceNamespace } = forms.sourceClusterProject.values;
   const { selectedPVCs } = forms.pvcSelect.values;
   const { editValuesByPVC } = forms.pvcEdit.values;
+
   const registryReplacements = [
     `$(tasks.source-registry-info.results.internal)/${sourceNamespace}=$(tasks.destination-registry-info.results.internal)/$(context.taskRun.namespace)`,
     `$(tasks.source-registry-info.results.public)/${sourceNamespace}=$(tasks.destination-registry-info.results.public)/$(context.taskRun.namespace)`,
   ];
 
-  const pvcRenameMap = function (pvc: PersistentVolumeClaim): string {
+  const pvcRenameMap = (pvc: PersistentVolumeClaim): string => {
     const editValues = editValuesByPVC[pvc.metadata?.name || ''];
     const { targetPvcName } = editValues;
     return `${pvc.metadata?.name}:${targetPvcName}`;
@@ -195,12 +197,12 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
     workspaces: [{ name: 'kubeconfig', workspace: 'kubeconfig' }],
   };
 
-  const transferPvcTasks: PipelineTask[] = selectedPVCs.map((pvc, index) => {
+  const transferPvcTasks: PipelineTask[] = selectedPVCs.map((pvc) => {
     const editValues = editValuesByPVC[pvc.metadata?.name || ''];
     const { targetPvcName, storageClass, capacity, verifyCopy } = editValues; // TODO where to put verifyCopy?
     console.log('TODO: use verifyCopy flag!', pvc.metadata?.name, verifyCopy);
     return {
-      name: `transfer-pvc-${index}`,
+      name: getValidatedName('transfer-pvc-', pvc.metadata?.name || ''),
       params: [
         { name: 'source-context', value: 'source' },
         { name: 'source-namespace', value: sourceNamespace },
