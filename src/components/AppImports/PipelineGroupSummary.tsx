@@ -21,7 +21,7 @@ interface PipelineGroupSummaryProps {
 export const PipelineGroupSummary: React.FunctionComponent<PipelineGroupSummaryProps> = ({
   pipelineGroup,
 }) => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const latestPipelineRun = pipelineGroup.pipelineRuns.latestNonPending;
   return (
     <DescriptionList

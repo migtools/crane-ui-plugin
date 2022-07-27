@@ -9,7 +9,7 @@ export const pvcGVK: K8sGroupVersionKind = {
 };
 
 export const useWatchPVCs = () => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const [data, loaded, error] = useK8sWatchResource<PersistentVolumeClaim[]>({
     groupVersionKind: pvcGVK,
     isList: true,

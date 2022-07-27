@@ -12,7 +12,10 @@ import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard'
 import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
 import { useHistory } from 'react-router-dom';
 
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import {
+  useNamespaceContext,
+  useRedirectOnInvalidNamespaceEffect,
+} from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
 import { PVCSelectStep } from './PVCSelectStep';
@@ -33,8 +36,14 @@ import { getYamlFieldKeys } from './helpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { RouteGuard } from 'src/common/components/RouteGuard';
 import { useSourcePVCsQuery } from 'src/api/queries/sourceResources';
-import { appImportsPageUrl } from 'src/utils/paths';
+import {
+  addPageAllNamespacesUrl,
+  appImportsPageUrl,
+  appImportWizardAllNamespacesUrl,
+} from 'src/utils/paths';
 import { ImportWizardWelcomeModal } from './ImportWizardWelcomeModal';
+import { NoProjectEmptyState } from 'src/common/components/NoProjectEmptyState';
+import { LoadingEmptyState } from 'src/common/components/LoadingEmptyState';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -86,7 +95,9 @@ export const ImportWizard: React.FunctionComponent = () => {
   const canMoveToStep = (stepId: StepId) =>
     !allNavDisabled && stepId >= 0 && stepIdReached >= stepId;
 
-  const namespace = useNamespaceContext();
+  const { namespace, isValidatingNamespace, isAllNamespaces, isNamespaceValid } =
+    useNamespaceContext();
+  useRedirectOnInvalidNamespaceEffect(appImportWizardAllNamespacesUrl);
 
   const configureDestinationSecretMutation = useConfigureDestinationSecretMutation({
     existingSecretFromState: forms.review.values.destinationApiSecret,
@@ -153,10 +164,17 @@ export const ImportWizard: React.FunctionComponent = () => {
   );
   const [isResetYamlConfirmModalOpen, setIsResetYamlConfirmModalOpen] = React.useState(false);
 
+  if (isValidatingNamespace) return <LoadingEmptyState />;
+  if (isAllNamespaces) return <NoProjectEmptyState selectProjectHref={addPageAllNamespacesUrl} />;
+
   return (
     <ImportWizardFormContext.Provider value={forms}>
       <RouteGuard
-        when={forms.isSomeFormDirty && createTektonResourcesMutation.status === 'idle'}
+        when={
+          forms.isSomeFormDirty &&
+          createTektonResourcesMutation.status === 'idle' &&
+          isNamespaceValid
+        }
         title="Leave this page?"
         message="All unsaved changes will be lost."
       />

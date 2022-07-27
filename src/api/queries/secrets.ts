@@ -28,7 +28,7 @@ export const useConfigureSourceSecretMutation = ({
   onSuccess,
 }: UseConfigureSecretMutationArgs) => {
   const [secretModel] = useK8sModel(secretGVK);
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   return useMutation<OAuthSecret, Error, ConfigureSourceSecretMutationParams>(
     async ({ apiUrl, token }) => {
       // If we already have a secret in state, use that instead of looking for one to replace.
@@ -62,7 +62,7 @@ export const useConfigureDestinationSecretMutation = ({
   onSuccess,
 }: UseConfigureSecretMutationArgs) => {
   const [secretModel] = useK8sModel(secretGVK);
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const apiUrl = 'https://kubernetes.default.svc';
   return useMutation<OAuthSecret, Error>(
     async () => {

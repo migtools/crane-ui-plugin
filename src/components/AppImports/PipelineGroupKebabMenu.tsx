@@ -17,7 +17,7 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
   pipelineGroup,
   deletePipelineMutation,
 }) => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const history = useHistory();
 
   const onFocus = (id: string) => {

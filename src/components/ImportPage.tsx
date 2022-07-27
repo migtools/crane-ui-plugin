@@ -4,7 +4,7 @@ import { useRouteMatch } from 'react-router-dom';
 import { PageSection, Title } from '@patternfly/react-core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ImportWizard } from './ImportWizard/ImportWizard';
-import { NamespaceContext } from 'src/context/NamespaceContext';
+import { NamespaceContextProvider } from 'src/context/NamespaceContext';
 
 const queryClient = new QueryClient();
 
@@ -18,7 +18,7 @@ const ImportPage: React.FunctionComponent = () => {
         <title>Crane</title>
       </Helmet>
       <QueryClientProvider client={queryClient}>
-        <NamespaceContext.Provider value={namespace}>
+        <NamespaceContextProvider value={namespace}>
           <>
             <PageSection variant="light">
               <Title headingLevel="h1">Import application</Title>
@@ -27,7 +27,7 @@ const ImportPage: React.FunctionComponent = () => {
               <ImportWizard />
             </PageSection>
           </>
-        </NamespaceContext.Provider>
+        </NamespaceContextProvider>
       </QueryClientProvider>
     </>
   );

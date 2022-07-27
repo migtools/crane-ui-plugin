@@ -40,7 +40,7 @@ export const pipelineRunGVK: K8sGroupVersionKind = {
 };
 
 export const useWatchPipelines = () => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   return useK8sWatchResource<CranePipeline[]>({
     groupVersionKind: pipelineGVK,
     isList: true,
@@ -50,7 +50,7 @@ export const useWatchPipelines = () => {
 };
 
 export const useWatchPipelineRuns = () => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   return useK8sWatchResource<CranePipelineRun[]>({
     groupVersionKind: pipelineRunGVK,
     isList: true,
@@ -61,7 +61,7 @@ export const useWatchPipelineRuns = () => {
 
 // TODO memoize these?
 export const useWatchCranePipelineGroups = () => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const [watchedPipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
   const [watchedPipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
 

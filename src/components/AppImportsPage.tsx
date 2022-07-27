@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Helmet from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Link, useHistory, useRouteMatch } from 'react-router-dom';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import {
   Page,
   PageSection,
@@ -16,10 +16,8 @@ import {
   Alert,
   EmptyState,
   EmptyStateIcon,
-  Spinner,
   Divider,
   AlertActionLink,
-  EmptyStateBody,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
@@ -30,12 +28,23 @@ import {
   useWatchCranePipelineGroups,
 } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
-import { appImportsPageUrl, appImportWizardUrl } from 'src/utils/paths';
-import { NamespaceContext, useNamespaceContext } from 'src/context/NamespaceContext';
+import {
+  appImportsAllNamespacesUrl,
+  appImportsPageUrl,
+  appImportWizardUrl,
+  projectDetailsAllNamespacesUrl,
+} from 'src/utils/paths';
+import {
+  NamespaceContextProvider,
+  useNamespaceContext,
+  useRedirectOnInvalidNamespaceEffect,
+} from 'src/context/NamespaceContext';
 
 import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
 import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';
 import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTable';
+import { NoProjectEmptyState } from 'src/common/components/NoProjectEmptyState';
+import { LoadingEmptyState } from 'src/common/components/LoadingEmptyState';
 
 const queryClient = new QueryClient();
 
@@ -49,9 +58,9 @@ const AppImportsPageWrapper: React.FunctionComponent = () => {
         <title>Application Imports</title>
       </Helmet>
       <QueryClientProvider client={queryClient}>
-        <NamespaceContext.Provider value={namespace}>
+        <NamespaceContextProvider value={namespace}>
           <AppImportsPage activePipelineGroupName={activePipelineGroupName} />
-        </NamespaceContext.Provider>
+        </NamespaceContextProvider>
       </QueryClientProvider>
     </>
   );
@@ -64,10 +73,12 @@ interface AppImportsPageProps {
 const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
   activePipelineGroupName,
 }) => {
-  const { pipelineGroups, loaded, error } = useWatchCranePipelineGroups();
   const history = useHistory();
-  const namespace = useNamespaceContext();
-  const isAllNamespaces = !namespace || namespace === '#ALL_NS#';
+  const { pipelineGroups, loaded: pipelineGroupsLoaded, error } = useWatchCranePipelineGroups();
+  const { namespace, isValidatingNamespace, isAllNamespaces } = useNamespaceContext();
+  useRedirectOnInvalidNamespaceEffect(appImportsAllNamespacesUrl);
+
+  const isLoaded = pipelineGroupsLoaded && !isValidatingNamespace;
 
   const setActivePipelineGroupName = React.useCallback(
     (name: string, op: 'push' | 'replace' = 'push') =>
@@ -78,8 +89,8 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
   // If pipeline groups are loaded and we don't have one selected, or we have one selected that doesn't exist, select the first one
   React.useEffect(() => {
     if (
+      isLoaded &&
       !isAllNamespaces &&
-      loaded &&
       pipelineGroups.length > 0 &&
       (!activePipelineGroupName ||
         !pipelineGroups.find(({ name }) => name === activePipelineGroupName))
@@ -87,8 +98,8 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
       setActivePipelineGroupName(pipelineGroups[0].name, 'replace');
     }
   }, [
+    isLoaded,
     isAllNamespaces,
-    loaded,
     pipelineGroups,
     activePipelineGroupName,
     setActivePipelineGroupName,
@@ -114,7 +125,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
     }
   }, [activePipelineGroupName, activePipelineGroup, deletePipelineMutation, history, namespace]);
 
-  const isEmptyState = loaded && pipelineGroups.length === 0;
+  const isEmptyState = isLoaded && pipelineGroups.length === 0;
   const goToImportWizard = () => history.push(appImportWizardUrl(namespace));
 
   return (
@@ -133,15 +144,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
         </Level>
       </PageSection>
       {isAllNamespaces ? (
-        <EmptyState variant="large" className={spacing.mtXl}>
-          <Title headingLevel="h4" size="lg">
-            No project selected
-          </Title>
-          <EmptyStateBody>
-            <Link to="/project-details/all-namespaces">Select a project</Link> and return to this
-            page.
-          </EmptyStateBody>
-        </EmptyState>
+        <NoProjectEmptyState selectProjectHref={projectDetailsAllNamespacesUrl} />
       ) : error ? (
         <Alert
           variant="danger"
@@ -160,13 +163,8 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
             Start a new import
           </Button>
         </EmptyState>
-      ) : !loaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
-        <EmptyState className={spacing.mtXl}>
-          <EmptyStateIcon variant="container" component={Spinner} />
-          <Title size="lg" headingLevel="h4">
-            Loading
-          </Title>
-        </EmptyState>
+      ) : !isLoaded || !activePipelineGroup || !deletePipelineMutation.isIdle ? (
+        <LoadingEmptyState />
       ) : (
         <>
           {areTabsVisible ? (

@@ -18,7 +18,7 @@ interface PipelineGroupHistoryTableProps {
 export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHistoryTableProps> = ({
   pipelineGroup,
 }) => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   return (
     <>
       <Title headingLevel="h3" className={spacing.mbMd}>

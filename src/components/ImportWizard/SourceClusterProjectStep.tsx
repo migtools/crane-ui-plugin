@@ -22,7 +22,7 @@ import {
 import { useNamespaceContext } from 'src/context/NamespaceContext';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const formContext = React.useContext(ImportWizardFormContext);
   const form = formContext.sourceClusterProject;
 

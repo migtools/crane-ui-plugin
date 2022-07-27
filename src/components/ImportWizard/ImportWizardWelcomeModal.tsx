@@ -7,7 +7,7 @@ import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { useLocalStorage } from 'src/common/hooks/useLocalStorage';
 
 export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useNamespaceContext();
   const [isDisabled, setIsDisabled] = useLocalStorage('isCraneWizardWelcomeModalDisabled');
   const [isOpen, setIsOpen] = React.useState(isDisabled !== 'true');
   const onClose = () => setIsOpen(false);
