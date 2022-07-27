@@ -5,8 +5,8 @@ import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-tab
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { Timestamp } from '@openshift-console/dynamic-plugin-sdk';
 
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { resourceActionToString } from 'src/api/pipelineHelpers';
 import { pipelineRunUrl } from 'src/utils/paths';
 import { PipelineRunStatus } from './PipelineRunStatus';
@@ -18,7 +18,7 @@ interface PipelineGroupHistoryTableProps {
 export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHistoryTableProps> = ({
   pipelineGroup,
 }) => {
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   return (
     <>
       <Title headingLevel="h3" className={spacing.mbMd}>

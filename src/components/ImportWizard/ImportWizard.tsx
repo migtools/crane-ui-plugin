@@ -12,10 +12,6 @@ import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard'
 import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
 import { useHistory } from 'react-router-dom';
 
-import {
-  useNamespaceContext,
-  useRedirectOnInvalidNamespaceEffect,
-} from 'src/context/NamespaceContext';
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
 import { SourceProjectDetailsStep } from './SourceProjectDetailsStep';
 import { PVCSelectStep } from './PVCSelectStep';
@@ -44,6 +40,10 @@ import {
 import { ImportWizardWelcomeModal } from './ImportWizardWelcomeModal';
 import { NoProjectEmptyState } from 'src/common/components/NoProjectEmptyState';
 import { LoadingEmptyState } from 'src/common/components/LoadingEmptyState';
+import {
+  useValidatedNamespace,
+  useRedirectOnInvalidNamespaceEffect,
+} from 'src/common/hooks/useValidatedNamespace';
 
 enum StepId {
   SourceClusterProject = 0,
@@ -96,7 +96,7 @@ export const ImportWizard: React.FunctionComponent = () => {
     !allNavDisabled && stepId >= 0 && stepIdReached >= stepId;
 
   const { namespace, isValidatingNamespace, isAllNamespaces, isNamespaceValid } =
-    useNamespaceContext();
+    useValidatedNamespace();
   useRedirectOnInvalidNamespaceEffect(appImportWizardAllNamespacesUrl);
 
   const configureDestinationSecretMutation = useConfigureDestinationSecretMutation({

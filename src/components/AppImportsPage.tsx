@@ -34,33 +34,30 @@ import {
   appImportWizardUrl,
   projectDetailsAllNamespacesUrl,
 } from 'src/utils/paths';
-import {
-  NamespaceContextProvider,
-  useNamespaceContext,
-  useRedirectOnInvalidNamespaceEffect,
-} from 'src/context/NamespaceContext';
 
 import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
 import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';
 import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTable';
 import { NoProjectEmptyState } from 'src/common/components/NoProjectEmptyState';
 import { LoadingEmptyState } from 'src/common/components/LoadingEmptyState';
+import {
+  useValidatedNamespace,
+  useRedirectOnInvalidNamespaceEffect,
+} from 'src/common/hooks/useValidatedNamespace';
 
 const queryClient = new QueryClient();
 
 const AppImportsPageWrapper: React.FunctionComponent = () => {
   const {
-    params: { pipelineGroupName: activePipelineGroupName, namespace },
-  } = useRouteMatch<{ pipelineGroupName: string; namespace: string }>();
+    params: { pipelineGroupName: activePipelineGroupName },
+  } = useRouteMatch<{ pipelineGroupName: string }>();
   return (
     <>
       <Helmet>
         <title>Application Imports</title>
       </Helmet>
       <QueryClientProvider client={queryClient}>
-        <NamespaceContextProvider value={namespace}>
-          <AppImportsPage activePipelineGroupName={activePipelineGroupName} />
-        </NamespaceContextProvider>
+        <AppImportsPage activePipelineGroupName={activePipelineGroupName} />
       </QueryClientProvider>
     </>
   );
@@ -75,7 +72,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
 }) => {
   const history = useHistory();
   const { pipelineGroups, loaded: pipelineGroupsLoaded, error } = useWatchCranePipelineGroups();
-  const { namespace, isValidatingNamespace, isAllNamespaces } = useNamespaceContext();
+  const { namespace, isValidatingNamespace, isAllNamespaces } = useValidatedNamespace();
   useRedirectOnInvalidNamespaceEffect(appImportsAllNamespacesUrl);
 
   const isLoaded = pipelineGroupsLoaded && !isValidatingNamespace;

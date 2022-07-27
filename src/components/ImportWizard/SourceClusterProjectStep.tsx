@@ -19,10 +19,10 @@ import {
   useSourceApiRootQuery,
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   const formContext = React.useContext(ImportWizardFormContext);
   const form = formContext.sourceClusterProject;
 

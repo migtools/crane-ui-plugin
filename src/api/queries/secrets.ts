@@ -9,7 +9,7 @@ import {
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation } from 'react-query';
 import { SECRET_SERVICE_URL } from 'src/common/constants';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 import { OAuthSecret, Secret } from '../types/Secret';
 
 export const secretGVK: K8sGroupVersionKind = { group: '', version: 'v1', kind: 'Secret' };
@@ -28,7 +28,7 @@ export const useConfigureSourceSecretMutation = ({
   onSuccess,
 }: UseConfigureSecretMutationArgs) => {
   const [secretModel] = useK8sModel(secretGVK);
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   return useMutation<OAuthSecret, Error, ConfigureSourceSecretMutationParams>(
     async ({ apiUrl, token }) => {
       // If we already have a secret in state, use that instead of looking for one to replace.
@@ -62,7 +62,7 @@ export const useConfigureDestinationSecretMutation = ({
   onSuccess,
 }: UseConfigureSecretMutationArgs) => {
   const [secretModel] = useK8sModel(secretGVK);
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   const apiUrl = 'https://kubernetes.default.svc';
   return useMutation<OAuthSecret, Error>(
     async () => {

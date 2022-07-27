@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { useHistory } from 'react-router';
+import { useRouteMatch, useHistory } from 'react-router-dom';
 import { useHostNamespaceQuery } from 'src/api/queries/namespaces';
 
-const NamespaceContext = React.createContext<string>('');
-export const NamespaceContextProvider = NamespaceContext.Provider;
-export const useNamespaceContext = () => {
-  const namespace = React.useContext(NamespaceContext);
+export const useValidatedNamespace = () => {
+  const {
+    params: { namespace },
+  } = useRouteMatch<{ namespace: string }>();
   const validateQuery = useHostNamespaceQuery(namespace);
   return {
     namespace,
@@ -16,7 +16,7 @@ export const useNamespaceContext = () => {
 };
 
 export const useRedirectOnInvalidNamespaceEffect = (href: string) => {
-  const { isValidatingNamespace, isNamespaceValid, isAllNamespaces } = useNamespaceContext();
+  const { isValidatingNamespace, isNamespaceValid, isAllNamespaces } = useValidatedNamespace();
   const history = useHistory();
   React.useEffect(() => {
     if (!isValidatingNamespace && !isNamespaceValid && !isAllNamespaces) {

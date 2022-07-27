@@ -10,7 +10,6 @@ import {
 import { K8sModel } from '@openshift-console/dynamic-plugin-sdk/lib/api/common-types';
 import { useMutation, UseMutationOptions } from 'react-query';
 import { attachOwnerReference, getObjectRef, sortByCreationTimestamp } from 'src/utils/helpers';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { sortByStartedTime, WizardTektonResources } from '../pipelineHelpers';
 import { OAuthSecret } from '../types/Secret';
 import { secretGVK } from './secrets';
@@ -26,6 +25,7 @@ import {
   pipelineRunStatus,
   PipelineRunStatusString,
 } from 'src/reused/pipelines-plugin/src/utils/pipeline-filter-reducer';
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 
 export const pipelineGVK: K8sGroupVersionKind = {
   group: 'tekton.dev',
@@ -40,7 +40,7 @@ export const pipelineRunGVK: K8sGroupVersionKind = {
 };
 
 export const useWatchPipelines = () => {
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   return useK8sWatchResource<CranePipeline[]>({
     groupVersionKind: pipelineGVK,
     isList: true,
@@ -50,7 +50,7 @@ export const useWatchPipelines = () => {
 };
 
 export const useWatchPipelineRuns = () => {
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   return useK8sWatchResource<CranePipelineRun[]>({
     groupVersionKind: pipelineRunGVK,
     isList: true,
@@ -61,7 +61,7 @@ export const useWatchPipelineRuns = () => {
 
 // TODO memoize these?
 export const useWatchCranePipelineGroups = () => {
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   const [watchedPipelines, pipelinesLoaded, pipelinesError] = useWatchPipelines();
   const [watchedPipelineRuns, pipelineRunsLoaded, pipelineRunsError] = useWatchPipelineRuns();
 

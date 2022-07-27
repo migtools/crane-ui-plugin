@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { appImportsPageUrl, pipelinesListUrl } from 'src/utils/paths';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { useLocalStorage } from 'src/common/hooks/useLocalStorage';
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 
 export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
-  const { namespace } = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   const [isDisabled, setIsDisabled] = useLocalStorage('isCraneWizardWelcomeModalDisabled');
   const [isOpen, setIsOpen] = React.useState(isDisabled !== 'true');
   const onClose = () => setIsOpen(false);
