@@ -29,7 +29,7 @@ export const RouteGuard: React.FunctionComponent<IRouteGuard> = ({
 }) => {
   const history = useHistory();
   const [showRouteGuard, setShowRouteGuard] = React.useState(when);
-  const [currentPath, setCurrentPath] = React.useState('');
+  const [targetPath, setTargetPath] = React.useState('');
 
   const unblockFnRef = React.useRef<UnregisterCallback | null>(null);
   const unblock = () => {
@@ -43,8 +43,11 @@ export const RouteGuard: React.FunctionComponent<IRouteGuard> = ({
     if (when) {
       // When browser history routing happens (clicking links, back/forward) we can handle it with our custom modal.
       unblockFnRef.current = history.block((prompt) => {
-        setCurrentPath(prompt.pathname);
-        setShowRouteGuard(true);
+        // If only the query string is changing, don't interrupt the user.
+        if (history.location.pathname !== prompt.pathname) {
+          setTargetPath(prompt.pathname);
+          setShowRouteGuard(true);
+        }
         return false;
       });
       // When the page is being unloaded (closing or reloading tab), we have to trigger a native JS confirm dialog.
@@ -58,8 +61,8 @@ export const RouteGuard: React.FunctionComponent<IRouteGuard> = ({
 
   const handleOk = React.useCallback(() => {
     unblock();
-    history.push(currentPath);
-  }, [currentPath, history]);
+    history.push(targetPath);
+  }, [targetPath, history]);
 
   const handleCancel = React.useCallback(() => setShowRouteGuard(false), []);
 
