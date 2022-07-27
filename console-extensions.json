@@ -3,7 +3,7 @@
     "type": "console.page/route",
     "properties": {
       "exact": true,
-      "path": ["/app-imports/new/ns/:namespace"],
+      "path": ["/app-imports/new/ns/:namespace", "/app-imports/new/all-namespaces"],
       "component": { "$codeRef": "ImportPage" }
     }
   },

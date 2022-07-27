@@ -10,9 +10,9 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { getPipelineGroupSourceNamespace } from 'src/api/pipelineHelpers';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { pipelineRunUrl } from 'src/utils/paths';
 import { PipelineRunStatus } from './PipelineRunStatus';
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 
 interface PipelineGroupSummaryProps {
   pipelineGroup: CranePipelineGroup;
@@ -21,7 +21,7 @@ interface PipelineGroupSummaryProps {
 export const PipelineGroupSummary: React.FunctionComponent<PipelineGroupSummaryProps> = ({
   pipelineGroup,
 }) => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   const latestPipelineRun = pipelineGroup.pipelineRuns.latestNonPending;
   return (
     <DescriptionList

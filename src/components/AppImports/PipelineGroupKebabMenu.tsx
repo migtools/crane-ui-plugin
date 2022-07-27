@@ -4,9 +4,9 @@ import { Dropdown, KebabToggle, DropdownItem, Tooltip } from '@patternfly/react-
 
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { isSomePipelineRunning, useDeletePipelineMutation } from 'src/api/queries/pipelines';
-import { useNamespaceContext } from 'src/context/NamespaceContext';
 import { pipelinesListUrl } from 'src/utils/paths';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
+import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 
 interface PipelineGroupKebabMenuProps {
   pipelineGroup: CranePipelineGroup;
@@ -17,7 +17,7 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
   pipelineGroup,
   deletePipelineMutation,
 }) => {
-  const namespace = useNamespaceContext();
+  const { namespace } = useValidatedNamespace();
   const history = useHistory();
 
   const onFocus = (id: string) => {
