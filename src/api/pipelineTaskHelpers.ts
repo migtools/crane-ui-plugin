@@ -199,8 +199,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
 
   const transferPvcTasks: PipelineTask[] = selectedPVCs.map((pvc) => {
     const editValues = editValuesByPVC[pvc.metadata?.name || ''];
-    const { targetPvcName, storageClass, capacity, verifyCopy } = editValues; // TODO where to put verifyCopy?
-    console.log('TODO: use verifyCopy flag!', pvc.metadata?.name, verifyCopy);
+    const { targetPvcName, storageClass, capacity, verifyCopy } = editValues;
     return {
       name: getValidatedName('transfer-pvc-', pvc.metadata?.name || ''),
       params: [
@@ -213,6 +212,7 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
         { name: 'dest-storage-class-name', value: storageClass },
         { name: 'dest-storage-requests', value: capacity },
         { name: 'endpoint-type', value: 'route' },
+        { name: 'verify', value: verifyCopy ? 'true' : 'false' },
       ],
       taskRef: { kind: 'ClusterTask', name: 'crane-transfer-pvc' },
       workspaces: [{ name: 'kubeconfig', workspace: 'kubeconfig' }],
