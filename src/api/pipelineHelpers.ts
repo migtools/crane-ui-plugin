@@ -143,6 +143,7 @@ export const formsToTektonResources = (
               })),
             ]
           : []),
+        tasks.imageSyncTask,
         tasks.craneTransformTask,
         tasks.craneApplyTask,
         tasks.kustomizeInitTask,

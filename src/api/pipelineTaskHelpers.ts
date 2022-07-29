@@ -80,12 +80,14 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
         value: '$(tasks.source-registry-info.results.internal)',
       },
       { name: 'src-public-registry-url', value: '$(tasks.source-registry-info.results.public)' },
+      { name: 'src-tls-verify', value: 'false' },
       { name: 'dest-context', value: 'destination' },
       { name: 'dest-namespace', value: '$(context.taskRun.namespace)' },
       {
         name: 'dest-public-registry-url',
         value: '$(tasks.destination-registry-info.results.public)',
       },
+      { name: 'dest-tls-verify', value: 'false' },
     ],
     taskRef: { name: 'crane-image-sync', kind: 'ClusterTask' },
     workspaces: [
@@ -97,13 +99,15 @@ export const getAllPipelineTasks = (forms: ImportWizardFormState, namespace: str
 
   const craneTransformTask: PipelineTask = {
     name: 'transform',
-    runAfter: ['source-registry-info', 'destination-registry-info'],
+    runAfter: ['image-sync'],
     params: [
       {
         name: 'optional-flags',
-        value: `"registry-replacement=${registryReplacements.join(
-          ',',
-        )}","pvc-rename-map=${selectedPVCs.map(pvcRenameMap).join(',')}"`,
+        value: JSON.stringify({
+          'registry-replacement': registryReplacements.join(','),
+          'pvc-rename-map': selectedPVCs.map(pvcRenameMap).join(','),
+          'src-internal-registry': '$(tasks.source-registry-info.results.internal)',
+        }),
       },
     ],
     taskRef: { name: 'crane-transform', kind: 'ClusterTask' },
