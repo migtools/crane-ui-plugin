@@ -13,7 +13,7 @@ const ImportPage: React.FunctionComponent = () => (
     </Helmet>
     <QueryClientProvider client={queryClient}>
       <PageSection variant="light">
-        <Title headingLevel="h1">Import application</Title>
+        <Title headingLevel="h1">Import existing application</Title>
       </PageSection>
       <PageSection variant="light" type="wizard">
         <ImportWizard />
