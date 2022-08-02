@@ -27,7 +27,7 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
       {pipelineGroup.pipelineRuns.nonPending.length === 0 ? (
         <EmptyState variant="small">
           <Title headingLevel="h4" size="md">
-            No import history yet
+            No history yet
           </Title>
           <EmptyStateBody>Stage and Cutover PipelineRun history will appear here.</EmptyStateBody>
         </EmptyState>
