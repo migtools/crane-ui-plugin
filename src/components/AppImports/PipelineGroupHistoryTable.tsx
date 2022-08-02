@@ -68,7 +68,7 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
                   {pipelineRun.status?.startTime ? (
                     <Timestamp timestamp={pipelineRun.status?.startTime} />
                   ) : (
-                    'Not started'
+                    'Starting...'
                   )}
                 </Td>
                 <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="result-heading">
