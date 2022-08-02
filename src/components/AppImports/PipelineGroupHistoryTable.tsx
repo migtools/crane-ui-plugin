@@ -22,7 +22,7 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
   return (
     <>
       <Title headingLevel="h3" className={spacing.mbMd}>
-        Import pipeline history
+        History
       </Title>
       {pipelineGroup.pipelineRuns.nonPending.length === 0 ? (
         <EmptyState variant="small">
