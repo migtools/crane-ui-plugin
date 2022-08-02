@@ -54,7 +54,7 @@ const AppImportsPageWrapper: React.FunctionComponent = () => {
   return (
     <>
       <Helmet>
-        <title>Application Imports</title>
+        <title>Imported Applications</title>
       </Helmet>
       <QueryClientProvider client={queryClient}>
         <AppImportsPage activePipelineGroupName={activePipelineGroupName} />
@@ -130,8 +130,8 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
       <PageSection variant="light">
         <Level>
           <TextContent>
-            <Title headingLevel="h1">Application Imports</Title>
-            <Text>View status and take actions on your application import pipelines.</Text>
+            <Title headingLevel="h1">Imported Applications</Title>
+            <Text>View status and take actions on your pipeline groups.</Text>
           </TextContent>
           {!isAllNamespaces && !isEmptyState ? (
             <Button variant="secondary" className={spacing.mxMd} onClick={goToImportWizard}>
@@ -154,7 +154,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
         <EmptyState variant="large" className={spacing.mtXl}>
           <EmptyStateIcon icon={PlusCircleIcon} />
           <Title headingLevel="h4" size="lg">
-            No application imports yet
+            No imported applications yet
           </Title>
           <Button variant="primary" onClick={goToImportWizard}>
             Start a new import
