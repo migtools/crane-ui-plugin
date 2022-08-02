@@ -29,15 +29,15 @@ import {
 } from 'src/api/queries/pipelines';
 import { watchErrorToString } from 'src/utils/helpers';
 import {
-  appImportsAllNamespacesUrl,
-  appImportsPageUrl,
+  importedAppsAllNamespacesUrl,
+  importedAppsPageUrl,
   appImportWizardUrl,
   projectDetailsAllNamespacesUrl,
 } from 'src/utils/paths';
 
-import { PipelineGroupHeader } from './AppImports/PipelineGroupHeader';
-import { PipelineGroupSummary } from './AppImports/PipelineGroupSummary';
-import { PipelineGroupHistoryTable } from './AppImports/PipelineGroupHistoryTable';
+import { PipelineGroupHeader } from './ImportedApps/PipelineGroupHeader';
+import { PipelineGroupSummary } from './ImportedApps/PipelineGroupSummary';
+import { PipelineGroupHistoryTable } from './ImportedApps/PipelineGroupHistoryTable';
 import { NoProjectEmptyState } from 'src/common/components/NoProjectEmptyState';
 import { LoadingEmptyState } from 'src/common/components/LoadingEmptyState';
 import {
@@ -47,7 +47,7 @@ import {
 
 const queryClient = new QueryClient();
 
-const AppImportsPageWrapper: React.FunctionComponent = () => {
+const ImportedAppsPageWrapper: React.FunctionComponent = () => {
   const {
     params: { pipelineGroupName: activePipelineGroupName },
   } = useRouteMatch<{ pipelineGroupName: string }>();
@@ -57,29 +57,29 @@ const AppImportsPageWrapper: React.FunctionComponent = () => {
         <title>Imported Applications</title>
       </Helmet>
       <QueryClientProvider client={queryClient}>
-        <AppImportsPage activePipelineGroupName={activePipelineGroupName} />
+        <ImportedAppsPage activePipelineGroupName={activePipelineGroupName} />
       </QueryClientProvider>
     </>
   );
 };
 
-interface AppImportsPageProps {
+interface ImportedAppsPageProps {
   activePipelineGroupName: string;
 }
 
-const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
+const ImportedAppsPage: React.FunctionComponent<ImportedAppsPageProps> = ({
   activePipelineGroupName,
 }) => {
   const history = useHistory();
   const { pipelineGroups, loaded: pipelineGroupsLoaded, error } = useWatchCranePipelineGroups();
   const { namespace, isValidatingNamespace, isAllNamespaces } = useValidatedNamespace();
-  useRedirectOnInvalidNamespaceEffect(appImportsAllNamespacesUrl);
+  useRedirectOnInvalidNamespaceEffect(importedAppsAllNamespacesUrl);
 
   const isLoaded = pipelineGroupsLoaded && !isValidatingNamespace;
 
   const setActivePipelineGroupName = React.useCallback(
     (name: string, op: 'push' | 'replace' = 'push') =>
-      history[op](appImportsPageUrl(namespace, name)),
+      history[op](importedAppsPageUrl(namespace, name)),
     [history, namespace],
   );
 
@@ -118,7 +118,7 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
       !activePipelineGroup
     ) {
       deletePipelineMutation.reset();
-      history.replace(appImportsPageUrl(namespace));
+      history.replace(importedAppsPageUrl(namespace));
     }
   }, [activePipelineGroupName, activePipelineGroup, deletePipelineMutation, history, namespace]);
 
@@ -218,4 +218,4 @@ const AppImportsPage: React.FunctionComponent<AppImportsPageProps> = ({
   );
 };
 
-export default AppImportsPageWrapper;
+export default ImportedAppsPageWrapper;

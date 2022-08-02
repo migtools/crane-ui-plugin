@@ -3,7 +3,7 @@
     "type": "console.page/route",
     "properties": {
       "exact": true,
-      "path": ["/app-imports/new/ns/:namespace", "/app-imports/new/all-namespaces"],
+      "path": ["/imported-apps/new/ns/:namespace", "/imported-apps/new/all-namespaces"],
       "component": { "$codeRef": "ImportPage" }
     }
   },
@@ -12,11 +12,11 @@
     "properties": {
       "exact": true,
       "path": [
-        "/app-imports/ns/:namespace",
-        "/app-imports/ns/:namespace/:pipelineGroupName",
-        "/app-imports/all-namespaces"
+        "/imported-apps/ns/:namespace",
+        "/imported-apps/ns/:namespace/:pipelineGroupName",
+        "/imported-apps/all-namespaces"
       ],
-      "component": { "$codeRef": "AppImportsPage" }
+      "component": { "$codeRef": "ImportedAppsPage" }
     }
   },
   {
@@ -27,7 +27,7 @@
       "section": "resources",
       "insertAfter": "pipelines",
       "name": "Imported Applications",
-      "href": "/app-imports",
+      "href": "/imported-apps",
       "namespaced": true
     }
   },
@@ -46,7 +46,7 @@
       "groupId": "import-application-group",
       "label": "Import from another cluster",
       "description": "Create pipelines to import an existing application from another cluster",
-      "href": "/app-imports/new/ns/:namespace",
+      "href": "/imported-apps/new/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
     }
   },
@@ -57,7 +57,7 @@
       "groupId": "import-application-group",
       "label": "Imported applications",
       "description": "View status and take actions on import pipelines",
-      "href": "/app-imports/ns/:namespace",
+      "href": "/imported-apps/ns/:namespace",
       "icon": { "$codeRef": "icons.applicationsIconElement" }
     }
   },
