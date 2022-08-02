@@ -26,7 +26,7 @@
       "perspective": "dev",
       "section": "resources",
       "insertAfter": "pipelines",
-      "name": "Application Imports",
+      "name": "Imported Applications",
       "href": "/app-imports",
       "namespaced": true
     }
@@ -44,8 +44,8 @@
     "properties": {
       "id": "import-application",
       "groupId": "import-application-group",
-      "label": "Import from cluster",
-      "description": "Import a manually deployed application on another cluster to an automated GitOps workflow.",
+      "label": "Import from another cluster",
+      "description": "Create pipelines to import an existing application from another cluster",
       "href": "/app-imports/new/ns/:namespace",
       "icon": { "$codeRef": "icons.importIconElement" }
     }
@@ -55,8 +55,8 @@
     "properties": {
       "id": "application-imports-add",
       "groupId": "import-application-group",
-      "label": "Application imports",
-      "description": "View imported applications.",
+      "label": "Imported applications",
+      "description": "View status and take actions on import pipelines",
       "href": "/app-imports/ns/:namespace",
       "icon": { "$codeRef": "icons.applicationsIconElement" }
     }
