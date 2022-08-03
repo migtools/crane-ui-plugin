@@ -45,6 +45,8 @@ import {
   useRedirectOnInvalidNamespaceEffect,
 } from 'src/common/hooks/useValidatedNamespace';
 
+import './ImportedApps/ImportedApps.css';
+
 const queryClient = new QueryClient();
 
 const ImportedAppsPageWrapper: React.FunctionComponent = () => {

@@ -1,0 +1,7 @@
+a span.co-icon-and-text.crane-plr-status {
+  display: inline-block;
+}
+
+a span.co-icon-and-text.crane-plr-status svg {
+  vertical-align: initial !important;
+}
