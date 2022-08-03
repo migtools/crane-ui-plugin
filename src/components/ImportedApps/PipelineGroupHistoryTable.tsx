@@ -9,7 +9,7 @@ import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
 import { resourceActionToString } from 'src/api/pipelineHelpers';
 import { pipelineRunUrl } from 'src/utils/paths';
-import { PipelineRunStatus } from './PipelineRunStatus';
+import { PipelineRunStatusLink } from './PipelineRunStatusLink';
 
 interface PipelineGroupHistoryTableProps {
   pipelineGroup: CranePipelineGroup;
@@ -72,9 +72,7 @@ export const PipelineGroupHistoryTable: React.FunctionComponent<PipelineGroupHis
                   )}
                 </Td>
                 <Td className="pf-m-truncate" dataLabel="Status" aria-labelledby="result-heading">
-                  <Link to={pipelineRunUrl(namespace, pipelineRun)}>
-                    <PipelineRunStatus pipelineRun={pipelineRun} />
-                  </Link>
+                  <PipelineRunStatusLink pipelineRun={pipelineRun} />
                 </Td>
               </Tr>
             ))}
