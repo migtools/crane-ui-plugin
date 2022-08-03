@@ -7,6 +7,7 @@ import { isSomePipelineRunning, useDeletePipelineMutation } from 'src/api/querie
 import { pipelinesListUrl } from 'src/utils/paths';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
+import { UpdateCredentialsModal } from './UpdateCredentialsModal';
 
 interface PipelineGroupKebabMenuProps {
   pipelineGroup: CranePipelineGroup;
@@ -26,6 +27,7 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
   };
 
   const [isAppKebabOpen, toggleAppKebabOpen] = React.useReducer((isOpen) => !isOpen, false);
+  const [isUpdateCredentialsModalOpen, setIsUpdateCredentialsModalOpen] = React.useState(false);
 
   const onAppKebabSelect = () => {
     toggleAppKebabOpen();
@@ -62,11 +64,18 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
             deleteItem
           ),
           <DropdownItem
-            key="app-view-pipelies"
+            key="app-view-pipelines"
             component="button"
             onClick={() => history.push(pipelinesListUrl(namespace, pipelineGroup.name))}
           >
             View pipelines
+          </DropdownItem>,
+          <DropdownItem
+            key="refresh-credentials"
+            component="button"
+            onClick={() => setIsUpdateCredentialsModalOpen(true)}
+          >
+            Update OAuth tokens
           </DropdownItem>,
         ]}
       />
@@ -86,6 +95,11 @@ export const PipelineGroupKebabMenu: React.FunctionComponent<PipelineGroupKebabM
         mutateFn={() => deletePipelineMutation.mutate(pipelineGroup.pipelines.cutover)}
         mutateResult={deletePipelineMutation}
         errorText="Cannot delete resources"
+      />
+      <UpdateCredentialsModal
+        pipelineGroup={pipelineGroup}
+        isOpen={isUpdateCredentialsModalOpen}
+        onClose={() => setIsUpdateCredentialsModalOpen(false)}
       />
     </>
   );
