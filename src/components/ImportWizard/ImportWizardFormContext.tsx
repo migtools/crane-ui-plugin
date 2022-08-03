@@ -100,9 +100,16 @@ export const useImportWizardFormState = () => {
     editValuesByPVCField.reinitialize(defaultEditValuesByPVC);
   };
 
+  // The yup.string() here is a temporary schema that is reassigned below
   const sourceNamespaceField = useFormField('', yup.string(), {
-    onChange: resetSourceSelections,
-  }); // Temporary schema reassigned below
+    onChange: (newSourceNamespace) => {
+      resetSourceSelections();
+      if (!pipelineGroupNameField.isDirty) {
+        pipelineGroupNameField.prefill(`import-${newSourceNamespace}`);
+        pipelineGroupNameField.setIsTouched(true);
+      }
+    },
+  });
   const validateSourceNamespaceQuery = useValidateSourceNamespaceQuery(
     sourceApiSecretField.value,
     sourceNamespaceField.value,
