@@ -1,20 +1,7 @@
 import * as React from 'react';
-import * as yup from 'yup';
-import {
-  Button,
-  Flex,
-  Modal,
-  Stack,
-  TextContent,
-  Text,
-  Form,
-  Checkbox,
-} from '@patternfly/react-core';
-import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { useFormState, useFormField } from '@konveyor/lib-ui';
+import { Button, Flex, Modal, Stack, TextContent, Text } from '@patternfly/react-core';
 import { CranePipelineGroup } from 'src/api/types/CranePipeline';
-import { HostTokenAlert } from 'src/common/components/HostTokenAlert';
-import { SourceTokenInput } from 'src/common/components/SourceTokenInput';
+import { UpdateCredentialsForm, useUpdateCredentialsFormState } from './UpdateCredentialsForm';
 
 interface UpdateCredentialsModalProps {
   pipelineGroup: CranePipelineGroup;
@@ -36,16 +23,7 @@ export const UpdateCredentialsModal: React.FunctionComponent<UpdateCredentialsMo
   isOpen,
   onClose,
 }) => {
-  const [isUpdatingSourceToken, setIsUpdatingSourceToken] = React.useState(false);
-  const [isUpdatingTargetToken, setIsUpdatingTargetToken] = React.useState(false);
-
-  const sourceTokenSchema = yup.string().label('Source cluster OAuth token');
-  const form = useFormState({
-    newSourceToken: useFormField(
-      '',
-      isUpdatingSourceToken ? sourceTokenSchema.required() : sourceTokenSchema,
-    ),
-  });
+  const { form } = useUpdateCredentialsFormState({ defaultExpanded: true });
 
   // TODO mutation for updating both the source and target secrets?
   return (
@@ -70,7 +48,7 @@ export const UpdateCredentialsModal: React.FunctionComponent<UpdateCredentialsMo
                 // TODO
               }}
               isDisabled={
-                !(isUpdatingSourceToken || isUpdatingTargetToken) ||
+                !(form.values.isUpdatingSourceToken || form.values.isUpdatingTargetToken) ||
                 !form.isValid /* || mutateResult?.isLoading */
               }
             >
@@ -95,33 +73,7 @@ export const UpdateCredentialsModal: React.FunctionComponent<UpdateCredentialsMo
           with the source and target clusters during import.
         </Text>
       </TextContent>
-      <Form isWidthLimited className={spacing.mtMd}>
-        <Checkbox
-          id="update-source-token-checkbox"
-          label="Update OAuth token for source cluster"
-          isChecked={isUpdatingSourceToken}
-          onChange={setIsUpdatingSourceToken}
-          body={
-            isUpdatingSourceToken ? (
-              <SourceTokenInput
-                field={form.fields.newSourceToken}
-                credentialsValidating={false}
-                credentialsAreValid={false}
-                configureSourceSecret={() => {
-                  // TODO
-                }}
-              />
-            ) : null
-          }
-        />
-        <Checkbox
-          id="update-target-token-checkbox"
-          label="Update OAuth token for target cluster"
-          isChecked={isUpdatingTargetToken}
-          onChange={setIsUpdatingTargetToken}
-          body={isUpdatingTargetToken ? <HostTokenAlert /> : null}
-        />
-      </Form>
+      <UpdateCredentialsForm form={form} />
     </Modal>
   );
 };
