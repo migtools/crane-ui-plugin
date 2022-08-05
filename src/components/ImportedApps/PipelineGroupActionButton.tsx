@@ -12,6 +12,7 @@ import { CranePipelineAction, CranePipelineGroup } from 'src/api/types/CranePipe
 import { actionToString } from 'src/api/pipelineHelpers';
 import { ConfirmModal } from 'src/common/components/ConfirmModal';
 import { PipelineExplanation } from 'src/common/components/PipelineExplanation';
+import { UpdateCredentialsForm, useUpdateCredentialsFormState } from './UpdateCredentialsForm';
 
 interface PipelineGroupActionButtonProps {
   pipelineGroup: CranePipelineGroup;
@@ -70,16 +71,23 @@ export const PipelineGroupActionButton: React.FunctionComponent<PipelineGroupAct
     <>A stage or cutover cannot be run after a cutover is already succeeded.</>
   ) : null;
 
+  const { form } = useUpdateCredentialsFormState({ defaultExpanded: false });
+
   return (
     <>
       {disabledReason ? <Tooltip content={disabledReason}>{button}</Tooltip> : button}
       <ConfirmModal
         title={`Run ${action}?`}
+        className="crane-modal"
+        variant="medium"
         body={
-          <PipelineExplanation
-            action={action}
-            isStatefulMigration={pipelineGroup.isStatefulMigration}
-          />
+          <>
+            <PipelineExplanation
+              action={action}
+              isStatefulMigration={pipelineGroup.isStatefulMigration}
+            />
+            <UpdateCredentialsForm form={form} isStartingPipeline />
+          </>
         }
         confirmButtonText={actionToString(action)}
         isOpen={isConfirmModalOpen}

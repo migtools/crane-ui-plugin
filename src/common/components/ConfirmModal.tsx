@@ -19,6 +19,7 @@ export type UnknownMutationResult = Pick<
 
 export interface IConfirmModalProps {
   variant?: ModalProps['variant'];
+  className?: string;
   isOpen: boolean;
   toggleOpen: () => void;
   mutateFn: () => void;
@@ -34,6 +35,7 @@ export interface IConfirmModalProps {
 
 export const ConfirmModal: React.FunctionComponent<IConfirmModalProps> = ({
   variant = 'small',
+  className = '',
   isOpen,
   toggleOpen,
   mutateFn,
@@ -49,6 +51,7 @@ export const ConfirmModal: React.FunctionComponent<IConfirmModalProps> = ({
   isOpen ? (
     <Modal
       variant={variant}
+      className={className}
       title={title}
       isOpen
       onClose={toggleOpen}

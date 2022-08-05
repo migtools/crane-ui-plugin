@@ -28,7 +28,6 @@ export const UpdateCredentialsModal: React.FunctionComponent<UpdateCredentialsMo
   // TODO mutation for updating both the source and target secrets?
   return (
     <Modal
-      id="update-credentials-modal"
       className="crane-modal"
       variant="medium"
       title="Update OAuth tokens"

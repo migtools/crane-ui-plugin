@@ -32,16 +32,20 @@ export const useUpdateCredentialsFormState = ({
 
 interface UpdateCredentialsFormProps {
   form: ReturnType<typeof useUpdateCredentialsFormState>['form'];
+  isStartingPipeline?: boolean;
 }
 
 export const UpdateCredentialsForm: React.FunctionComponent<UpdateCredentialsFormProps> = ({
   form,
+  isStartingPipeline = false,
 }) => {
   return (
-    <Form isWidthLimited className={spacing.mtMd}>
+    <Form id="update-credentials-form" isWidthLimited className={spacing.mtMd}>
       <Checkbox
         id="update-source-token-checkbox"
-        label="Update OAuth token for source cluster"
+        label={
+          <>Update OAuth token for source cluster {isStartingPipeline ? 'before starting' : null}</>
+        }
         isChecked={form.values.isUpdatingSourceToken}
         onChange={form.fields.isUpdatingSourceToken.setValue}
         body={
@@ -59,7 +63,9 @@ export const UpdateCredentialsForm: React.FunctionComponent<UpdateCredentialsFor
       />
       <Checkbox
         id="update-target-token-checkbox"
-        label="Update OAuth token for target cluster"
+        label={
+          <>Update OAuth token for target cluster {isStartingPipeline ? 'before starting' : null}</>
+        }
         isChecked={form.values.isUpdatingTargetToken}
         onChange={form.fields.isUpdatingTargetToken.setValue}
         body={form.values.isUpdatingTargetToken ? <HostTokenAlert /> : null}
