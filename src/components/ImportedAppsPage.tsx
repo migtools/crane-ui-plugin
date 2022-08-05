@@ -45,6 +45,8 @@ import {
   useRedirectOnInvalidNamespaceEffect,
 } from 'src/common/hooks/useValidatedNamespace';
 
+import './ImportedApps/ImportedApps.css';
+
 const queryClient = new QueryClient();
 
 const ImportedAppsPageWrapper: React.FunctionComponent = () => {
@@ -126,7 +128,7 @@ const ImportedAppsPage: React.FunctionComponent<ImportedAppsPageProps> = ({
   const goToImportWizard = () => history.push(appImportWizardUrl(namespace));
 
   return (
-    <Page>
+    <Page id="crane-imported-apps-page">
       <PageSection variant="light">
         <Level>
           <TextContent>

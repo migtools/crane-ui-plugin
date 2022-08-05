@@ -12,10 +12,10 @@
   font-weight: normal;
 }
 
-#crane-import-wizard .pipeline-info-help-icon {
+#crane-import-wizard .inline-help-popover-icon {
   color: var(--pf-global--Color--200);
 }
 
-#crane-import-wizard .pipeline-info-help-icon:hover {
+#crane-import-wizard .inline-help-popover-icon:hover {
   color: var(--pf-global--Color--100);
 }

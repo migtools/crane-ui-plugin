@@ -1,0 +1,7 @@
+#crane-imported-apps-page a span.co-icon-and-text.crane-plr-status {
+  display: inline-block;
+}
+
+#crane-imported-apps-page a span.co-icon-and-text.crane-plr-status svg {
+  vertical-align: initial !important;
+}

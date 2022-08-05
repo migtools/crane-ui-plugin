@@ -176,7 +176,7 @@ export const ReviewStep: React.FunctionComponent = () => {
                   aria-label={`More info for ${stagePipelineName} pipeline visualization`}
                   variant="link"
                   isInline
-                  className={`${spacing.mlSm} pipeline-info-help-icon`}
+                  className={`${spacing.mlSm} inline-help-popover-icon`}
                 >
                   <HelpIcon />
                 </Button>
@@ -203,7 +203,7 @@ export const ReviewStep: React.FunctionComponent = () => {
               aria-label={`More info for ${cutoverPipelineName} pipeline visualization`}
               variant="link"
               isInline
-              className={`${spacing.mlSm} pipeline-info-help-icon`}
+              className={`${spacing.mlSm} inline-help-popover-icon`}
             >
               <HelpIcon />
             </Button>

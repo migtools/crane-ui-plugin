@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { TextContent, Text, Form } from '@patternfly/react-core';
+import { TextContent, Text, Form, Popover, Button } from '@patternfly/react-core';
 import { TableComposable, Thead, Tr, Th, Tbody } from '@patternfly/react-table';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import {
   ListPageFilter,
   RowFilter,
@@ -56,7 +57,28 @@ export const PVCEditStep: React.FunctionComponent = () => {
               <Th>{columnNames.targetPvcName}</Th>
               <Th width={20}>{columnNames.storageClass}</Th>
               <Th>{columnNames.capacity}</Th>
-              <Th textCenter>{columnNames.verifyCopy}</Th>
+              <Th textCenter>
+                {columnNames.verifyCopy}
+                <Popover
+                  position="top"
+                  bodyContent={
+                    <>
+                      Enables checksum verification after copy. Each file is verified with a
+                      checksum, which significantly reduces performance. See the product
+                      documentation for more information.
+                    </>
+                  }
+                >
+                  <Button
+                    aria-label="More info for verify copy column"
+                    variant="link"
+                    isInline
+                    className={`${spacing.mlSm} inline-help-popover-icon`}
+                  >
+                    <HelpIcon />
+                  </Button>
+                </Popover>
+              </Th>
               <Th />
             </Tr>
           </Thead>
