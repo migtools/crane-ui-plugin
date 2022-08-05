@@ -1,30 +1,22 @@
 import * as React from 'react';
 import { isWebUri } from 'valid-url';
-import {
-  TextContent,
-  Popover,
-  Text,
-  Form,
-  TextInputProps,
-  FormGroupProps,
-  Alert,
-} from '@patternfly/react-core';
+import { TextContent, Popover, Text, Form } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
-
+import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
+import { ResolvedQueries, ValidatedTextInput } from '@konveyor/lib-ui';
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureSourceSecretMutation } from 'src/api/queries/secrets';
 import { OAuthSecret } from 'src/api/types/Secret';
-import HelpIcon from '@patternfly/react-icons/dist/esm/icons/help-icon';
 import {
   useSourceApiRootQuery,
   useValidateSourceNamespaceQuery,
 } from 'src/api/queries/sourceResources';
 import { areSourceCredentialsValid } from 'src/api/proxyHelpers';
-import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
+import { HostTokenAlert } from 'src/common/components/HostTokenAlert';
+import { SourceTokenInput } from 'src/common/components/SourceTokenInput';
+import { getAsyncValidationFieldProps } from 'src/common/helpers';
 
 export const SourceClusterProjectStep: React.FunctionComponent = () => {
-  const { namespace } = useValidatedNamespace();
   const formContext = React.useContext(ImportWizardFormContext);
   const form = formContext.sourceClusterProject;
 
@@ -67,34 +59,6 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
     form.fields.sourceNamespace.isTouched,
   );
 
-  // Override validation styles based on connection check.
-  // Can't use greenWhenValid prop of ValidatedTextInput because fields can be valid before connection test passes.
-  // This way we don't show the connection failed message when you just haven't finished entering credentials.
-  // The `validated: 'error'` case is handled in ValidatedTextInput based on the field schema.
-  type validationFieldPropsType = {
-    validating: boolean;
-    valid: boolean;
-    helperText?: React.ReactNode;
-    labelIcon?: React.ReactElement;
-  };
-  const getAsyncValidationFieldProps = ({
-    valid,
-    validating,
-    helperText,
-    labelIcon,
-  }: validationFieldPropsType) => {
-    const inputProps: Pick<TextInputProps, 'validated'> = {
-      ...(validating ? { validated: 'default' } : {}),
-      ...(valid ? { validated: 'success' } : {}),
-    };
-    const formGroupProps: Pick<FormGroupProps, 'validated' | 'helperText' | 'labelIcon'> = {
-      ...inputProps,
-      helperText: validating ? 'Validating...' : helperText,
-      labelIcon: labelIcon,
-    };
-    return { inputProps, formGroupProps };
-  };
-
   const apiUrlFieldProps = getAsyncValidationFieldProps({
     validating: credentialsValidating,
     valid: credentialsAreValid,
@@ -112,32 +76,6 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           aria-label="More info for api url field"
           onClick={(e) => e.preventDefault()}
           aria-describedby="api-url"
-          className="pf-c-form__group-label-help"
-        >
-          <HelpIcon noVerticalAlign />
-        </button>
-      </Popover>
-    ),
-    helperText: <>&nbsp;</>,
-  });
-
-  const sourceTokenFieldProps = getAsyncValidationFieldProps({
-    validating: credentialsValidating,
-    valid: credentialsAreValid,
-    labelIcon: (
-      <Popover
-        headerContent={`OAuth token of the source cluster`}
-        bodyContent={
-          <span>
-            Can be found via <code>oc whoami -t</code>
-          </span>
-        }
-      >
-        <button
-          type="button"
-          aria-label="More info for oauth token field"
-          onClick={(e) => e.preventDefault()}
-          aria-describedby="token"
           className="pf-c-form__group-label-help"
         >
           <HelpIcon noVerticalAlign />
@@ -185,12 +123,11 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           onBlur={configureSourceSecret}
           {...apiUrlFieldProps}
         />
-        <ValidatedPasswordInput
+        <SourceTokenInput
           field={form.fields.token}
-          isRequired
-          fieldId="token"
-          onBlur={configureSourceSecret}
-          {...sourceTokenFieldProps}
+          credentialsValidating={credentialsValidating}
+          credentialsAreValid={credentialsAreValid}
+          configureSourceSecret={configureSourceSecret}
         />
         <ValidatedTextInput
           field={form.fields.sourceNamespace}
@@ -213,17 +150,7 @@ export const SourceClusterProjectStep: React.FunctionComponent = () => {
           />
         ) : null}
       </Form>
-      {form.isValid ? (
-        <Alert
-          className={spacing.mtXl}
-          variant="info"
-          isInline
-          isLiveRegion
-          title={`If you proceed, your current session's OAuth token will be stored in a secret in the ${namespace} namespace.`}
-        >
-          This allows the import pipeline tasks to be performed with the required permissions.
-        </Alert>
-      ) : null}
+      {form.isValid ? <HostTokenAlert className={spacing.mtXl} /> : null}
     </>
   );
 };

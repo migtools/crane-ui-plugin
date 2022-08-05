@@ -5,3 +5,11 @@
 #crane-imported-apps-page a span.co-icon-and-text.crane-plr-status svg {
   vertical-align: initial !important;
 }
+
+#update-credentials-modal span.pf-c-check__body {
+  width: 100%;
+}
+
+.crane-modal .pf-c-alert__title {
+  font-size: 14px; /* This was being computed as 16px but only in modals, something about global overrides in Console CSS. Temporary workaround */
+}
