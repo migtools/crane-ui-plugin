@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Button, Modal, TextContent, Text, Checkbox } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { useLocalStorage } from 'src/common/hooks/useLocalStorage';
+import { useLocalStorage } from '@konveyor/lib-ui';
 import { useValidatedNamespace } from 'src/common/hooks/useValidatedNamespace';
 
 export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
   const { namespace } = useValidatedNamespace();
-  const [isDisabled, setIsDisabled] = useLocalStorage('isCraneWizardWelcomeModalDisabled');
-  const [isOpen, setIsOpen] = React.useState(isDisabled !== 'true');
+  const [isDisabled, setIsDisabled] = useLocalStorage('isCraneWizardWelcomeModalDisabled', false);
+  const [isOpen, setIsOpen] = React.useState(!isDisabled);
   const onClose = () => setIsOpen(false);
   return (
     <Modal
@@ -35,10 +35,8 @@ export const ImportWizardWelcomeModal: React.FunctionComponent = () => {
         className={spacing.mtMd}
         label="Don't show this again"
         id="show-again-checkbox"
-        isChecked={isDisabled === 'true'}
-        onChange={(checked: boolean) => {
-          setIsDisabled(checked ? 'true' : 'false');
-        }}
+        isChecked={isDisabled}
+        onChange={setIsDisabled}
       />
     </Modal>
   );

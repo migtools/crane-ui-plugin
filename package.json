@@ -17,7 +17,7 @@
     "lint:fix": "yarn lint --fix"
   },
   "devDependencies": {
-    "@konveyor/lib-ui": "^8.2.8",
+    "@konveyor/lib-ui": "^8.3.2",
     "@openshift-console/dynamic-plugin-sdk": "^0.0.12",
     "@openshift-console/dynamic-plugin-sdk-webpack": "0.0.7",
     "@patternfly/patternfly": "^4.196.7",
