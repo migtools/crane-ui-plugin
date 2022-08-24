@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 import { K8sResourceCommon } from '@openshift-console/dynamic-plugin-sdk';
-import { CoreNamespacedResource } from '@konveyor/lib-ui';
+import { CoreNamespacedResource } from '@migtools/lib-ui';
 import {
   getSourceClusterApiUrl,
   namespaceResource,

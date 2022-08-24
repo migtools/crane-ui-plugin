@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Modal, Stack, Flex, Button, ModalProps, ButtonProps } from '@patternfly/react-core';
-import { ResolvedQuery } from '@konveyor/lib-ui';
+import { ResolvedQuery } from '@migtools/lib-ui';
 import { UseMutationResult, UseQueryResult } from 'react-query';
 
 // TODO export this from lib-ui? part of ResolvedQueries

@@ -15,7 +15,7 @@ import {
   useSourcePVCsQuery,
   useSourceServicesQuery,
 } from 'src/api/queries/sourceResources';
-import { ResolvedQueries } from '@konveyor/lib-ui';
+import { ResolvedQueries } from '@migtools/lib-ui';
 
 export const SourceProjectDetailsStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);

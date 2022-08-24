@@ -9,7 +9,7 @@ import {
   WizardStepFunctionType,
 } from '@patternfly/react-core';
 import wizardStyles from '@patternfly/react-styles/css/components/Wizard/wizard';
-import { IFormState, ResolvedQueries } from '@konveyor/lib-ui';
+import { IFormState, ResolvedQueries } from '@migtools/lib-ui';
 import { useHistory } from 'react-router-dom';
 
 import { SourceClusterProjectStep } from './SourceClusterProjectStep';
