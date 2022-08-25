@@ -5,7 +5,7 @@ import {
   CoreClusterResourceKind,
   IFormField,
   KubeResource,
-} from '@konveyor/lib-ui';
+} from '@migtools/lib-ui';
 import { OAuthSecret } from './types/Secret';
 import { useSourceApiRootQuery } from './queries/sourceResources';
 import { secretMatchesCredentials } from './queries/secrets';

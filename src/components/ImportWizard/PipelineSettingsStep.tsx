@@ -3,7 +3,7 @@ import { TextContent, Text, Form } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
-import { ValidatedTextInput } from '@konveyor/lib-ui';
+import { ValidatedTextInput } from '@migtools/lib-ui';
 
 export const PipelineSettingsStep: React.FunctionComponent = () => {
   const forms = React.useContext(ImportWizardFormContext);

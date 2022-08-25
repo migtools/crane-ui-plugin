@@ -9,7 +9,7 @@ import {
   RowFilter,
   useListPageFilter,
 } from '@openshift-console/dynamic-plugin-sdk';
-import { ResolvedQuery, useSelectionState } from '@konveyor/lib-ui';
+import { ResolvedQuery, useSelectionState } from '@migtools/lib-ui';
 
 import { getCapacity, isSameResource } from 'src/utils/helpers';
 import { useSortState } from 'src/common/hooks/useSortState';

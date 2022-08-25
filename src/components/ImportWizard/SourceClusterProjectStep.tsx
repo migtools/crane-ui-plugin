@@ -10,7 +10,7 @@ import {
   Alert,
 } from '@patternfly/react-core';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@konveyor/lib-ui';
+import { ResolvedQueries, ValidatedPasswordInput, ValidatedTextInput } from '@migtools/lib-ui';
 
 import { ImportWizardFormContext } from './ImportWizardFormContext';
 import { useConfigureSourceSecretMutation } from 'src/api/queries/secrets';

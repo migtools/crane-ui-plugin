@@ -4,7 +4,7 @@ import { Button, Checkbox, MenuContent, MenuItem, MenuList } from '@patternfly/r
 import PencilAltIcon from '@patternfly/react-icons/dist/esm/icons/pencil-alt-icon';
 import TimesIcon from '@patternfly/react-icons/dist/esm/icons/times-icon';
 import CheckIcon from '@patternfly/react-icons/dist/esm/icons/check-icon';
-import { ValidatedTextInput } from '@konveyor/lib-ui';
+import { ValidatedTextInput } from '@migtools/lib-ui';
 
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { SimpleSelectMenu } from 'src/common/components/SimpleSelectMenu';

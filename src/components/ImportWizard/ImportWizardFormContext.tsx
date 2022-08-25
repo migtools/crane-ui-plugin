@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as yup from 'yup';
 import { isWebUri } from 'valid-url';
-import { useFormField, useFormState } from '@konveyor/lib-ui';
+import { useFormField, useFormState } from '@migtools/lib-ui';
 import { OAuthSecret } from 'src/api/types/Secret';
 import { PersistentVolumeClaim } from 'src/api/types/PersistentVolume';
 import { getCapacity } from 'src/utils/helpers';
